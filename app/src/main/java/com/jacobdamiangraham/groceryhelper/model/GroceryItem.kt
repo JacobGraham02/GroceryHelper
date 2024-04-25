@@ -6,7 +6,7 @@ data class GroceryItem(var name: String, var id: UUID,
                        var category: String, var store: String?,
                        var quantity: Int? = 1) {
 
-        init {
+    init {
             require(name.isNotBlank()) {
                 "The item must have a name"
             }
