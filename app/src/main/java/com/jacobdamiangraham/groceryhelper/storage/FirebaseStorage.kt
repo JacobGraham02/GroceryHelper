@@ -21,6 +21,7 @@ class FirebaseStorage {
 
     init {
         firebaseAuthentication = Firebase.auth
+        mutableGroceryItemList = MutableLiveData<List<GroceryItem>>()
     }
 
     fun setAuthStatusListener(listener: IAuthStatusListener) {
@@ -35,11 +36,12 @@ class FirebaseStorage {
         }
     }
 
-    private fun getCollectionOfGroceryItems() {
+    private fun getCollectionOfGroceryItems(collectionName: String) {
         val firebaseCurrentUser = Firebase.auth.currentUser
+        firebaseCollectionInstance = FirebaseFirestore.getInstance().collection(collectionName)
+        userId = "1"
         if (firebaseCurrentUser != null) {
             userId = firebaseCurrentUser.uid
-            firebaseCollectionInstance = FirebaseFirestore.getInstance().collection("groceryitems")
         }
     }
 
@@ -63,7 +65,9 @@ class FirebaseStorage {
         return groceryItemDocument.toObject(GroceryItem::class.java)
     }
 
-    fun getMutableLiveDataListOfGroceryItem(): MutableLiveData<List<GroceryItem>> {
+    fun getMutableLiveDataListOfGroceryItem(collectionName: String): MutableLiveData<List<GroceryItem>> {
+        getCollectionOfGroceryItems(collectionName)
+        getGroceryItemsFromCollection(collectionName)
         return mutableGroceryItemList
     }
 }

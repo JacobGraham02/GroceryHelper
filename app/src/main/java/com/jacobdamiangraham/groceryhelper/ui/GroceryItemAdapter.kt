@@ -9,15 +9,21 @@ import androidx.recyclerview.widget.RecyclerView
 import com.jacobdamiangraham.groceryhelper.R
 import com.jacobdamiangraham.groceryhelper.model.GroceryItem
 
-class GroceryItemAdapter(val context: Context, private val groceryItemList: List<GroceryItem>):
+class GroceryItemAdapter(val context: Context):
     RecyclerView.Adapter<GroceryItemAdapter.GroceryItemViewHolder>() {
 
         private lateinit var groceryItem: GroceryItem
         private var arrayListGroceryItems: ArrayList<View>
+        private var groceryItemList: List<GroceryItem> = emptyList()
 
         init {
             arrayListGroceryItems = ArrayList()
         }
+
+    fun updateGroceryItems(newGroceryItems: List<GroceryItem>) {
+        groceryItemList = newGroceryItems
+        notifyDataSetChanged()
+    }
 
     inner class GroceryItemViewHolder(groceryItemView: View): RecyclerView.ViewHolder(groceryItemView) {
         val groceryItemName: TextView = groceryItemView.findViewById(R.id.groceryItemNameTextView)
@@ -35,10 +41,16 @@ class GroceryItemAdapter(val context: Context, private val groceryItemList: List
     }
 
     override fun getItemCount(): Int {
-        return arrayListGroceryItems.size
+        return groceryItemList.size
     }
 
     override fun onBindViewHolder(holder: GroceryItemViewHolder, position: Int) {
-        TODO("Not yet implemented")
+        groceryItem = groceryItemList[position]
+        with(holder) {
+            groceryItemName.text = groceryItem.name
+            groceryItemAmount.text = groceryItem.quantity.toString()
+            groceryItemCost.text = "1.00"
+            groceryItemStoreName.text = groceryItem.store
+        }
     }
 }
