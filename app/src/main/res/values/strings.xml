@@ -14,4 +14,21 @@
     <string name="item_cost">Item cost</string>
     <string name="item_amount">Item amount</string>
     <string name="item_name">Item name</string>
+
+    <string name="prompt_category">Choose a category</string>
+    <string-array name="categories">
+        <item>Baking</item>
+        <item>Canned goods</item>
+        <item>Cereal</item>
+        <item>Condiment</item>
+        <item>Dairy</item>
+        <item>Deli</item>
+        <item>Meat</item>
+        <item>Pasta</item>
+        <item>Rice</item>
+        <item>Seafood</item>
+        <item>Spice</item>
+        <item>Sweet</item>
+        <item>Vegetable</item>
+    </string-array>
 </resources>
