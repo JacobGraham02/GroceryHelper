@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    tools:context=".ui.addgroceryitem.AddGroceryItemFragment"
     android:background="#FFFFFF"
     android:backgroundTint="#FFFFFF">
 
@@ -131,7 +132,7 @@
         app:layout_constraintTop_toBottomOf="@+id/itemCostLinearLayout">
 
         <TextView
-            android:id="@+id/textView5"
+            android:id="@+id/storeNameTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Store name"
@@ -141,7 +142,7 @@
             android:textStyle="bold" />
 
         <EditText
-            android:id="@+id/editTextText3"
+            android:id="@+id/addStoreName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -153,7 +154,7 @@
         android:id="@+id/addItemButtonLinearLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="40dp"
         android:gravity="center_horizontal|center_vertical"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
