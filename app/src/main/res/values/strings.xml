@@ -10,4 +10,8 @@
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
+    <string name="store_name">Store name</string>
+    <string name="item_cost">Item cost</string>
+    <string name="item_amount">Item amount</string>
+    <string name="item_name">Item name</string>
 </resources>
