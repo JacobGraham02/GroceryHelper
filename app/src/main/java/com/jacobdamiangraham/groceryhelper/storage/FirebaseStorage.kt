@@ -1,5 +1,7 @@
 package com.jacobdamiangraham.groceryhelper.storage
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -12,17 +14,12 @@ import com.jacobdamiangraham.groceryhelper.model.GroceryItem
 
 class FirebaseStorage {
 
-    private lateinit var firebaseAuthentication: FirebaseAuth
+    private var firebaseAuthentication: FirebaseAuth = Firebase.auth
     private lateinit var firebaseCollectionInstance: CollectionReference
-    private lateinit var mutableGroceryItemList: MutableLiveData<List<GroceryItem>>
+    private var mutableGroceryItemList: MutableLiveData<List<GroceryItem>> = MutableLiveData<List<GroceryItem>>()
     private lateinit var groceryItemList: ArrayList<GroceryItem>
     private lateinit var userId: String
     private var authStatusListener: IAuthStatusListener? = null
-
-    init {
-        firebaseAuthentication = Firebase.auth
-        mutableGroceryItemList = MutableLiveData<List<GroceryItem>>()
-    }
 
     fun setAuthStatusListener(listener: IAuthStatusListener) {
         this.authStatusListener = listener
@@ -45,7 +42,7 @@ class FirebaseStorage {
         }
     }
 
-    private fun getGroceryItemsFromCollection(collectionName: String) {
+    private fun getGroceryItemsFromCollection() {
         firebaseCollectionInstance.whereEqualTo("userId", userId).orderBy("itemName")
             .addSnapshotListener { groceryItemDocuments, exception ->
                 groceryItemDocuments.let {
@@ -61,13 +58,25 @@ class FirebaseStorage {
             }
     }
 
+    fun addGroceryItemToFirebase(groceryItem: GroceryItem, collectionName: String) {
+        val firebaseCurrentUser = Firebase.auth.currentUser
+        FirebaseFirestore.getInstance().collection(collectionName).document()
+            .set(groceryItem)
+            .addOnSuccessListener {
+                Log.d(TAG, "DocumentSnapshot successfully written!")
+            }
+            .addOnFailureListener {
+                error -> Log.w(TAG, "Error writing DocumentSnapshot to Firebase: ${error}")
+            }
+    }
+
     private fun convertJsonToGroceryItemObjects(groceryItemDocument: QueryDocumentSnapshot): GroceryItem {
         return groceryItemDocument.toObject(GroceryItem::class.java)
     }
 
     fun getMutableLiveDataListOfGroceryItem(collectionName: String): MutableLiveData<List<GroceryItem>> {
         getCollectionOfGroceryItems(collectionName)
-        getGroceryItemsFromCollection(collectionName)
+        getGroceryItemsFromCollection()
         return mutableGroceryItemList
     }
 }
