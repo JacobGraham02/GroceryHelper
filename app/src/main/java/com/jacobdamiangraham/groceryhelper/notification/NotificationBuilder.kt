@@ -38,7 +38,7 @@ class NotificationBuilder(private val context: Context) {
     private fun createNotification(notificationName: String, notificationDescription: String): NotificationCompat.Builder {
         createNotificationChannel()
         val notificationBuilder: NotificationCompat.Builder = NotificationCompat.Builder(context, notificationChannelId)
-            .setSmallIcon(R.drawable.ic_menu_camera)
+            .setSmallIcon(R.drawable.grocery_helper_app_icon_mdpi)
             .setContentTitle(notificationName)
             .setContentText(notificationDescription)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
