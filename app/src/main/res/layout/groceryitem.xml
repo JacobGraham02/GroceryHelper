@@ -1,55 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.widget.LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/verticalLinearLayout"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:layout_gravity="center_horizontal"
     android:layout_margin="5dp"
     android:clickable="true"
-    android:focusable="true">
+    android:focusable="true"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/horizontalLinearLayout"
-        android:layout_width="410dp"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:padding="1dp">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/itemNameTextLabel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:padding="2dp"
+            android:text="Name"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/groceryItemNameTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:layout_marginEnd="6dp"
-            android:text="@string/item_name" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:text="@string/item_name"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/itemQuantityLabel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:padding="2dp"
+            android:text="Quantity"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/groceryItemAmountTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:text="@string/item_amount" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:text="@string/item_amount"
+            android:textSize="18sp" />
+
+        <ImageView
+            android:id="@+id/arrowIndicator"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:clickable="true"
+            android:contentDescription="This is an indicator arrow"
+            android:focusable="true"
+            android:foregroundGravity="left"
+            android:padding="4dp"
+            android:src="@drawable/expanddetailsicon" />
+
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/linearLayoutAdditionalInformation"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:padding="1dp">
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/itemCostLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="Cost"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/itemCostTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:layout_marginEnd="6dp"
-            android:text="@string/item_cost" />
+            android:gravity="center_horizontal"
+            android:text="@string/item_cost"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/itemStoreNameLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:padding="2dp"
+            android:text="Store"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/storeNameTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:text="@string/store_name" />
+            android:gravity="center_horizontal"
+            android:text="@string/store_name"
+            android:textSize="18sp" />
     </LinearLayout>
 </android.widget.LinearLayout>
