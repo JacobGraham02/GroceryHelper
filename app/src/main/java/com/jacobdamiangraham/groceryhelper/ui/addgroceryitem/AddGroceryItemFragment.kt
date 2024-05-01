@@ -28,6 +28,7 @@ class AddGroceryItemFragment: Fragment() {
 
         _binding = FragmentAddGroceryItemBinding.inflate(inflater, container, false)
         val root: View = binding.root
+        viewModel = ViewModelProvider(this).get(AddGroceryItemViewModel::class.java)
 
         val textView: TextView = binding.addItemPageLabel
         addGroceryItemViewModel.text.observe(viewLifecycleOwner) {

@@ -1,8 +1,6 @@
 package com.jacobdamiangraham.groceryhelper.model
 
-import java.util.UUID
-
-data class GroceryItem(var name: String, var id: UUID,
+data class GroceryItem(var name: String, var id: String,
                        var category: String, var store: String?,
                        var quantity: Int? = 1, var cost: Float?) {
 
@@ -16,11 +14,11 @@ data class GroceryItem(var name: String, var id: UUID,
             require(store?.isNotBlank() ?: true) {
                 "The store the item is located in must not be blank"
             }
-            require(quantity!! >= 1) {
+            require((quantity ?: 1) >= 1) {
                 "The quantity of item must be larger than 0"
             }
-            require(cost!! > 0.00) {
-                "The cost of item must be greater than $0.00"
+            require((cost ?: 0.00f) >= 0.00f) {
+                "The cost of item must be greater than or equal to $0.00"
             }
         }
 
@@ -57,10 +55,6 @@ data class GroceryItem(var name: String, var id: UUID,
             "The new store for this grocery item must not be blank"
         }
         store = newStore;
-    }
-
-    fun getGroceryItem():GroceryItem {
-        return this
     }
 
     override fun toString(): String {

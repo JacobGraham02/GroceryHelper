@@ -1,6 +1,5 @@
 package com.jacobdamiangraham.groceryhelper.storage
 
-import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
@@ -12,7 +11,7 @@ import com.google.firebase.ktx.Firebase
 import com.jacobdamiangraham.groceryhelper.interfaces.IAuthStatusListener
 import com.jacobdamiangraham.groceryhelper.model.GroceryItem
 
-class FirebaseStorage {
+class FirebaseStorage(collectionName: String? = "groceryitems") {
 
     private var firebaseAuthentication: FirebaseAuth = Firebase.auth
     private lateinit var firebaseCollectionInstance: CollectionReference
@@ -20,6 +19,12 @@ class FirebaseStorage {
     private lateinit var groceryItemList: ArrayList<GroceryItem>
     private lateinit var userId: String
     private var authStatusListener: IAuthStatusListener? = null
+
+    init {
+        if (collectionName != null) {
+            getCollectionOfGroceryItems(collectionName)
+        }
+    }
 
     fun setAuthStatusListener(listener: IAuthStatusListener) {
         this.authStatusListener = listener
@@ -58,15 +63,17 @@ class FirebaseStorage {
             }
     }
 
-    fun addGroceryItemToFirebase(groceryItem: GroceryItem, collectionName: String) {
+    fun addGroceryItemToFirebase(groceryItem: GroceryItem) {
         val firebaseCurrentUser = Firebase.auth.currentUser
-        FirebaseFirestore.getInstance().collection(collectionName).document()
+        Log.w("Firebase add grocery item", "Add grocery item")
+        firebaseCollectionInstance
+            .document(groceryItem.id.toString())
             .set(groceryItem)
             .addOnSuccessListener {
-                Log.d(TAG, "DocumentSnapshot successfully written!")
+                Log.w("Success writing Firebase object", "GroceryItem was successfully written to the database")
             }
             .addOnFailureListener {
-                error -> Log.w(TAG, "Error writing DocumentSnapshot to Firebase: ${error}")
+                Log.w("Error writing Firebase object", "GroceryItem could not be written to the database")
             }
     }
 
@@ -75,7 +82,6 @@ class FirebaseStorage {
     }
 
     fun getMutableLiveDataListOfGroceryItem(collectionName: String): MutableLiveData<List<GroceryItem>> {
-        getCollectionOfGroceryItems(collectionName)
         getGroceryItemsFromCollection()
         return mutableGroceryItemList
     }

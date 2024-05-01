@@ -14,8 +14,8 @@ class AddGroceryItemViewModel: ViewModel() {
     fun addGroceryItemToFirebase(name: String, category: String, store: String, quantity: Int, cost: Float) {
         if (validateInput(name, category, store, quantity, cost)) {
             val groceryItemUUID = UUID.randomUUID()
-            val newGroceryItem = GroceryItem(name, groceryItemUUID, category, store, quantity, cost)
-            firebaseStorage.addGroceryItemToFirebase(newGroceryItem, "groceryitems")
+            val newGroceryItem = GroceryItem(name, groceryItemUUID.toString(), category, store, quantity, cost)
+            firebaseStorage.addGroceryItemToFirebase(newGroceryItem)
         }
     }
 
