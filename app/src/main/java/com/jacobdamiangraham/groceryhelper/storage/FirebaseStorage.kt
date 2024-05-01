@@ -48,7 +48,10 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
     }
 
     private fun getGroceryItemsFromCollection() {
+        /*
         firebaseCollectionInstance.whereEqualTo("userId", userId).orderBy("itemName")
+         */
+        firebaseCollectionInstance
             .addSnapshotListener { groceryItemDocuments, exception ->
                 groceryItemDocuments.let {
                     groceryItemList = ArrayList()
@@ -65,7 +68,6 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
 
     fun addGroceryItemToFirebase(groceryItem: GroceryItem) {
         val firebaseCurrentUser = Firebase.auth.currentUser
-        Log.w("Firebase add grocery item", "Add grocery item")
         firebaseCollectionInstance
             .document(groceryItem.id.toString())
             .set(groceryItem)
@@ -81,7 +83,7 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
         return groceryItemDocument.toObject(GroceryItem::class.java)
     }
 
-    fun getMutableLiveDataListOfGroceryItem(collectionName: String): MutableLiveData<List<GroceryItem>> {
+    fun getMutableLiveDataListOfGroceryItem(): MutableLiveData<List<GroceryItem>> {
         getGroceryItemsFromCollection()
         return mutableGroceryItemList
     }

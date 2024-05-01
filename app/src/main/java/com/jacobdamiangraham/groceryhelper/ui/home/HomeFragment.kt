@@ -1,6 +1,7 @@
 package com.jacobdamiangraham.groceryhelper.ui.home
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -42,10 +43,8 @@ class HomeFragment : Fragment() {
             adapter.updateGroceryItems(items)
         })
 
-//        val textView: TextView = binding.yourGroceryListTextView
-//        homeViewModel.text.observe(viewLifecycleOwner) {
-//            textView.text = it
-//        }
+        Log.w("ApplicationLogs", "${viewModel.groceryItems.value}")
+
         return root
     }
 

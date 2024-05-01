@@ -1,8 +1,8 @@
 package com.jacobdamiangraham.groceryhelper.model
 
-data class GroceryItem(var name: String, var id: String,
-                       var category: String, var store: String?,
-                       var quantity: Int? = 1, var cost: Float?) {
+data class GroceryItem(var name: String = "undefined", var id: String = "undefined",
+                       var category: String = "undefined", var store: String? = "undefined",
+                       var quantity: Int? = 1, var cost: Float? = 0.00f) {
 
     init {
             require(name.isNotBlank()) {
@@ -20,7 +20,7 @@ data class GroceryItem(var name: String, var id: String,
             require((cost ?: 0.00f) >= 0.00f) {
                 "The cost of item must be greater than or equal to $0.00"
             }
-        }
+    }
 
     fun updateQuantity(newQuantity: Int) {
         require(newQuantity >= 1) {

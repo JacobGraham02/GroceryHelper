@@ -30,7 +30,6 @@ class GroceryItemAdapter(val context: Context):
         val groceryItemAmount: TextView = groceryItemView.findViewById(R.id.groceryItemAmountTextView)
         val groceryItemCost: TextView = groceryItemView.findViewById(R.id.itemCostTextView)
         val groceryItemStoreName: TextView = groceryItemView.findViewById(R.id.storeNameTextView)
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GroceryItemViewHolder {
@@ -50,7 +49,7 @@ class GroceryItemAdapter(val context: Context):
         with(holder) {
             groceryItemName.text = groceryItem.name
             groceryItemAmount.text = groceryItem.quantity.toString()
-            groceryItemCost.text = "1.00"
+            groceryItemCost.text = groceryItem.cost.toString()
             groceryItemStoreName.text = groceryItem.store
         }
     }

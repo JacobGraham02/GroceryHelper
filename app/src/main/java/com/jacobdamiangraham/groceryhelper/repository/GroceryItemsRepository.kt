@@ -7,7 +7,7 @@ import com.jacobdamiangraham.groceryhelper.storage.FirebaseStorage
 class GroceryItemsRepository(private val firebaseStorageInstance: FirebaseStorage) {
 
     fun getMutableListOfGroceryItems(): MutableLiveData<List<GroceryItem>> {
-        val firebaseCollectionItems = firebaseStorageInstance.getMutableLiveDataListOfGroceryItem("groceryitems")
+        val firebaseCollectionItems = firebaseStorageInstance.getMutableLiveDataListOfGroceryItem()
         return firebaseCollectionItems
     }
 }
