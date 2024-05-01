@@ -9,14 +9,21 @@ import java.util.UUID
 
 class AddGroceryItemViewModel: ViewModel() {
 
+    private val _selectedGroceryItem = MutableLiveData<GroceryItem>()
+    val selectedGroceryItem: LiveData<GroceryItem> = _selectedGroceryItem
+
     private val firebaseStorage: FirebaseStorage = FirebaseStorage()
 
     fun addGroceryItemToFirebase(name: String, category: String, store: String, quantity: Int, cost: Float) {
         if (validateInput(name, category, store, quantity, cost)) {
             val groceryItemUUID = UUID.randomUUID()
-            val newGroceryItem = GroceryItem(name, groceryItemUUID, category, store, quantity, cost)
-            firebaseStorage.addGroceryItemToFirebase(newGroceryItem, "groceryitems")
+            val newGroceryItem = GroceryItem(name, groceryItemUUID.toString(), category, store, quantity, cost)
+            firebaseStorage.addGroceryItemToFirebase(newGroceryItem)
         }
+    }
+    
+    fun setSelectedGroceryItem(groceryItem: GroceryItem) {
+        _selectedGroceryItem.value = groceryItem
     }
 
     private fun validateInput(name: String, category: String, store: String, quantity: Int, cost: Float): Boolean {
