@@ -11,7 +11,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.jacobdamiangraham.groceryhelper.R
 import com.jacobdamiangraham.groceryhelper.model.GroceryItem
 
-class GroceryItemAdapter(val context: Context):
+class GroceryItemAdapter(
+    private val context: Context,
+    private val onItemClick: (GroceryItem) -> Unit):
     RecyclerView.Adapter<GroceryItemAdapter.GroceryItemViewHolder>() {
 
         private lateinit var groceryItem: GroceryItem
@@ -50,6 +52,9 @@ class GroceryItemAdapter(val context: Context):
 
     override fun onBindViewHolder(holder: GroceryItemViewHolder, position: Int) {
         groceryItem = groceryItemList[position]
+        holder.itemView.setOnClickListener {
+            onItemClick(groceryItem)
+        }
         with(holder) {
             var isExpanded = false
             groceryItemName.text = groceryItem.name

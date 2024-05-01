@@ -9,7 +9,38 @@
         android:id="@+id/nav_home"
         android:name="com.jacobdamiangraham.groceryhelper.ui.home.HomeFragment"
         android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home">
+
+        <action
+            android:id="@+id/actionHomeFragmentToAddGroceryItemFragment"
+            app:destination="@id/nav_add_grocery_item">
+            <argument
+                android:name="groceryItemId"
+                app:argType="string"
+                android:defaultValue="undefined"/>
+            <argument
+                android:name="groceryItemName"
+                app:argType="string"
+                android:defaultValue="undefined"/>
+            <argument
+                android:name="groceryItemCategory"
+                app:argType="string"
+                android:defaultValue="undefined"/>
+            <argument
+                android:name="groceryItemStore"
+                app:argType="string"
+                android:defaultValue="undefined"/>
+            <argument
+                android:name="groceryItemQuantity"
+                app:argType="integer"
+                android:defaultValue="1"/>
+            <argument
+                android:name="groceryItemCost"
+                app:argType="float"
+                android:defaultValue="0.00"/>
+        </action>
+    </fragment>
+
 
     <fragment
         android:id="@+id/nav_gallery"
@@ -22,9 +53,35 @@
         android:name="com.jacobdamiangraham.groceryhelper.ui.slideshow.SlideshowFragment"
         android:label="@string/menu_slideshow"
         tools:layout="@layout/fragment_slideshow" />
+
     <fragment
         android:id="@+id/nav_add_grocery_item"
         android:name="com.jacobdamiangraham.groceryhelper.ui.addgroceryitem.AddGroceryItemFragment"
-        android:label="fragment_add_grocery_item"
-        tools:layout="@layout/fragment_add_grocery_item" />
+        android:label="AddGroceryItemFragment"
+        tools:layout="@layout/fragment_add_grocery_item">
+        <argument
+            android:name="groceryItemId"
+            app:argType="string"
+            android:defaultValue="undefined"/>
+        <argument
+            android:name="groceryItemName"
+            app:argType="string"
+            android:defaultValue="undefined"/>
+        <argument
+            android:name="groceryItemCategory"
+            app:argType="string"
+            android:defaultValue="undefined"/>
+        <argument
+            android:name="groceryItemStore"
+            app:argType="string"
+            android:defaultValue="undefined"/>
+        <argument
+            android:name="groceryItemQuantity"
+            app:argType="integer"
+            android:defaultValue="1"/>
+        <argument
+            android:name="groceryItemCost"
+            app:argType="float"
+            android:defaultValue="0.00"/>
+    </fragment>
 </navigation>

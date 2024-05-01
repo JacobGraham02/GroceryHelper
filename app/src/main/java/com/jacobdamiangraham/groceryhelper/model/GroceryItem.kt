@@ -4,6 +4,8 @@ data class GroceryItem(var name: String = "undefined", var id: String = "undefin
                        var category: String = "undefined", var store: String? = "undefined",
                        var quantity: Int? = 1, var cost: Float? = 0.00f) {
 
+    constructor() : this("undefined", "undefined", "undefined", "undefined", 1, 0.00f)
+
     init {
             require(name.isNotBlank()) {
                 "The item must have a name"
