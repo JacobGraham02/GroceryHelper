@@ -5,12 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.navArgs
 import com.jacobdamiangraham.groceryhelper.R
 import com.jacobdamiangraham.groceryhelper.databinding.FragmentAddGroceryItemBinding
-import com.jacobdamiangraham.groceryhelper.model.GroceryItem
 
 class AddGroceryItemFragment: Fragment() {
 
@@ -24,39 +23,51 @@ class AddGroceryItemFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val addGroceryItemViewModel = ViewModelProvider(this)
-            .get(AddGroceryItemViewModel::class.java)
-
+        viewModel = ViewModelProvider(this)[AddGroceryItemViewModel::class.java]
         _binding = FragmentAddGroceryItemBinding.inflate(inflater, container, false)
         val root: View = binding.root
-        viewModel = ViewModelProvider(this).get(AddGroceryItemViewModel::class.java)
 
-        val groceryItemArgs = AddGroceryItemFragmentArgs.fromBundle(requireArguments())
-        viewModel.setSelectedGroceryItem(
-            GroceryItem(
-                name = groceryItemArgs.groceryItemName,
-                id = groceryItemArgs.groceryItemId,
-                category = groceryItemArgs.groceryItemCategory,
-                store = groceryItemArgs.groceryItemStore,
-                quantity = groceryItemArgs.groceryItemQuantity,
-                cost = groceryItemArgs.groceryItemCost
-            )
-        )
+        val groceryItemArgs: AddGroceryItemFragmentArgs by navArgs()
+        val groceryItemId = groceryItemArgs.groceryItemId
+        val groceryItemName = groceryItemArgs.groceryItemName
+        val groceryItemCategory = groceryItemArgs.groceryItemCategory
+        val groceryItemStore = groceryItemArgs.groceryItemStore
+        val groceryItemQuantity = groceryItemArgs.groceryItemQuantity
+        val groceryItemCost = groceryItemArgs.groceryItemCost
 
-        val textView: TextView = binding.addItemPageLabel
-        addGroceryItemViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
-        }
-
-        setupObservers()
         setupCategorySpinner()
+
+        val categoryAdapter = binding.addGroceryItemCategorySpinner.adapter as ArrayAdapter<String>
+        val categoryPosition = categoryAdapter.getPosition(groceryItemCategory)
+
+        binding.addItemName.setText(groceryItemName)
+        binding.addItemQuantity.setText(groceryItemQuantity.toString())
+        binding.addItemCost.setText(String.format("%.2f", groceryItemCost))
+        binding.addStoreName.setText(groceryItemStore)
+        binding.addGroceryItemCategorySpinner.setSelection(categoryPosition)
+
         setupAddItemButton()
 
         return root
     }
 
+    /*
+    Android MVVM code commented out as of May 01, 2024. I get DeadObjectExceptions when attempting to observe the MutableLiveData object that contains
+    the data for the grocery item. I have to manually set the input boxes inside of the onCreateView instead of dynamically setting them by using
+    the observers. This will be corrected once I find a fix.
+
+        viewModel.setGroceryItem(
+            GroceryItem(
+                groceryItemName,
+                groceryItemId,
+                groceryItemCategory,
+                groceryItemStore,
+                groceryItemQuantity,
+                groceryItemCost
+            )
+        )
     private fun setupObservers() {
-        viewModel.selectedGroceryItem.observe(viewLifecycleOwner) { item ->
+        viewModel.liveDataGroceryItem.observe(viewLifecycleOwner) { item ->
             val categoriesAdapter =
                 binding.addGroceryItemCategorySpinner.adapter as ArrayAdapter<String>
             val categoryPosition = categoriesAdapter.getPosition(item.category)
@@ -67,6 +78,7 @@ class AddGroceryItemFragment: Fragment() {
             binding.addGroceryItemCategorySpinner.setSelection(categoryPosition)
         }
     }
+    */
 
     private fun setupAddItemButton() {
         binding.addItemButton.setOnClickListener {
@@ -98,6 +110,7 @@ class AddGroceryItemFragment: Fragment() {
     }
 
     override fun onDestroyView() {
+        viewModel.liveDataGroceryItem.removeObservers(viewLifecycleOwner)
         super.onDestroyView()
         _binding = null
     }

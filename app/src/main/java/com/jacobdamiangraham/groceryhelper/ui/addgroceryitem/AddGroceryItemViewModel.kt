@@ -3,14 +3,18 @@ package com.jacobdamiangraham.groceryhelper.ui.addgroceryitem
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.jacobdamiangraham.groceryhelper.model.GroceryItem
 import com.jacobdamiangraham.groceryhelper.storage.FirebaseStorage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 class AddGroceryItemViewModel: ViewModel() {
 
-    private val _selectedGroceryItem = MutableLiveData<GroceryItem>()
-    val selectedGroceryItem: LiveData<GroceryItem> = _selectedGroceryItem
+    private val _mutableLiveDataGroceryItem = MutableLiveData<GroceryItem>()
+
+    val liveDataGroceryItem: LiveData<GroceryItem> = _mutableLiveDataGroceryItem
 
     private val firebaseStorage: FirebaseStorage = FirebaseStorage()
 
@@ -18,20 +22,27 @@ class AddGroceryItemViewModel: ViewModel() {
         if (validateInput(name, category, store, quantity, cost)) {
             val groceryItemUUID = UUID.randomUUID()
             val newGroceryItem = GroceryItem(name, groceryItemUUID.toString(), category, store, quantity, cost)
-            firebaseStorage.addGroceryItemToFirebase(newGroceryItem)
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    firebaseStorage.addGroceryItemToFirebase(newGroceryItem)
+                } catch (e: Exception) {
+                    // Handle any exceptions, possibly re-throw on main thread or use postValue to update an error message LiveData
+                }
+            }
         }
     }
-    
-    fun setSelectedGroceryItem(groceryItem: GroceryItem) {
-        _selectedGroceryItem.value = groceryItem
+
+    /*
+      Android MVVM code commented out as of May 01, 2024. I get DeadObjectExceptions when attempting to observe the MutableLiveData object that contains
+    the data for the grocery item. I have to manually set the input boxes inside of the onCreateView instead of dynamically setting them by using
+    the observers. This will be corrected once I find a fix.
+
+    fun setGroceryItem(groceryItem: GroceryItem) {
+        _mutableLiveDataGroceryItem.value = groceryItem
     }
+    */
 
     private fun validateInput(name: String, category: String, store: String, quantity: Int, cost: Float): Boolean {
         return name.isNotBlank() && category.isNotBlank() && store.isNotBlank() && quantity >= 1 && cost > 0.00
     }
-
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is the add grocery item fragment"
-    }
-    val text: LiveData<String> = _text
 }

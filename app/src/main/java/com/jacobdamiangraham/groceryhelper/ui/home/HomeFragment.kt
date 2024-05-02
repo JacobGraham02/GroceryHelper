@@ -39,17 +39,19 @@ class HomeFragment : Fragment() {
             val groceryItemId = selectedGroceryItem.id
             val groceryItemName = selectedGroceryItem.name
             val groceryItemCategory = selectedGroceryItem.category
-            val groceryItemStore = selectedGroceryItem.store
-            val groceryItemQuantity = selectedGroceryItem.quantity
-            val groceryItemCost = selectedGroceryItem.cost
+            val groceryItemStore = selectedGroceryItem.store ?: "undefined"
+            val groceryItemQuantity = selectedGroceryItem.quantity ?: 1
+            val groceryItemCost = selectedGroceryItem.cost ?: 0.00f
+
             val action = HomeFragmentDirections.actionHomeFragmentToAddGroceryItemFragment(
                 groceryItemId,
                 groceryItemName,
                 groceryItemCategory,
-                groceryItemStore!!,
-                groceryItemQuantity!!,
-                groceryItemCost!!
+                groceryItemStore,
+                groceryItemQuantity,
+                groceryItemCost
             )
+
             try {
                 if (isAdded && findNavController().currentDestination?.id == R.id.nav_home) {
                     findNavController().navigate(action)
@@ -71,8 +73,8 @@ class HomeFragment : Fragment() {
         return root
     }
 
-//    override fun onDestroyView() {
-//        super.onDestroyView()
-//        _binding = null
-//    }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }
