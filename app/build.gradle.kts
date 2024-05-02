@@ -38,8 +38,8 @@ android {
 }
 
 dependencies {
-    implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
-    implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
     implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
     implementation(libs.androidx.core.ktx.v1130)
     implementation(libs.androidx.core.ktx)
@@ -53,7 +53,17 @@ dependencies {
     implementation(libs.firebase.messaging)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.firestore.ktx)
+    implementation(libs.androidx.annotation)
+    implementation(libs.androidx.activity)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.firestore.ktx)
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.android.gms:play-services-auth:21.1.0")
+    implementation("androidx.credentials:credentials:1.3.0-alpha03")
+    implementation("androidx.credentials:credentials-play-services-auth:1.3.0-alpha03")
+    implementation(libs.firebase.ui.auth)
 }
