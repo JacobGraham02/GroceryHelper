@@ -45,7 +45,6 @@ class HomeFragment : Fragment() {
             binding.yourGroceryListTextView.text = getString(R.string.grocery_list_title, "food basics")
         }
 
-
         viewModel = ViewModelProvider(this, viewModelFactory).get(GroceryViewModel::class.java)
 
         adapter = GroceryItemAdapter(requireContext()) { selectedGroceryItem ->
