@@ -20,6 +20,16 @@
         <item
             android:id="@+id/nav_add_grocery_item"
             android:icon="@drawable/ic_menu_camera"
-            android:title="Add item to list" />
+            android:title="@string/add_item_to_list" />
+
+        <item
+            android:id="@+id/nav_food_basics_list"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/food_basics"/>
+
+        <item
+            android:id="@+id/nav_zehrs_list"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/zehrs"/>
     </group>
 </menu>

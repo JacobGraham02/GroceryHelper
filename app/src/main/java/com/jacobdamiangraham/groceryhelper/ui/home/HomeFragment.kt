@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jacobdamiangraham.groceryhelper.R
 import com.jacobdamiangraham.groceryhelper.databinding.FragmentHomeBinding
+import com.jacobdamiangraham.groceryhelper.factory.GroceryViewModelFactory
 import com.jacobdamiangraham.groceryhelper.ui.GroceryItemAdapter
 import com.jacobdamiangraham.groceryhelper.viewmodel.GroceryViewModel
 
@@ -18,6 +19,7 @@ class HomeFragment : Fragment() {
 
     private lateinit var viewModel: GroceryViewModel
     private lateinit var adapter: GroceryItemAdapter
+    private lateinit var viewModelFactory: GroceryViewModelFactory
 
     private var _binding: FragmentHomeBinding? = null
 
@@ -33,23 +35,35 @@ class HomeFragment : Fragment() {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        viewModel = ViewModelProvider(this).get(GroceryViewModel::class.java)
+        val storeName = arguments?.getString("storeName")
+
+        if (storeName != null && (storeName == "food basics" || storeName == "zehrs")) {
+            viewModelFactory = GroceryViewModelFactory(storeName)
+            binding.yourGroceryListTextView.text = getString(R.string.grocery_list_title, storeName)
+        } else {
+            viewModelFactory = GroceryViewModelFactory("food basics")
+            binding.yourGroceryListTextView.text = getString(R.string.grocery_list_title, "food basics")
+        }
+
+        viewModel = ViewModelProvider(this, viewModelFactory).get(GroceryViewModel::class.java)
 
         adapter = GroceryItemAdapter(requireContext()) { selectedGroceryItem ->
             val groceryItemId = selectedGroceryItem.id
             val groceryItemName = selectedGroceryItem.name
             val groceryItemCategory = selectedGroceryItem.category
-            val groceryItemStore = selectedGroceryItem.store
-            val groceryItemQuantity = selectedGroceryItem.quantity
-            val groceryItemCost = selectedGroceryItem.cost
+            val groceryItemStore = selectedGroceryItem.store ?: "undefined"
+            val groceryItemQuantity = selectedGroceryItem.quantity ?: 1
+            val groceryItemCost = selectedGroceryItem.cost ?: 0.00f
+
             val action = HomeFragmentDirections.actionHomeFragmentToAddGroceryItemFragment(
                 groceryItemId,
                 groceryItemName,
                 groceryItemCategory,
-                groceryItemStore!!,
-                groceryItemQuantity!!,
-                groceryItemCost!!
+                groceryItemStore,
+                groceryItemQuantity,
+                groceryItemCost
             )
+
             try {
                 if (isAdded && findNavController().currentDestination?.id == R.id.nav_home) {
                     findNavController().navigate(action)
@@ -66,13 +80,11 @@ class HomeFragment : Fragment() {
             adapter.updateGroceryItems(items)
         })
 
-        Log.w("ApplicationLogs", "${viewModel.groceryItems.value}")
-
         return root
     }
 
-//    override fun onDestroyView() {
-//        super.onDestroyView()
-//        _binding = null
-//    }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }
