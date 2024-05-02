@@ -3,6 +3,7 @@ package com.jacobdamiangraham.groceryhelper
 import android.os.Bundle
 import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -45,6 +46,22 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow, R.id.nav_add_grocery_item), drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+        navView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_food_basics_list -> {
+                    val bundle = bundleOf("storeName" to "food basics")
+                    navController.navigate(R.id.nav_home, bundle)
+                }
+                R.id.nav_zehrs_list -> {
+                    val bundle = bundleOf("storeName" to "zehrs")
+                    navController.navigate(R.id.nav_home, bundle)
+                }
+            }
+            menuItem.isChecked = true
+            drawerLayout.closeDrawers()
+            true
+        }
 
         displayNotification("Test notification title", "Test notification description")
     }

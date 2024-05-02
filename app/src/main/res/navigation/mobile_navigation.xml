@@ -10,7 +10,10 @@
         android:name="com.jacobdamiangraham.groceryhelper.ui.home.HomeFragment"
         android:label="@string/menu_home"
         tools:layout="@layout/fragment_home">
-
+        <argument
+            android:name="storeName"
+            app:argType="string"
+            android:defaultValue="undefined"/>
         <action
             android:id="@+id/actionHomeFragmentToAddGroceryItemFragment"
             app:destination="@id/nav_add_grocery_item">

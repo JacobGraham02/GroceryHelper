@@ -19,6 +19,7 @@ class HomeFragment : Fragment() {
 
     private lateinit var viewModel: GroceryViewModel
     private lateinit var adapter: GroceryItemAdapter
+    private lateinit var viewModelFactory: GroceryViewModelFactory
 
     private var _binding: FragmentHomeBinding? = null
 
@@ -34,7 +35,17 @@ class HomeFragment : Fragment() {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val viewModelFactory = GroceryViewModelFactory("food basics")
+        val storeName = arguments?.getString("storeName")
+
+        if (storeName != null && (storeName == "food basics" || storeName == "zehrs")) {
+            viewModelFactory = GroceryViewModelFactory(storeName)
+            binding.yourGroceryListTextView.text = getString(R.string.grocery_list_title, storeName)
+        } else {
+            viewModelFactory = GroceryViewModelFactory("food basics")
+            binding.yourGroceryListTextView.text = getString(R.string.grocery_list_title, "food basics")
+        }
+
+
         viewModel = ViewModelProvider(this, viewModelFactory).get(GroceryViewModel::class.java)
 
         adapter = GroceryItemAdapter(requireContext()) { selectedGroceryItem ->
@@ -69,8 +80,6 @@ class HomeFragment : Fragment() {
         viewModel.groceryItems.observe(viewLifecycleOwner, { items ->
             adapter.updateGroceryItems(items)
         })
-
-        Log.w("ApplicationLogs", "${viewModel.groceryItems.value}")
 
         return root
     }
