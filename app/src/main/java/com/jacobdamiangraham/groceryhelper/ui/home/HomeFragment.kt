@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jacobdamiangraham.groceryhelper.R
 import com.jacobdamiangraham.groceryhelper.databinding.FragmentHomeBinding
+import com.jacobdamiangraham.groceryhelper.factory.GroceryViewModelFactory
 import com.jacobdamiangraham.groceryhelper.ui.GroceryItemAdapter
 import com.jacobdamiangraham.groceryhelper.viewmodel.GroceryViewModel
 
@@ -33,7 +34,8 @@ class HomeFragment : Fragment() {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        viewModel = ViewModelProvider(this).get(GroceryViewModel::class.java)
+        val viewModelFactory = GroceryViewModelFactory("food basics")
+        viewModel = ViewModelProvider(this, viewModelFactory).get(GroceryViewModel::class.java)
 
         adapter = GroceryItemAdapter(requireContext()) { selectedGroceryItem ->
             val groceryItemId = selectedGroceryItem.id

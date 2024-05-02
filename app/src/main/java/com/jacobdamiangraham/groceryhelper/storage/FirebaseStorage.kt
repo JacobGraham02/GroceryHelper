@@ -47,11 +47,12 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
         }
     }
 
-    private fun getGroceryItemsFromCollection() {
+    private fun getGroceryItemsFromCollection(storeName: String?) {
         /*
         firebaseCollectionInstance.whereEqualTo("userId", userId).orderBy("itemName")
          */
         firebaseCollectionInstance
+            .whereEqualTo("store", storeName)
             .addSnapshotListener { groceryItemDocuments, exception ->
                 groceryItemDocuments.let {
                     groceryItemList = ArrayList()
@@ -83,8 +84,8 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
         return groceryItemDocument.toObject(GroceryItem::class.java)
     }
 
-    fun getMutableLiveDataListOfGroceryItem(): MutableLiveData<List<GroceryItem>> {
-        getGroceryItemsFromCollection()
+    fun getMutableLiveDataListOfGroceryItem(storeName: String?): MutableLiveData<List<GroceryItem>> {
+        getGroceryItemsFromCollection(storeName)
         return mutableGroceryItemList
     }
 }

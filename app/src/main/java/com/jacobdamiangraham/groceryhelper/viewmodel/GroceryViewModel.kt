@@ -6,9 +6,9 @@ import com.jacobdamiangraham.groceryhelper.model.GroceryItem
 import com.jacobdamiangraham.groceryhelper.repository.GroceryItemsRepository
 import com.jacobdamiangraham.groceryhelper.storage.FirebaseStorage
 
-class GroceryViewModel: ViewModel() {
+class GroceryViewModel(storeName: String? = "food basics"): ViewModel() {
     private val firebaseStorage: FirebaseStorage = FirebaseStorage()
     private val repository = GroceryItemsRepository(firebaseStorage)
 
-    val groceryItems: LiveData<List<GroceryItem>> = repository.getMutableListOfGroceryItems()
+    val groceryItems: LiveData<List<GroceryItem>> = repository.getMutableListOfGroceryItems(storeName)
 }
