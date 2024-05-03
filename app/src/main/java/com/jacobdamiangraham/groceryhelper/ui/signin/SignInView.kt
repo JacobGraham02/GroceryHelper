@@ -9,6 +9,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.jacobdamiangraham.groceryhelper.MainActivity
 import com.jacobdamiangraham.groceryhelper.databinding.ActivitySigninBinding
 import com.jacobdamiangraham.groceryhelper.ui.register.RegisterView
+import com.jacobdamiangraham.groceryhelper.utils.ValidationUtil
 
 class SignInView : AppCompatActivity() {
 
@@ -50,6 +51,17 @@ class SignInView : AppCompatActivity() {
                 Toast.LENGTH_LONG)
                 .show()
             return
+        }
+
+        val validEmail = ValidationUtil.isValidEmailAddress(email)
+        val validPassword = ValidationUtil.isValidPassword(password)
+
+        if (!validEmail || !validPassword) {
+            Toast.makeText(
+                this,
+                "Please enter a valid email and password",
+                Toast.LENGTH_LONG)
+                .show()
         }
 
         firebaseAuthentication.signInWithEmailAndPassword(email, password)
