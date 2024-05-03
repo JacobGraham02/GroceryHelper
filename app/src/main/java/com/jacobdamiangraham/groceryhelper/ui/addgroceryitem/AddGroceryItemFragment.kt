@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
@@ -26,26 +27,65 @@ class AddGroceryItemFragment: Fragment() {
         viewModel = ViewModelProvider(this)[AddGroceryItemViewModel::class.java]
         _binding = FragmentAddGroceryItemBinding.inflate(inflater, container, false)
         val root: View = binding.root
-
         val groceryItemArgs: AddGroceryItemFragmentArgs by navArgs()
-        val groceryItemId = groceryItemArgs.groceryItemId
-        val groceryItemName = groceryItemArgs.groceryItemName
+
+        val groceryItemValueConditions = mapOf(
+            0 to { item: Any? -> item != null && item.toString() != "undefined" }, // Name
+            1 to { item: Any? -> item != null && item != 1 },                      // Quantity
+            2 to { item: Any? -> item != null && item != 0.00 },                   // Cost
+            3 to { item: Any? -> item != null && item.toString() != "undefined" }  // Store
+        )
+
+        val arrayListBindingElements = arrayListOf(
+            binding.addItemName,
+            binding.addItemQuantity,
+            binding.addItemCost,
+            binding.addStoreName)
+
+        val arrayListGroceryItemArgs = arrayListOf(
+            groceryItemArgs.groceryItemName,
+            groceryItemArgs.groceryItemQuantity,
+            groceryItemArgs.groceryItemCost,
+            groceryItemArgs.groceryItemStore,
+        )
+
+        val arrayListGroceryItemCategory = arrayListOf(
+            "Baking",
+            "Canned goods",
+            "Cereal",
+            "Condiments",
+            "Dairy",
+            "Deli",
+            "Meat",
+            "Pasta",
+            "Rice",
+            "Seafood",
+            "Spice",
+            "Sweet",
+            "Vegetable"
+        )
+
+        for (index in arrayListBindingElements.indices) {
+            val editText: EditText = arrayListBindingElements[index]
+            val itemValue = arrayListGroceryItemArgs[index]
+
+            groceryItemValueConditions[index]?.let { condition ->
+                if (condition(itemValue)) {
+                    editText.setText(itemValue.toString())
+                }
+            }
+        }
+
         val groceryItemCategory = groceryItemArgs.groceryItemCategory
-        val groceryItemStore = groceryItemArgs.groceryItemStore
-        val groceryItemQuantity = groceryItemArgs.groceryItemQuantity
-        val groceryItemCost = groceryItemArgs.groceryItemCost
+
+        if (arrayListGroceryItemCategory.contains(groceryItemCategory)) {
+            val categoryAdapter =
+                binding.addGroceryItemCategorySpinner.adapter as ArrayAdapter<String>
+            val categoryPosition = categoryAdapter.getPosition(groceryItemCategory)
+            binding.addGroceryItemCategorySpinner.setSelection(categoryPosition)
+        }
 
         setupCategorySpinner()
-
-        val categoryAdapter = binding.addGroceryItemCategorySpinner.adapter as ArrayAdapter<String>
-        val categoryPosition = categoryAdapter.getPosition(groceryItemCategory)
-
-        binding.addItemName.setText(groceryItemName)
-        binding.addItemQuantity.setText(groceryItemQuantity.toString())
-        binding.addItemCost.setText(String.format("%.2f", groceryItemCost))
-        binding.addStoreName.setText(groceryItemStore)
-        binding.addGroceryItemCategorySpinner.setSelection(categoryPosition)
-
         setupAddItemButton()
 
         return root

@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(setOf(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow, R.id.nav_add_grocery_item), drawerLayout)
+                R.id.nav_home, R.id.nav_add_grocery_item), drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
@@ -56,6 +56,12 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_zehrs_list -> {
                     val bundle = bundleOf("storeName" to "zehrs")
                     navController.navigate(R.id.nav_home, bundle)
+                }
+                R.id.nav_add_grocery_item -> {
+                    navController.navigate(R.id.nav_add_grocery_item)
+                }
+                R.id.nav_home -> {
+                    navController.navigate(R.id.nav_home)
                 }
             }
             menuItem.isChecked = true

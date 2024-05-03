@@ -46,18 +46,6 @@
 
 
     <fragment
-        android:id="@+id/nav_gallery"
-        android:name="com.jacobdamiangraham.groceryhelper.ui.gallery.GalleryFragment"
-        android:label="@string/menu_gallery"
-        tools:layout="@layout/fragment_gallery" />
-
-    <fragment
-        android:id="@+id/nav_slideshow"
-        android:name="com.jacobdamiangraham.groceryhelper.ui.slideshow.SlideshowFragment"
-        android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
-
-    <fragment
         android:id="@+id/nav_add_grocery_item"
         android:name="com.jacobdamiangraham.groceryhelper.ui.addgroceryitem.AddGroceryItemFragment"
         android:label="AddGroceryItemFragment"
