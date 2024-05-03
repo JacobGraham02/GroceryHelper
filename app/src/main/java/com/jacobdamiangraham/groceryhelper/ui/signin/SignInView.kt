@@ -8,35 +8,40 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.jacobdamiangraham.groceryhelper.MainActivity
 import com.jacobdamiangraham.groceryhelper.databinding.ActivitySigninBinding
+import com.jacobdamiangraham.groceryhelper.ui.register.RegisterView
 
 class SignInView : AppCompatActivity() {
 
-    private lateinit var activitySigninBinding: ActivitySigninBinding
+    private lateinit var activitySignInBinding: ActivitySigninBinding
     private lateinit var firebaseAuthentication: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        activitySigninBinding = ActivitySigninBinding.inflate(layoutInflater)
-        setContentView(activitySigninBinding.root)
+        activitySignInBinding = ActivitySigninBinding.inflate(layoutInflater)
+        setContentView(activitySignInBinding.root)
 
         firebaseAuthentication = FirebaseAuth.getInstance()
 
-        activitySigninBinding.signInButton.setOnClickListener {
+        activitySignInBinding.signInButton.setOnClickListener {
             attemptLogin()
         }
 
-        activitySigninBinding.clearEmailFieldButton.setOnClickListener {
-            activitySigninBinding.emailInputField.text.clear()
+        activitySignInBinding.clearEmailFieldButton.setOnClickListener {
+            activitySignInBinding.emailInputField.text.clear()
         }
 
-        activitySigninBinding.clearPasswordFieldButton.setOnClickListener {
-            activitySigninBinding.passwordInputField.text.clear()
+        activitySignInBinding.clearPasswordFieldButton.setOnClickListener {
+            activitySignInBinding.passwordInputField.text.clear()
+        }
+
+        activitySignInBinding.registerAccountButton.setOnClickListener {
+            redirectToRegisterActivity()
         }
     }
 
     private fun attemptLogin() {
-        val email = activitySigninBinding.emailInputField.text.toString().trim()
-        val password = activitySigninBinding.passwordInputField.text.toString().trim()
+        val email = activitySignInBinding.emailInputField.text.toString().trim()
+        val password = activitySignInBinding.passwordInputField.text.toString().trim()
 
         if (email.isEmpty() || password.isEmpty()) {
             Toast.makeText(
@@ -69,5 +74,11 @@ class SignInView : AppCompatActivity() {
             startActivity(mainActivityIntent)
             finish()
         }
+    }
+
+    private fun redirectToRegisterActivity() {
+        val registerActivityIntent = Intent(this, RegisterView::class.java)
+        startActivity(registerActivityIntent)
+        finish()
     }
 }
