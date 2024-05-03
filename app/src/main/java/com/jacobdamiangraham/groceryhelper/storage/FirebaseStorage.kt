@@ -9,12 +9,15 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QueryDocumentSnapshot
 import com.google.firebase.ktx.Firebase
 import com.jacobdamiangraham.groceryhelper.interfaces.IAuthStatusListener
+import com.jacobdamiangraham.groceryhelper.interfaces.IUserLoginCallback
+import com.jacobdamiangraham.groceryhelper.interfaces.IUserRegistrationCallback
 import com.jacobdamiangraham.groceryhelper.model.GroceryItem
 
 class FirebaseStorage(collectionName: String? = "groceryitems") {
 
     private var firebaseAuthentication: FirebaseAuth = Firebase.auth
-    private lateinit var firebaseCollectionInstance: CollectionReference
+    private lateinit var firebaseGroceryItemCollectionInstance: CollectionReference
+    private lateinit var firebaseUserCollectionInstance: CollectionReference
     private var mutableGroceryItemList: MutableLiveData<List<GroceryItem>> = MutableLiveData<List<GroceryItem>>()
     private lateinit var groceryItemList: ArrayList<GroceryItem>
     private lateinit var userId: String
@@ -22,7 +25,18 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
 
     init {
         if (collectionName != null) {
-            getCollectionOfGroceryItems(collectionName)
+            getCollectionOfItems(collectionName)
+        }
+    }
+
+    private fun getCollectionOfItems(collectionName: String) {
+        when (collectionName) {
+            "groceryitems" -> {
+                getCollectionOfGroceryItems("groceryitems")
+            }
+            "users" -> {
+                getCollectionOfUsers("users")
+            }
         }
     }
 
@@ -40,18 +54,23 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
 
     private fun getCollectionOfGroceryItems(collectionName: String) {
         val firebaseCurrentUser = Firebase.auth.currentUser
-        firebaseCollectionInstance = FirebaseFirestore.getInstance().collection(collectionName)
+        firebaseGroceryItemCollectionInstance = FirebaseFirestore.getInstance().collection(collectionName)
         userId = "1"
         if (firebaseCurrentUser != null) {
             userId = firebaseCurrentUser.uid
         }
     }
 
+    private fun getCollectionOfUsers(collectionName: String) {
+        val firebaseCurrentUser = Firebase.auth.currentUser
+        firebaseUserCollectionInstance = FirebaseFirestore.getInstance().collection(collectionName)
+    }
+
     private fun getGroceryItemsFromCollection(storeName: String?) {
         /*
-        firebaseCollectionInstance.whereEqualTo("userId", userId).orderBy("itemName")
+        firebaseGroceryItemCollectionInstance.whereEqualTo("userId", userId).orderBy("itemName")
          */
-        firebaseCollectionInstance
+        firebaseGroceryItemCollectionInstance
             .whereEqualTo("store", storeName)
             .addSnapshotListener { groceryItemDocuments, exception ->
                 groceryItemDocuments.let {
@@ -67,10 +86,53 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
             }
     }
 
+    fun registerUserInFirebase(email: String, password: String, callback: IUserRegistrationCallback) {
+        firebaseAuthentication.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener { completedCreateUserTask ->
+                if (completedCreateUserTask.isSuccessful) {
+                    val firebaseUser = completedCreateUserTask.result?.user
+                    if (firebaseUser != null) {
+                        Log.w("ApplicationLogs", "Firebase user when registering user is not null")
+                        val firebaseUserUid = firebaseUser.uid
+
+                        val user = hashMapOf(
+                            "email" to email,
+                            "uid" to firebaseUser.uid,
+                        )
+                        FirebaseFirestore.getInstance().collection("users")
+                            .document(firebaseUserUid)
+                            .set(user)
+                            .addOnSuccessListener {
+                                callback.onRegistrationSuccess("Registration successful")
+                            }
+                            .addOnFailureListener { exception ->
+                                callback.onRegistrationFailure("Registration failure: ${exception.message}")
+                            }
+                    } else {
+                        callback.onRegistrationFailure("User registration failed. Please try again")
+                    }
+                } else {
+                    throw IllegalArgumentException(completedCreateUserTask.exception)
+                }
+            }
+    }
+
+    fun logInUserWithFirebase(email: String, password: String, callback: IUserLoginCallback) {
+        firebaseAuthentication.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener { completedLogInUserTask ->
+                if (completedLogInUserTask.isSuccessful) {
+                    val firebaseUser = firebaseAuthentication.currentUser
+                    callback.onLoginSuccess("You logged in successfully")
+                } else {
+                    callback.onLoginFailure("Unable to log you in")
+                }
+            }
+    }
+
     fun addGroceryItemToFirebase(groceryItem: GroceryItem) {
         val firebaseCurrentUser = Firebase.auth.currentUser
-        firebaseCollectionInstance
-            .document(groceryItem.id.toString())
+        firebaseGroceryItemCollectionInstance
+            .document(groceryItem.id)
             .set(groceryItem)
             .addOnSuccessListener {
                 Log.w("Success writing Firebase object", "GroceryItem was successfully written to the database")
