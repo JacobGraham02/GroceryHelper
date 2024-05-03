@@ -55,7 +55,6 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
     private fun getCollectionOfGroceryItems(collectionName: String) {
         val firebaseCurrentUser = Firebase.auth.currentUser
         firebaseGroceryItemCollectionInstance = FirebaseFirestore.getInstance().collection(collectionName)
-        userId = "1"
         if (firebaseCurrentUser != null) {
             userId = firebaseCurrentUser.uid
         }
