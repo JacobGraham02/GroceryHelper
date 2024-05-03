@@ -59,7 +59,7 @@
 
             <EditText
                 android:id="@+id/emailInputField"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="2dp"
                 android:autofillHints="Type your email"
@@ -92,7 +92,7 @@
 
             <EditText
                 android:id="@+id/passwordInputField"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="2dp"
                 android:autofillHints="Type your password"
@@ -125,7 +125,7 @@
 
             <EditText
                 android:id="@+id/confirmPasswordInputField"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="@string/required_confirm_password"

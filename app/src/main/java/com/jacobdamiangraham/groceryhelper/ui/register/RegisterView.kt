@@ -123,6 +123,7 @@ class RegisterView: AppCompatActivity() {
                 "Password and confirm password do not match",
                 Toast.LENGTH_LONG)
                 .show()
+            return
         }
 
         val validEmail = ValidationUtil.isValidEmailAddress(email)
@@ -134,6 +135,7 @@ class RegisterView: AppCompatActivity() {
                 "Please enter a valid email and password",
                 Toast.LENGTH_LONG)
                 .show()
+            return
         }
 
         firebaseAuthentication.createUserWithEmailAndPassword(email, password)
