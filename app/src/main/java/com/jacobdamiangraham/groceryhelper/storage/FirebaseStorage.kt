@@ -9,6 +9,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QueryDocumentSnapshot
 import com.google.firebase.ktx.Firebase
 import com.jacobdamiangraham.groceryhelper.interfaces.IAuthStatusListener
+import com.jacobdamiangraham.groceryhelper.interfaces.IUserLoginCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserRegistrationCallback
 import com.jacobdamiangraham.groceryhelper.model.GroceryItem
 
@@ -111,11 +112,22 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
                         callback.onRegistrationFailure("User registration failed. Please try again")
                     }
                 } else {
-                    callback.onRegistrationFailure("User registration failed. Please try again")
+                    throw IllegalArgumentException(completedCreateUserTask.exception)
                 }
             }
     }
 
+    fun logInUserWithFirebase(email: String, password: String, callback: IUserLoginCallback) {
+        firebaseAuthentication.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener { completedLogInUserTask ->
+                if (completedLogInUserTask.isSuccessful) {
+                    val firebaseUser = firebaseAuthentication.currentUser
+                    callback.onLoginSuccess("You logged in successfully")
+                } else {
+                    callback.onLoginFailure("Unable to log you in")
+                }
+            }
+    }
 
     fun addGroceryItemToFirebase(groceryItem: GroceryItem) {
         val firebaseCurrentUser = Firebase.auth.currentUser

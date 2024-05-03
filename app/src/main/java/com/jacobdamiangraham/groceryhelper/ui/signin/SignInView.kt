@@ -7,26 +7,24 @@ import android.text.TextWatcher
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.jacobdamiangraham.groceryhelper.MainActivity
 import com.jacobdamiangraham.groceryhelper.R
 import com.jacobdamiangraham.groceryhelper.databinding.ActivitySigninBinding
 import com.jacobdamiangraham.groceryhelper.enums.InputType
+import com.jacobdamiangraham.groceryhelper.interfaces.IUserLoginCallback
+import com.jacobdamiangraham.groceryhelper.storage.FirebaseStorage
 import com.jacobdamiangraham.groceryhelper.ui.register.RegisterView
 import com.jacobdamiangraham.groceryhelper.utils.ValidationUtil
 
 class SignInView : AppCompatActivity() {
 
     private lateinit var activitySignInBinding: ActivitySigninBinding
-    private lateinit var firebaseAuthentication: FirebaseAuth
+    private val firebaseStorage: FirebaseStorage = FirebaseStorage("users")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         activitySignInBinding = ActivitySigninBinding.inflate(layoutInflater)
         setContentView(activitySignInBinding.root)
-
-        firebaseAuthentication = FirebaseAuth.getInstance()
 
         activitySignInBinding.signInButton.setOnClickListener {
             attemptLogin()
@@ -102,7 +100,8 @@ class SignInView : AppCompatActivity() {
             Toast.makeText(
                 this,
                 "Both the email and password field must not be empty",
-                Toast.LENGTH_LONG)
+                Toast.LENGTH_LONG
+            )
                 .show()
             return
         }
@@ -114,32 +113,37 @@ class SignInView : AppCompatActivity() {
             Toast.makeText(
                 this,
                 "Please enter a valid email and password",
-                Toast.LENGTH_LONG)
+                Toast.LENGTH_LONG
+            )
                 .show()
         }
 
-        firebaseAuthentication.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this) {signInTask ->
-                if (signInTask.isSuccessful) {
-                    val firebaseUser = firebaseAuthentication.currentUser
-                    redirectToMainActivity(firebaseUser)
-                } else {
-                    Toast.makeText(
-                        this,
-                        "Your user account could not be found. Please try again",
-                        Toast.LENGTH_LONG)
-                        .show()
-                    return@addOnCompleteListener
-                }
+        firebaseStorage.logInUserWithFirebase(email, password, object : IUserLoginCallback {
+            override fun onLoginSuccess(successMessage: String) {
+                Toast.makeText(
+                    this@SignInView,
+                    successMessage,
+                    Toast.LENGTH_LONG
+                )
+                    .show()
+                redirectToMainActivity()
             }
+
+            override fun onLoginFailure(failureMessage: String) {
+                Toast.makeText(
+                    this@SignInView,
+                    failureMessage,
+                    Toast.LENGTH_LONG
+                )
+                    .show()
+            }
+        })
     }
 
-    private fun redirectToMainActivity(firebaseUser: FirebaseUser?) {
-        if (firebaseUser != null) {
-            val mainActivityIntent = Intent(this, MainActivity::class.java)
-            startActivity(mainActivityIntent)
-            finish()
-        }
+    private fun redirectToMainActivity() {
+        val mainActivityIntent = Intent(this, MainActivity::class.java)
+        startActivity(mainActivityIntent)
+        finish()
     }
 
     private fun redirectToRegisterActivity() {

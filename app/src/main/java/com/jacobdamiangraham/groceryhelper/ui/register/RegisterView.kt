@@ -147,6 +147,7 @@ class RegisterView: AppCompatActivity() {
                     Toast.LENGTH_LONG
                 )
                     .show()
+                backToLoginActivity()
             }
 
             override fun onRegistrationFailure(errorMessage: String) {
