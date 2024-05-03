@@ -7,17 +7,18 @@ import android.text.TextWatcher
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.google.firebase.auth.FirebaseAuth
 import com.jacobdamiangraham.groceryhelper.R
 import com.jacobdamiangraham.groceryhelper.databinding.ActivityRegisterBinding
 import com.jacobdamiangraham.groceryhelper.enums.InputType
+import com.jacobdamiangraham.groceryhelper.interfaces.IUserRegistrationCallback
+import com.jacobdamiangraham.groceryhelper.storage.FirebaseStorage
 import com.jacobdamiangraham.groceryhelper.ui.signin.SignInView
 import com.jacobdamiangraham.groceryhelper.utils.ValidationUtil
 
 class RegisterView: AppCompatActivity() {
 
-    private lateinit var firebaseAuthentication: FirebaseAuth
     private lateinit var activityRegisterBinding: ActivityRegisterBinding
+    private val firebaseStorage: FirebaseStorage = FirebaseStorage("users")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -138,24 +139,25 @@ class RegisterView: AppCompatActivity() {
             return
         }
 
-        firebaseAuthentication.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this) { completedCreateUserTask ->
-                if (completedCreateUserTask.isSuccessful) {
-                    Toast.makeText(
-                        this,
-                        "Registration successful. Redirecting to login...",
-                        Toast.LENGTH_LONG)
-                        .show()
-                    backToLoginActivity()
-                } else {
-                    Toast.makeText(
-                        this,
-                        "Registration failed. Please try again",
-                        Toast.LENGTH_LONG)
-                        .show()
-                    return@addOnCompleteListener
-                }
+        firebaseStorage.registerUserInFirebase(email, password, object : IUserRegistrationCallback {
+            override fun onRegistrationSuccess(successMessage: String) {
+                Toast.makeText(
+                    this@RegisterView,
+                    successMessage,
+                    Toast.LENGTH_LONG
+                )
+                    .show()
             }
+
+            override fun onRegistrationFailure(errorMessage: String) {
+                Toast.makeText(
+                    this@RegisterView,
+                    errorMessage,
+                    Toast.LENGTH_LONG
+                )
+                    .show()
+            }
+        })
     }
 
     private fun backToLoginActivity() {
