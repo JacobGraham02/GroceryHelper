@@ -7,7 +7,6 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QueryDocumentSnapshot
 import com.google.firebase.ktx.Firebase
 import com.jacobdamiangraham.groceryhelper.interfaces.IAddGroceryItemCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IAuthStatusListener
@@ -63,29 +62,69 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
     }
 
     private fun getCollectionOfUsers(collectionName: String) {
-        val firebaseCurrentUser = Firebase.auth.currentUser
         firebaseUserCollectionInstance = FirebaseFirestore.getInstance().collection(collectionName)
     }
 
     private fun getGroceryItemsFromCollection(storeName: String?) {
+        val currentFirebaseUser = Firebase.auth.currentUser
+        if (currentFirebaseUser != null) {
+            val firebaseUserId = currentFirebaseUser.uid
+            firebaseUserCollectionInstance
+                .document(firebaseUserId)
+                .get()
+                .addOnSuccessListener { userDocument ->
+                    val groceryItems = userDocument.get("groceryItems") as? List<Map<String, Any>>
+                    if (groceryItems != null) {
+                        val groceryItemList = ArrayList<GroceryItem>()
+                        for (groceryItemMap in groceryItems) {
+                            val groceryItem = convertJsonToGroceryItemObjects(groceryItemMap)
+                            groceryItemList.add(groceryItem)
+                        }
+                        mutableGroceryItemList.value = groceryItemList
+                    }
+                }
+        }
+    }
+
+    private fun convertJsonToGroceryItemObjects(groceryItemMap: Map<String, Any>): GroceryItem {
+        return GroceryItem(
+            name = groceryItemMap["name"] as String,
+            id = groceryItemMap["id"] as String,
+            category = groceryItemMap["category"] as String,
+            store = groceryItemMap["store"] as String,
+            quantity = (groceryItemMap["quantity"] as Number).toInt(),
+            cost = (groceryItemMap["cost"] as Number).toFloat(),
+        )
+    }
+
+//    private fun convertJsonToGroceryItemObjects(groceryItemMap: Map<String, Any>): GroceryItem {
+//        return GroceryItem(
+//            id = groceryItemMap["id"] as String,
+//            name = groceryItemMap["name"] as String,
+//            category = groceryItemMap["category"] as String,
+//            quantity = (groceryItemMap["quantity"] as Number).toInt(),
+//            cost = (groceryItemMap["cost"] as Number).toDouble(),
+//            store = groceryItemMap["store"] as String
+//        )
+//    }
         /*
         firebaseGroceryItemCollectionInstance.whereEqualTo("userId", userId).orderBy("itemName")
          */
-        firebaseGroceryItemCollectionInstance
-            .whereEqualTo("store", storeName)
-            .addSnapshotListener { groceryItemDocuments, exception ->
-                groceryItemDocuments.let {
-                    groceryItemList = ArrayList()
-                    if (groceryItemDocuments != null) {
-                        for (groceryItemDocument in groceryItemDocuments) {
-                            val groceryItem = convertJsonToGroceryItemObjects(groceryItemDocument)
-                            groceryItemList.add(groceryItem)
-                        }
-                    }
-                    mutableGroceryItemList.value = groceryItemList
-                }
-            }
-    }
+//        firebaseGroceryItemCollectionInstance
+//            .whereEqualTo("store", storeName)
+//            .addSnapshotListener { groceryItemDocuments, exception ->
+//                groceryItemDocuments.let {
+//                    groceryItemList = ArrayList()
+//                    if (groceryItemDocuments != null) {
+//                        for (groceryItemDocument in groceryItemDocuments) {
+//                            val groceryItem = convertJsonToGroceryItemObjects(groceryItemDocument)
+//                            groceryItemList.add(groceryItem)
+//                        }
+//                    }
+//                    mutableGroceryItemList.value = groceryItemList
+//                }
+//            }
+
 
     fun registerUserInFirebase(email: String, password: String, callback: IUserRegistrationCallback) {
         firebaseAuthentication.createUserWithEmailAndPassword(email, password)
@@ -150,10 +189,6 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
         } else {
             callback.onAddFailure("You are not logged in")
         }
-    }
-
-    private fun convertJsonToGroceryItemObjects(groceryItemDocument: QueryDocumentSnapshot): GroceryItem {
-        return groceryItemDocument.toObject(GroceryItem::class.java)
     }
 
     fun getMutableLiveDataListOfGroceryItem(storeName: String?): MutableLiveData<List<GroceryItem>> {

@@ -25,7 +25,7 @@ class AddGroceryItemFragment: Fragment() {
 
     private lateinit var viewModel: AddGroceryItemViewModel
 
-    private val firebaseStorage: FirebaseStorage = FirebaseStorage("groceryitems")
+    private val firebaseStorage: FirebaseStorage = FirebaseStorage("users")
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,6 +35,7 @@ class AddGroceryItemFragment: Fragment() {
         viewModel = ViewModelProvider(this)[AddGroceryItemViewModel::class.java]
         _binding = FragmentAddGroceryItemBinding.inflate(inflater, container, false)
         val root: View = binding.root
+
         val groceryItemArgs: AddGroceryItemFragmentArgs by navArgs()
 
         val groceryItemValueConditions = mapOf(
@@ -56,6 +57,8 @@ class AddGroceryItemFragment: Fragment() {
             groceryItemArgs.groceryItemCost,
             groceryItemArgs.groceryItemStore,
         )
+
+        val groceryItemCategory = groceryItemArgs.groceryItemCategory
 
         val arrayListGroceryItemCategory = arrayListOf(
             "Baking",
@@ -84,7 +87,8 @@ class AddGroceryItemFragment: Fragment() {
             }
         }
 
-        val groceryItemCategory = groceryItemArgs.groceryItemCategory
+        setupCategorySpinner()
+        setupAddItemButton()
 
         if (arrayListGroceryItemCategory.contains(groceryItemCategory)) {
             val categoryAdapter =
@@ -92,9 +96,6 @@ class AddGroceryItemFragment: Fragment() {
             val categoryPosition = categoryAdapter.getPosition(groceryItemCategory)
             binding.addGroceryItemCategorySpinner.setSelection(categoryPosition)
         }
-
-        setupCategorySpinner()
-        setupAddItemButton()
 
         return root
     }
