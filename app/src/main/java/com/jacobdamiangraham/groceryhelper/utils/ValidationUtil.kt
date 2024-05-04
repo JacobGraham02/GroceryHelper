@@ -21,4 +21,24 @@ object ValidationUtil {
     fun isValidPassword(password: String): Boolean {
         return password.matches(passwordRegex.toRegex())
     }
+
+    fun isValidGroceryItemString(value: String): Boolean {
+        return value.isNotBlank()
+    }
+
+    private fun isValidQuantity(quantity: Int): Boolean {
+        return quantity >= 1
+    }
+
+    private fun isValidCost(cost: Float): Boolean {
+        return cost >= 0.01
+    }
+
+    fun validateGroceryItemInputs(itemName: String, quantity: Int, category: String, store: String, cost: Float): Boolean {
+        return  isValidGroceryItemString(itemName) &&
+                isValidGroceryItemString(category) &&
+                isValidGroceryItemString(store) &&
+                isValidQuantity(quantity) &&
+                isValidCost(cost)
+    }
 }

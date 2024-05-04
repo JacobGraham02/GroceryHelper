@@ -5,9 +5,11 @@ import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QueryDocumentSnapshot
 import com.google.firebase.ktx.Firebase
+import com.jacobdamiangraham.groceryhelper.interfaces.IAddGroceryItemCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IAuthStatusListener
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserLoginCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserRegistrationCallback
@@ -128,17 +130,26 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
             }
     }
 
-    fun addGroceryItemToFirebase(groceryItem: GroceryItem) {
-        val firebaseCurrentUser = Firebase.auth.currentUser
-        firebaseGroceryItemCollectionInstance
-            .document(groceryItem.id)
-            .set(groceryItem)
-            .addOnSuccessListener {
-                Log.w("Success writing Firebase object", "GroceryItem was successfully written to the database")
-            }
-            .addOnFailureListener {
-                Log.w("Error writing Firebase object", "GroceryItem could not be written to the database")
-            }
+    fun addGroceryItemToFirebase(groceryItem: GroceryItem, callback: IAddGroceryItemCallback) {
+        val currentFirebaseUser = Firebase.auth.currentUser
+        val currentFirebaseUserUid = currentFirebaseUser?.uid
+
+        if (currentFirebaseUserUid != null) {
+            val userDocumentReference =
+                FirebaseFirestore
+                    .getInstance()
+                    .collection("users")
+                    .document(currentFirebaseUserUid)
+            userDocumentReference.update("groceryItems", FieldValue.arrayUnion(groceryItem))
+                .addOnSuccessListener {
+                    callback.onAddSuccess("Grocery item added successfully")
+                }
+                .addOnFailureListener {
+                    callback.onAddFailure("Failed to add grocery item")
+                }
+        } else {
+            callback.onAddFailure("You are not logged in")
+        }
     }
 
     private fun convertJsonToGroceryItemObjects(groceryItemDocument: QueryDocumentSnapshot): GroceryItem {

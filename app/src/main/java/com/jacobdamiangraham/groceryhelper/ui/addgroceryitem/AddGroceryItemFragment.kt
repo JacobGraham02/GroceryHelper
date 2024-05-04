@@ -6,11 +6,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.EditText
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
 import com.jacobdamiangraham.groceryhelper.R
 import com.jacobdamiangraham.groceryhelper.databinding.FragmentAddGroceryItemBinding
+import com.jacobdamiangraham.groceryhelper.interfaces.IAddGroceryItemCallback
+import com.jacobdamiangraham.groceryhelper.model.GroceryItem
+import com.jacobdamiangraham.groceryhelper.storage.FirebaseStorage
+import com.jacobdamiangraham.groceryhelper.utils.ValidationUtil
+import java.util.UUID
 
 class AddGroceryItemFragment: Fragment() {
 
@@ -18,6 +24,8 @@ class AddGroceryItemFragment: Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var viewModel: AddGroceryItemViewModel
+
+    private val firebaseStorage: FirebaseStorage = FirebaseStorage("groceryitems")
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -122,19 +130,61 @@ class AddGroceryItemFragment: Fragment() {
 
     private fun setupAddItemButton() {
         binding.addItemButton.setOnClickListener {
-            val groceryItemName = binding.addItemName.text.toString()
-            val groceryItemQuantity = binding.addItemQuantity.text.toString().toInt()
-            val groceryItemCost = binding.addItemCost.text.toString().toFloat()
-            val groceryItemStore = binding.addStoreName.text.toString()
-            val groceryItemCategory = binding.addGroceryItemCategorySpinner.selectedItem.toString()
+            val groceryItemName = binding.addItemName.text?.toString() ?: ""
+            val groceryItemQuantity = binding.addItemQuantity.text?.toString()?.toIntOrNull() ?: 0
+            val groceryItemCost = binding.addItemCost.text?.toString()?.toFloatOrNull() ?: 0.0f
+            val groceryItemStore = binding.addStoreName.text?.toString() ?: ""
+            val groceryItemCategory = binding.addGroceryItemCategorySpinner.selectedItem?.toString() ?: ""
 
-            viewModel.addGroceryItemToFirebase(
+            if (!(ValidationUtil.validateGroceryItemInputs(
+                    groceryItemName,
+                    groceryItemQuantity,
+                    groceryItemCategory,
+                    groceryItemStore,
+                    groceryItemCost))) {
+
+                Toast.makeText(
+                    context,
+                    "Please enter valid data",
+                    Toast.LENGTH_LONG)
+                    .show()
+                return@setOnClickListener
+            }
+
+            val groceryItemUUID = UUID.randomUUID()
+            val newGroceryItem = GroceryItem(
                 groceryItemName,
+                groceryItemUUID.toString(),
                 groceryItemCategory,
                 groceryItemStore,
                 groceryItemQuantity,
-                groceryItemCost
-            )
+                groceryItemCost)
+
+            try {
+                firebaseStorage.addGroceryItemToFirebase(
+                    newGroceryItem,
+                    object : IAddGroceryItemCallback {
+                        override fun onAddSuccess(successMessage: String) {
+                            Toast.makeText(
+                                context,
+                                successMessage,
+                                Toast.LENGTH_LONG
+                            )
+                                .show()
+                        }
+
+                        override fun onAddFailure(failureMessage: String) {
+                            Toast.makeText(
+                                context,
+                                failureMessage,
+                                Toast.LENGTH_LONG
+                            )
+                                .show()
+                        }
+                    })
+            } catch (e: Exception) {
+                throw Error("There was an error when attempting to insert grocery item into firebase: ${e}")
+            }
         }
     }
 
