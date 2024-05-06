@@ -1,7 +1,8 @@
 package com.jacobdamiangraham.groceryhelper
 
+import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.drawerlayout.widget.DrawerLayout
@@ -13,13 +14,17 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.jacobdamiangraham.groceryhelper.databinding.ActivityMainBinding
+import com.jacobdamiangraham.groceryhelper.interfaces.IUserLogoutCallback
 import com.jacobdamiangraham.groceryhelper.notification.NotificationBuilder
+import com.jacobdamiangraham.groceryhelper.storage.FirebaseStorage
+import com.jacobdamiangraham.groceryhelper.ui.signin.SignInView
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private lateinit var notificationBuilder: NotificationBuilder
+    private val firebaseStorage: FirebaseStorage = FirebaseStorage("users")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,6 +68,27 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_home -> {
                     navController.navigate(R.id.nav_home)
                 }
+                R.id.nav_log_out_icon -> {
+                    firebaseStorage.logoutWithFirebase(object: IUserLogoutCallback {
+                        override fun onLogoutSuccess(successMessage: String) {
+                            Toast.makeText(
+                                this@MainActivity,
+                                successMessage,
+                                Toast.LENGTH_LONG
+                            ).show()
+                            redirectToSignInScreen()
+                        }
+
+                        override fun onLogoutFailure(failureMessage: String) {
+                            Toast.makeText(
+                                this@MainActivity,
+                                failureMessage,
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+
+                    })
+                }
             }
             menuItem.isChecked = true
             drawerLayout.closeDrawers()
@@ -72,14 +98,14 @@ class MainActivity : AppCompatActivity() {
         displayNotification("Test notification title", "Test notification description")
     }
 
-    private fun displayNotification(title: String, description: String) {
-        notificationBuilder.displayNotification(title, description)
+    private fun redirectToSignInScreen() {
+        val signInActivityIntent = Intent(this, SignInView::class.java)
+        startActivity(signInActivityIntent)
+        finish()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.main, menu)
-        return true
+    private fun displayNotification(title: String, description: String) {
+        notificationBuilder.displayNotification(title, description)
     }
 
     override fun onSupportNavigateUp(): Boolean {

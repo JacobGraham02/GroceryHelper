@@ -11,6 +11,7 @@ import com.google.firebase.ktx.Firebase
 import com.jacobdamiangraham.groceryhelper.interfaces.IAddGroceryItemCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IAuthStatusListener
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserLoginCallback
+import com.jacobdamiangraham.groceryhelper.interfaces.IUserLogoutCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserRegistrationCallback
 import com.jacobdamiangraham.groceryhelper.model.GroceryItem
 
@@ -97,35 +98,6 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
         )
     }
 
-//    private fun convertJsonToGroceryItemObjects(groceryItemMap: Map<String, Any>): GroceryItem {
-//        return GroceryItem(
-//            id = groceryItemMap["id"] as String,
-//            name = groceryItemMap["name"] as String,
-//            category = groceryItemMap["category"] as String,
-//            quantity = (groceryItemMap["quantity"] as Number).toInt(),
-//            cost = (groceryItemMap["cost"] as Number).toDouble(),
-//            store = groceryItemMap["store"] as String
-//        )
-//    }
-        /*
-        firebaseGroceryItemCollectionInstance.whereEqualTo("userId", userId).orderBy("itemName")
-         */
-//        firebaseGroceryItemCollectionInstance
-//            .whereEqualTo("store", storeName)
-//            .addSnapshotListener { groceryItemDocuments, exception ->
-//                groceryItemDocuments.let {
-//                    groceryItemList = ArrayList()
-//                    if (groceryItemDocuments != null) {
-//                        for (groceryItemDocument in groceryItemDocuments) {
-//                            val groceryItem = convertJsonToGroceryItemObjects(groceryItemDocument)
-//                            groceryItemList.add(groceryItem)
-//                        }
-//                    }
-//                    mutableGroceryItemList.value = groceryItemList
-//                }
-//            }
-
-
     fun registerUserInFirebase(email: String, password: String, callback: IUserRegistrationCallback) {
         firebaseAuthentication.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { completedCreateUserTask ->
@@ -188,6 +160,15 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
                 }
         } else {
             callback.onAddFailure("You are not logged in")
+        }
+    }
+
+    fun logoutWithFirebase(callback: IUserLogoutCallback) {
+        try {
+            firebaseAuthentication.signOut()
+            callback.onLogoutSuccess("You have successfully logged out")
+        } catch (e: Exception) {
+            callback.onLogoutFailure("Failed to log out. Try again")
         }
     }
 

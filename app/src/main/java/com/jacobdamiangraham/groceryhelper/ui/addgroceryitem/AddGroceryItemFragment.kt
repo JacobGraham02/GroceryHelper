@@ -105,35 +105,6 @@ class AddGroceryItemFragment: Fragment() {
         return root
     }
 
-    /*
-    Android MVVM code commented out as of May 01, 2024. I get DeadObjectExceptions when attempting to observe the MutableLiveData object that contains
-    the data for the grocery item. I have to manually set the input boxes inside of the onCreateView instead of dynamically setting them by using
-    the observers. This will be corrected once I find a fix.
-
-        viewModel.setGroceryItem(
-            GroceryItem(
-                groceryItemName,
-                groceryItemId,
-                groceryItemCategory,
-                groceryItemStore,
-                groceryItemQuantity,
-                groceryItemCost
-            )
-        )
-    private fun setupObservers() {
-        viewModel.liveDataGroceryItem.observe(viewLifecycleOwner) { item ->
-            val categoriesAdapter =
-                binding.addGroceryItemCategorySpinner.adapter as ArrayAdapter<String>
-            val categoryPosition = categoriesAdapter.getPosition(item.category)
-            binding.addItemName.setText(item.name)
-            binding.addItemQuantity.setText(item.quantity!!)
-            binding.addItemCost.setText(String.format("%.2f", item.cost))
-            binding.addStoreName.setText(item.store)
-            binding.addGroceryItemCategorySpinner.setSelection(categoryPosition)
-        }
-    }
-    */
-
     private fun setupAddItemButton() {
         binding.addItemButton.setOnClickListener {
             val groceryItemName = binding.addItemName.text?.toString() ?: ""

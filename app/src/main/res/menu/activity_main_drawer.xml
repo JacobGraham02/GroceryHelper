@@ -22,6 +22,11 @@
         <item
             android:id="@+id/nav_zehrs_list"
             android:icon="@drawable/ic_menu_camera"
-            android:title="@string/zehrs"/>
+            android:title="@string/zehrs" />
+
+        <item
+            android:id="@+id/nav_log_out_icon"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/log_out" />
     </group>
 </menu>
