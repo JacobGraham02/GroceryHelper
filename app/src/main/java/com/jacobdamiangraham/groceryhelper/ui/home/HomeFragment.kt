@@ -48,13 +48,6 @@ class HomeFragment : Fragment() {
         viewModel = ViewModelProvider(this, viewModelFactory).get(GroceryViewModel::class.java)
 
         adapter = GroceryItemAdapter(requireContext()) { selectedGroceryItem ->
-            Log.w("ApplicationLogs", "grocery item id:" + selectedGroceryItem.id)
-            Log.w("ApplicationLogs", "grocery item name:" + selectedGroceryItem.name)
-            Log.w("ApplicationLogs", "grocery item category:" + selectedGroceryItem.category)
-            Log.w("ApplicationLogs", "grocery item store:" + selectedGroceryItem.store)
-            Log.w("ApplicationLogs", "grocery item quantity:" + selectedGroceryItem.quantity)
-            Log.w("ApplicationLogs", "grocery item cost:" + selectedGroceryItem.cost)
-
             val groceryItemId = selectedGroceryItem.id
             val groceryItemName = selectedGroceryItem.name
             val groceryItemCategory = selectedGroceryItem.category

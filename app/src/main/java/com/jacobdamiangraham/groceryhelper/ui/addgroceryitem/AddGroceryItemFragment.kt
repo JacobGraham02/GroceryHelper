@@ -87,6 +87,11 @@ class AddGroceryItemFragment: Fragment() {
             }
         }
 
+        if (groceryItemArgs.groceryItemName != "undefined") {
+            binding.addItemButton.text = getString(R.string.grocery_list_modify_item, groceryItemArgs.groceryItemName)
+            binding.addItemPageLabel.text = getString(R.string.grocery_list_title_modify, groceryItemArgs.groceryItemName)
+        }
+
         setupCategorySpinner()
         setupAddItemButton()
 
