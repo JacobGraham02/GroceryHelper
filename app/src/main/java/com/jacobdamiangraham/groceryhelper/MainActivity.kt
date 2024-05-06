@@ -13,6 +13,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.FirebaseAuth
 import com.jacobdamiangraham.groceryhelper.databinding.ActivityMainBinding
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserLogoutCallback
 import com.jacobdamiangraham.groceryhelper.notification.NotificationBuilder
@@ -94,7 +95,14 @@ class MainActivity : AppCompatActivity() {
             drawerLayout.closeDrawers()
             true
         }
-
+        FirebaseAuth.getInstance().addAuthStateListener {
+            firebaseAuthentication ->
+                if (firebaseAuthentication.currentUser == null) {
+                    val signInIntent = Intent(applicationContext, SignInView::class.java)
+                    signInIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                    startActivity(signInIntent)
+                }
+        }
         displayNotification("Test notification title", "Test notification description")
     }
 
