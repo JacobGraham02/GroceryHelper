@@ -51,8 +51,8 @@ class HomeFragment : Fragment() {
             val groceryItemId = selectedGroceryItem.id
             val groceryItemName = selectedGroceryItem.name
             val groceryItemCategory = selectedGroceryItem.category
-            val groceryItemStore = selectedGroceryItem.store ?: "undefined"
-            val groceryItemQuantity = selectedGroceryItem.quantity ?: 1
+            val groceryItemStore = selectedGroceryItem.store ?: " "
+            val groceryItemQuantity = selectedGroceryItem.quantity ?: 0
             val groceryItemCost = selectedGroceryItem.cost ?: 0.00f
 
             val action = HomeFragmentDirections.actionHomeFragmentToAddGroceryItemFragment(
@@ -85,6 +85,7 @@ class HomeFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        viewModel.groceryItems.removeObservers(viewLifecycleOwner)
         _binding = null
     }
 }
