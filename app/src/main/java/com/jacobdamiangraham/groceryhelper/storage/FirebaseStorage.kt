@@ -63,12 +63,15 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
                 .document(firebaseUserId)
                 .get()
                 .addOnSuccessListener { userDocument ->
-                    val groceryItems = userDocument.get("groceryItems") as? List<Map<String, Any>>
+                    val groceryItems = userDocument
+                        .get("groceryItems") as? List<Map<String, Any>>
                     if (groceryItems != null) {
                         val groceryItemList = ArrayList<GroceryItem>()
                         for (groceryItemMap in groceryItems) {
                             val groceryItem = convertJsonToGroceryItemObjects(groceryItemMap)
-                            groceryItemList.add(groceryItem)
+                            if (groceryItem.store == storeName) {
+                                groceryItemList.add(groceryItem)
+                            }
                         }
                         mutableGroceryItemList.value = groceryItemList
                     }
