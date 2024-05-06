@@ -1,5 +1,7 @@
 package com.jacobdamiangraham.groceryhelper.storage
 
+import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
@@ -14,6 +16,7 @@ import com.jacobdamiangraham.groceryhelper.interfaces.IUserLoginCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserLogoutCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserRegistrationCallback
 import com.jacobdamiangraham.groceryhelper.model.GroceryItem
+import com.jacobdamiangraham.groceryhelper.ui.signin.SignInView
 
 class FirebaseStorage(collectionName: String? = "groceryitems") {
 
@@ -21,9 +24,7 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
     private lateinit var firebaseGroceryItemCollectionInstance: CollectionReference
     private lateinit var firebaseUserCollectionInstance: CollectionReference
     private var mutableGroceryItemList: MutableLiveData<List<GroceryItem>> = MutableLiveData<List<GroceryItem>>()
-    private lateinit var groceryItemList: ArrayList<GroceryItem>
     private lateinit var userId: String
-    private var authStatusListener: IAuthStatusListener? = null
 
     init {
         if (collectionName != null) {
@@ -39,18 +40,6 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
             "users" -> {
                 getCollectionOfUsers("users")
             }
-        }
-    }
-
-    fun setAuthStatusListener(listener: IAuthStatusListener) {
-        this.authStatusListener = listener
-    }
-
-    private fun authenticateUserWithFirebase() {
-        if (Firebase.auth.currentUser != null && authStatusListener != null) {
-            authStatusListener!!.onUserAuthenticate()
-        } else {
-            authStatusListener?.onUserUnauthenticated()
         }
     }
 
@@ -169,6 +158,16 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
             callback.onLogoutSuccess("You have successfully logged out")
         } catch (e: Exception) {
             callback.onLogoutFailure("Failed to log out. Try again")
+        }
+    }
+
+    fun registerGlobalAuthenticationCheck(context: Context, callback: IAuthStatusListener) {
+        FirebaseAuth.getInstance().addAuthStateListener { firebaseAuthentication ->
+            if (firebaseAuthentication.currentUser == null) {
+                val signInIntent = Intent(context, SignInView::class.java)
+                signInIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                callback.onUserUnauthenticated("You have been signed out")
+            }
         }
     }
 
