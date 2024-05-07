@@ -42,23 +42,20 @@ class AddGroceryItemFragment: Fragment() {
             0 to { item: Any? -> item != null && item.toString() != "undefined" }, // Name
             1 to { item: Any? -> item != null && item != 1 },                      // Quantity
             2 to { item: Any? -> item != null && item != 0.00 },                   // Cost
-            3 to { item: Any? -> item != null && item.toString() != "undefined" }  // Store
         )
 
         val arrayListBindingElements = arrayListOf(
             binding.addItemName,
             binding.addItemQuantity,
-            binding.addItemCost,
-            binding.addStoreName)
+            binding.addItemCost)
 
         val arrayListGroceryItemArgs = arrayListOf(
             groceryItemArgs.groceryItemName,
             groceryItemArgs.groceryItemQuantity,
-            groceryItemArgs.groceryItemCost,
-            groceryItemArgs.groceryItemStore,
-        )
+            groceryItemArgs.groceryItemCost)
 
         val groceryItemCategory = groceryItemArgs.groceryItemCategory
+        val groceryItemStore = groceryItemArgs.groceryItemStore
 
         val arrayListGroceryItemCategory = arrayListOf(
             "Baking",
@@ -74,6 +71,11 @@ class AddGroceryItemFragment: Fragment() {
             "Spice",
             "Sweet",
             "Vegetable"
+        )
+
+        val arrayListGroceryStoreNameCategory = arrayListOf(
+            "food basics",
+            "zehrs"
         )
 
         for (index in arrayListBindingElements.indices) {
@@ -93,6 +95,7 @@ class AddGroceryItemFragment: Fragment() {
         }
 
         setupCategorySpinner()
+        setupStoreNameSpinner()
         setupAddItemButton()
 
         if (arrayListGroceryItemCategory.contains(groceryItemCategory)) {
@@ -101,6 +104,13 @@ class AddGroceryItemFragment: Fragment() {
             val categoryPosition = categoryAdapter.getPosition(groceryItemCategory)
             binding.addGroceryItemCategorySpinner.setSelection(categoryPosition)
         }
+        if (arrayListGroceryStoreNameCategory.contains(groceryItemStore)) {
+            val storeAdapter =
+                binding.addGroceryStoreNameSpinner.adapter as ArrayAdapter<String>
+            val storePosition = storeAdapter.getPosition(groceryItemStore)
+            binding.addGroceryStoreNameSpinner.setSelection(storePosition)
+        }
+
 
         return root
     }
@@ -110,7 +120,7 @@ class AddGroceryItemFragment: Fragment() {
             val groceryItemName = binding.addItemName.text?.toString() ?: ""
             val groceryItemQuantity = binding.addItemQuantity.text?.toString()?.toIntOrNull() ?: 0
             val groceryItemCost = binding.addItemCost.text?.toString()?.toFloatOrNull() ?: 0.0f
-            val groceryItemStore = binding.addStoreName.text?.toString() ?: ""
+            val groceryItemStore = binding.addGroceryStoreNameSpinner.selectedItem?.toString() ?: ""
             val groceryItemCategory = binding.addGroceryItemCategorySpinner.selectedItem?.toString() ?: ""
 
             if (!(ValidationUtil.validateGroceryItemInputs(
@@ -173,6 +183,17 @@ class AddGroceryItemFragment: Fragment() {
         ).also { adapter ->
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             binding.addGroceryItemCategorySpinner.adapter = adapter
+        }
+    }
+
+    private fun setupStoreNameSpinner() {
+        ArrayAdapter.createFromResource(
+            requireContext(),
+            R.array.stores,
+            android.R.layout.simple_spinner_item
+        ).also { adapter ->
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            binding.addGroceryStoreNameSpinner.adapter = adapter
         }
     }
 

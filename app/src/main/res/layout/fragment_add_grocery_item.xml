@@ -144,14 +144,12 @@
             android:textSize="16sp"
             android:textStyle="bold" />
 
-        <EditText
-            android:id="@+id/addStoreName"
+        <Spinner
+            android:id="@+id/addGroceryStoreNameSpinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/optional_tap_to_type"
-            android:inputType="text"
-            android:autofillHints="" />
+            android:gravity="left" />
+
     </LinearLayout>
 
 
@@ -180,9 +178,7 @@
             android:id="@+id/addGroceryItemCategorySpinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/required_tap_to_type"
-            android:inputType="text" />
+            android:gravity="left" />
     </LinearLayout>
 
     <LinearLayout
