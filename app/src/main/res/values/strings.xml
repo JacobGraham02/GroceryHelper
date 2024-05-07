@@ -18,7 +18,7 @@
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
-    <string name="store_name">Store name</string>
+    <string name="category_name">Category</string>
     <string name="item_cost">Item cost</string>
     <string name="item_amount">Item amount</string>
     <string name="item_name">Item name</string>
@@ -49,9 +49,9 @@
     <string name="category">Category</string>
     <string name="add_item">Add item</string>
     <string name="name">Name</string>
+    <string name="store_name">Store</string>
     <string name="log_out">Log out</string>
     <string name="delete_item">Delete item</string>
-    <string name="store">Store</string>
     <string name="this_is_an_indicator_arrow">This is an indicator arrow</string>
     <string name="merge_grocery_lists">Merge with another user</string>
     <string name="required_select_a_recipient_to_merge_lists_with">(Required) select a recipient to merge lists with</string>

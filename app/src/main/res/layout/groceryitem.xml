@@ -96,21 +96,21 @@
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/itemStoreNameLabel"
+            android:id="@+id/itemCategoryTextViewLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:padding="2dp"
-            android:text="@string/store"
+            android:text="@string/category"
             android:textSize="16sp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/storeNameTextView"
+            android:id="@+id/itemCategoryTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:text="@string/store_name"
+            android:text="@string/category_name"
             android:textSize="18sp" />
 
         <LinearLayout

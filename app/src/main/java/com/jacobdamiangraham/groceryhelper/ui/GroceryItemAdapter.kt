@@ -36,7 +36,7 @@ class GroceryItemAdapter(
         val groceryItemName: TextView = groceryItemView.findViewById(R.id.groceryItemNameTextView)
         val groceryItemAmount: TextView = groceryItemView.findViewById(R.id.groceryItemAmountTextView)
         val groceryItemCost: TextView = groceryItemView.findViewById(R.id.itemCostTextView)
-        val groceryItemStoreName: TextView = groceryItemView.findViewById(R.id.storeNameTextView)
+        val groceryItemCategory: TextView = groceryItemView.findViewById(R.id.itemCategoryTextView)
         val groceryItemArrowIndicator: AppCompatImageView = groceryItemView.findViewById(R.id.arrowIndicator)
         val groceryItemAdditionalInformation: LinearLayout = groceryItemView.findViewById(R.id.linearLayoutAdditionalInformation)
         val deleteGroceryItemButton: Button = groceryItemView.findViewById(R.id.deleteStoreItemButton)
@@ -64,7 +64,7 @@ class GroceryItemAdapter(
             groceryItemName.text = groceryItem.name
             groceryItemAmount.text = groceryItem.quantity.toString()
             groceryItemCost.text = groceryItem.cost.toString()
-            groceryItemStoreName.text = groceryItem.store
+            groceryItemCategory.text = groceryItem.category
             groceryItemArrowIndicator.setOnClickListener {
                 if (isExpanded) {
                     groceryItemAdditionalInformation.visibility = View.GONE
