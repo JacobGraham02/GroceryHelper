@@ -4,11 +4,15 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.jacobdamiangraham.groceryhelper.R
+import com.jacobdamiangraham.groceryhelper.factory.PromptBuilderFactory
+import com.jacobdamiangraham.groceryhelper.model.DialogInformation
 import com.jacobdamiangraham.groceryhelper.model.GroceryItem
 
 class GroceryItemAdapter(
@@ -18,13 +22,13 @@ class GroceryItemAdapter(
 
         private lateinit var groceryItem: GroceryItem
         private var arrayListGroceryItems: ArrayList<View>
-        private var groceryItemList: List<GroceryItem> = emptyList()
+        private var groceryItemList: MutableList<GroceryItem> = ArrayList()
 
         init {
             arrayListGroceryItems = ArrayList()
         }
 
-    fun updateGroceryItems(newGroceryItems: List<GroceryItem>) {
+    fun updateGroceryItems(newGroceryItems: MutableList<GroceryItem>) {
         groceryItemList = newGroceryItems
         notifyDataSetChanged()
     }
@@ -36,6 +40,7 @@ class GroceryItemAdapter(
         val groceryItemStoreName: TextView = groceryItemView.findViewById(R.id.storeNameTextView)
         val groceryItemArrowIndicator: AppCompatImageView = groceryItemView.findViewById(R.id.arrowIndicator)
         val groceryItemAdditionalInformation: LinearLayout = groceryItemView.findViewById(R.id.linearLayoutAdditionalInformation)
+        val deleteGroceryItemButton: Button = groceryItemView.findViewById(R.id.deleteStoreItemButton)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GroceryItemViewHolder {
@@ -71,6 +76,28 @@ class GroceryItemAdapter(
                 }
                 isExpanded = !isExpanded
             }
+            deleteGroceryItemButton.setOnClickListener {
+                val dialogInfo = DialogInformation(
+                    title = "Confirm delete",
+                    message = "Are you sure you want to delete ${groceryItem.name} from your list?"
+                )
+                val alertDialogGenerator = PromptBuilderFactory.getAlertDialogGenerator(
+                    "confirmation")
+                alertDialogGenerator.configure(
+                    context,
+                    AlertDialog.Builder(context),
+                    dialogInfo,
+                    positiveButtonAction = {
+                        deleteGroceryItem(position)
+                    },
+                ).show()
+            }
         }
+    }
+
+    private fun deleteGroceryItem(position: Int) {
+            groceryItemList.removeAt(position)
+            notifyItemRemoved(position)
+            notifyItemRangeChanged(position, groceryItemList.size)
     }
 }

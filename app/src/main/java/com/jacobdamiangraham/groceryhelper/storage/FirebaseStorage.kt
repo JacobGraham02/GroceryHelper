@@ -24,7 +24,7 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
     private var firebaseAuthentication: FirebaseAuth = Firebase.auth
     private lateinit var firebaseGroceryItemCollectionInstance: CollectionReference
     private lateinit var firebaseUserCollectionInstance: CollectionReference
-    private var mutableGroceryItemList: MutableLiveData<List<GroceryItem>> = MutableLiveData<List<GroceryItem>>()
+    private var mutableGroceryItemList: MutableLiveData<MutableList<GroceryItem>> = MutableLiveData<MutableList<GroceryItem>>()
     private lateinit var userId: String
 
     init {
@@ -229,7 +229,7 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
         }
     }
 
-    fun getMutableLiveDataListOfGroceryItem(storeName: String?): MutableLiveData<List<GroceryItem>> {
+    fun getMutableLiveDataListOfGroceryItem(storeName: String?): MutableLiveData<MutableList<GroceryItem>> {
         getGroceryItemsFromCollection(storeName)
         return mutableGroceryItemList
     }
