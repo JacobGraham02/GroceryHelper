@@ -11,9 +11,4 @@ class GroceryItemsRepository(private val firebaseStorageInstance: FirebaseStorag
         val firebaseCollectionItems = firebaseStorageInstance.getMutableLiveDataListOfGroceryItem(storeName)
         return firebaseCollectionItems
     }
-
-    fun getListOfUsers(): CollectionReference {
-        val firebaseCollectionUsers = firebaseStorageInstance.getListOfRegisteredUsers()
-        return firebaseCollectionUsers
-    }
 }

@@ -7,22 +7,25 @@ import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.jacobdamiangraham.groceryhelper.interfaces.IAddGroceryItemCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IAuthStatusListener
+import com.jacobdamiangraham.groceryhelper.interfaces.IDeleteGroceryItemCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IMergeGroceryListOperation
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserLoginCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserLogoutCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserRegistrationCallback
 import com.jacobdamiangraham.groceryhelper.model.GroceryItem
 import com.jacobdamiangraham.groceryhelper.ui.signin.SignInView
+import java.lang.ref.Reference
 
 class FirebaseStorage(collectionName: String? = "groceryitems") {
 
     private var firebaseAuthentication: FirebaseAuth = Firebase.auth
-    private lateinit var firebaseGroceryItemCollectionInstance: CollectionReference
+    private lateinit var firebaseGroceryItemCollectionInstance: DocumentReference
     private lateinit var firebaseUserCollectionInstance: CollectionReference
     private var mutableGroceryItemList: MutableLiveData<MutableList<GroceryItem>> = MutableLiveData<MutableList<GroceryItem>>()
     private lateinit var userId: String
@@ -46,14 +49,35 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
 
     private fun getCollectionOfGroceryItems() {
         val firebaseCurrentUser = Firebase.auth.currentUser
-        firebaseGroceryItemCollectionInstance = FirebaseFirestore.getInstance().collection("groceryitems")
         if (firebaseCurrentUser != null) {
             userId = firebaseCurrentUser.uid
+            // Assuming each user has a document under "users" and their items are under "groceryitems" collection
+            firebaseGroceryItemCollectionInstance = FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(userId)
         }
     }
 
     private fun getCollectionOfUsers() {
         firebaseUserCollectionInstance = FirebaseFirestore.getInstance().collection("users")
+    }
+
+    fun deleteGroceryItem(itemId: String, callback: IDeleteGroceryItemCallback) {
+        // Start a transaction to safely modify the array within the document
+        FirebaseFirestore.getInstance().runTransaction { transaction ->
+            val snapshot = transaction.get(firebaseGroceryItemCollectionInstance)
+            val groceryItems = snapshot.get("groceryItems") as? List<Map<String, Any>> ?: listOf()
+
+            val updatedItems = groceryItems.filterNot { it["id"] == itemId }
+
+            transaction.update(firebaseGroceryItemCollectionInstance, "groceryItems", updatedItems)
+            null // Kotlin requires a return for the transaction block, use null for transactions not returning a value
+        }.addOnSuccessListener {
+            callback.onDeleteSuccess("Item successfully deleted.")
+        }.addOnFailureListener { e ->
+            Log.e("FirebaseError", "Failed to delete item: ${e.message}")
+            callback.onDeleteFailure("Failed to delete item: ${e.message}")
+        }
     }
 
     private fun getGroceryItemsFromCollection(storeName: String?) {
@@ -232,9 +256,5 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
     fun getMutableLiveDataListOfGroceryItem(storeName: String?): MutableLiveData<MutableList<GroceryItem>> {
         getGroceryItemsFromCollection(storeName)
         return mutableGroceryItemList
-    }
-
-    fun getListOfRegisteredUsers(): CollectionReference {
-        return firebaseUserCollectionInstance
     }
 }
