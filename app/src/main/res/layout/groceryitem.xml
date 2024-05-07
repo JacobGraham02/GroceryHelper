@@ -75,7 +75,8 @@
         android:layout_gravity="center"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:visibility="invisible">
+        android:visibility="gone"
+        tools:visibility="gone">
 
         <TextView
             android:id="@+id/itemCostLabel"

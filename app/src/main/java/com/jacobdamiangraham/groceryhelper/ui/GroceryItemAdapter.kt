@@ -20,7 +20,6 @@ class GroceryItemAdapter(
     private val onItemClick: (GroceryItem) -> Unit):
     RecyclerView.Adapter<GroceryItemAdapter.GroceryItemViewHolder>() {
 
-        private lateinit var groceryItem: GroceryItem
         private var arrayListGroceryItems: ArrayList<View>
         private var groceryItemList: MutableList<GroceryItem> = ArrayList()
 
@@ -56,7 +55,7 @@ class GroceryItemAdapter(
     }
 
     override fun onBindViewHolder(holder: GroceryItemViewHolder, position: Int) {
-        groceryItem = groceryItemList[position]
+        val groceryItem = groceryItemList[position]
         holder.itemView.setOnClickListener {
             onItemClick(groceryItem)
         }

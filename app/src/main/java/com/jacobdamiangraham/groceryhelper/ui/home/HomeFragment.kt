@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -45,7 +46,7 @@ class HomeFragment : Fragment() {
             binding.yourGroceryListTextView.text = getString(R.string.grocery_list_title, "food basics")
         }
 
-        viewModel = ViewModelProvider(this, viewModelFactory).get(GroceryViewModel::class.java)
+        viewModel = ViewModelProvider(requireActivity()).get(GroceryViewModel::class.java)
 
         adapter = GroceryItemAdapter(requireContext()) { selectedGroceryItem ->
             val groceryItemId = selectedGroceryItem.id
@@ -79,6 +80,8 @@ class HomeFragment : Fragment() {
         viewModel.groceryItems.observe(viewLifecycleOwner, { items ->
             adapter.updateGroceryItems(items)
         })
+
+
 
         return root
     }

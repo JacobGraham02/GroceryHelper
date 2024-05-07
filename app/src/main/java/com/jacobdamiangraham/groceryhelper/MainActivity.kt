@@ -3,10 +3,12 @@ package com.jacobdamiangraham.groceryhelper
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -15,11 +17,13 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.jacobdamiangraham.groceryhelper.databinding.ActivityMainBinding
+import com.jacobdamiangraham.groceryhelper.factory.GroceryViewModelFactory
 import com.jacobdamiangraham.groceryhelper.interfaces.IAuthStatusListener
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserLogoutCallback
 import com.jacobdamiangraham.groceryhelper.notification.NotificationBuilder
 import com.jacobdamiangraham.groceryhelper.storage.FirebaseStorage
 import com.jacobdamiangraham.groceryhelper.ui.signin.SignInView
+import com.jacobdamiangraham.groceryhelper.viewmodel.GroceryViewModel
 
 class MainActivity : AppCompatActivity() {
 
@@ -27,6 +31,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var notificationBuilder: NotificationBuilder
     private val firebaseStorage: FirebaseStorage = FirebaseStorage("users")
+
+    private lateinit var viewModel: GroceryViewModel
+    private lateinit var viewModelFactory: GroceryViewModelFactory
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +48,9 @@ class MainActivity : AppCompatActivity() {
                     .setAction("Action", null)
                     .setAnchorView(R.id.fab).show()
         }
+
+        viewModelFactory = GroceryViewModelFactory("food basics")
+        viewModel = ViewModelProvider(this).get(GroceryViewModel::class.java)
 
         notificationBuilder = NotificationBuilder(this)
 
@@ -125,6 +135,16 @@ class MainActivity : AppCompatActivity() {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
         return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.sort_a_to_z -> viewModel.sortByNameAToZ()
+            R.id.sort_by_alphabetical_category -> viewModel.sortByCategoryAToZ()
+            R.id.sort_cost_high_to_low -> viewModel.sortByCostHighToLow()
+            R.id.sort_cost_low_to_high -> viewModel.sortByCostLowToHigh()
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onSupportNavigateUp(): Boolean {
