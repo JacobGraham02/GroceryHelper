@@ -44,7 +44,6 @@
         </action>
     </fragment>
 
-
     <fragment
         android:id="@+id/nav_add_grocery_item"
         android:name="com.jacobdamiangraham.groceryhelper.ui.addgroceryitem.AddGroceryItemFragment"

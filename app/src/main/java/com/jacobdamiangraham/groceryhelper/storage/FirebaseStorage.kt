@@ -12,6 +12,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.jacobdamiangraham.groceryhelper.interfaces.IAddGroceryItemCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IAuthStatusListener
+import com.jacobdamiangraham.groceryhelper.interfaces.IMergeGroceryListOperation
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserLoginCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserLogoutCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserRegistrationCallback
@@ -35,24 +36,24 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
     private fun getCollectionOfItems(collectionName: String) {
         when (collectionName) {
             "groceryitems" -> {
-                getCollectionOfGroceryItems("groceryitems")
+                getCollectionOfGroceryItems()
             }
             "users" -> {
-                getCollectionOfUsers("users")
+                getCollectionOfUsers()
             }
         }
     }
 
-    private fun getCollectionOfGroceryItems(collectionName: String) {
+    private fun getCollectionOfGroceryItems() {
         val firebaseCurrentUser = Firebase.auth.currentUser
-        firebaseGroceryItemCollectionInstance = FirebaseFirestore.getInstance().collection(collectionName)
+        firebaseGroceryItemCollectionInstance = FirebaseFirestore.getInstance().collection("groceryitems")
         if (firebaseCurrentUser != null) {
             userId = firebaseCurrentUser.uid
         }
     }
 
-    private fun getCollectionOfUsers(collectionName: String) {
-        firebaseUserCollectionInstance = FirebaseFirestore.getInstance().collection(collectionName)
+    private fun getCollectionOfUsers() {
+        firebaseUserCollectionInstance = FirebaseFirestore.getInstance().collection("users")
     }
 
     private fun getGroceryItemsFromCollection(storeName: String?) {
@@ -76,6 +77,60 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
                         mutableGroceryItemList.value = groceryItemList
                     }
                 }
+        }
+    }
+
+    fun shareGroceryItemsWithUser(storeName: String, recipientUserId: String, callback: IMergeGroceryListOperation) {
+        val currentLoggedInUser = Firebase.auth.currentUser
+
+        if (currentLoggedInUser == null) {
+            callback.onFailure("User not logged in.")
+            return
+        }
+
+        // Query items from the current user's grocery list that match the store name
+        val currentUserGroceryItems = firebaseUserCollectionInstance
+            .document(currentLoggedInUser.uid)
+            .collection("groceryItems")
+            .whereEqualTo("store", storeName)
+
+        currentUserGroceryItems.get().addOnSuccessListener { currentUserSnapshot ->
+            if (currentUserSnapshot.isEmpty) {
+                callback.onFailure("No items found in your grocery list.")
+                return@addOnSuccessListener
+            }
+
+            // Reference to the recipient's grocery items collection
+            val recipientGroceryItemsRef = firebaseUserCollectionInstance
+                .document(recipientUserId)
+                .collection("groceryItems")
+
+            // Fetch recipient's current grocery items to avoid duplicates
+            recipientGroceryItemsRef.get().addOnSuccessListener { recipientSnapshot ->
+                val recipientItems = recipientSnapshot.documents.map { it.getString("id") }.toSet()
+
+                val batch = FirebaseFirestore.getInstance().batch()
+
+                currentUserSnapshot.documents.forEach { document ->
+                    val itemId = document.getString("id")
+                    if (itemId != null && !recipientItems.contains(itemId)) {
+                        // Only add if the item is not already in the recipient's list
+                        val newDocumentRef = recipientGroceryItemsRef.document() // Optionally, use itemId to overwrite/update same item
+                        batch.set(newDocumentRef, document.data!!)
+                    }
+                }
+
+                // Commit the batch to add all unique items to the recipient's grocery list
+                batch.commit().addOnSuccessListener {
+                    callback.onSuccess("Unique items from both grocery lists have been merged successfully.")
+                }.addOnFailureListener { e ->
+                    callback.onFailure("Failed to merge both grocery lists: ${e.message}")
+                }
+            }.addOnFailureListener { e ->
+                callback.onFailure("Failed to retrieve recipient's grocery list items: ${e.message}")
+            }
+        }.addOnFailureListener { e ->
+            callback.onFailure("Failed to retrieve your grocery list items: ${e.message}")
         }
     }
 
@@ -177,5 +232,9 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
     fun getMutableLiveDataListOfGroceryItem(storeName: String?): MutableLiveData<List<GroceryItem>> {
         getGroceryItemsFromCollection(storeName)
         return mutableGroceryItemList
+    }
+
+    fun getListOfRegisteredUsers(): CollectionReference {
+        return firebaseUserCollectionInstance
     }
 }

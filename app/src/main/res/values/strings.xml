@@ -51,6 +51,11 @@
     <string name="add_item">Add item</string>
     <string name="name">Name</string>
     <string name="log_out">Log out</string>
+    <string name="delete_item">Delete item</string>
+    <string name="store">Store</string>
+    <string name="this_is_an_indicator_arrow">This is an indicator arrow</string>
+    <string name="merge_grocery_lists">Merge with another user</string>
+    <string name="required_select_a_recipient_to_merge_lists_with">(Required) select a recipient to merge lists with</string>
     <string-array name="categories">
         <item>Baking</item>
         <item>Canned goods</item>
