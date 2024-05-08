@@ -88,24 +88,21 @@ class MainActivity : AppCompatActivity() {
                     navController.navigate(R.id.nav_home, bundle)
                 }
                 R.id.nav_log_out_icon -> {
-                    firebaseStorage.logoutWithFirebase(object: IUserLogoutCallback {
-                        override fun onLogoutSuccess(successMessage: String) {
-                            Toast.makeText(
-                                this@MainActivity,
-                                successMessage,
-                                Toast.LENGTH_LONG
-                            ).show()
+                    val dialogInfo = DialogInformation(
+                        title = "Confirm log out",
+                        message = "Are you sure you want to log out of your account?"
+                    )
+                    val alertDialogGenerator = PromptBuilderFactory.getAlertDialogGenerator(
+                        "confirmation"
+                    )
+                    alertDialogGenerator.configure(
+                        this,
+                        AlertDialog.Builder(this),
+                        dialogInfo,
+                        positiveButtonAction = {
+                            logOutOfAccount()
                         }
-
-                        override fun onLogoutFailure(failureMessage: String) {
-                            Toast.makeText(
-                                this@MainActivity,
-                                failureMessage,
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-
-                    })
+                    ).show()
                 }
                 R.id.nav_delete_account -> {
                     val dialogInfo = DialogInformation(
@@ -161,6 +158,27 @@ class MainActivity : AppCompatActivity() {
                     Toast.LENGTH_LONG
                 ).show()
             }
+        })
+    }
+
+    private fun logOutOfAccount() {
+        firebaseStorage.logoutWithFirebase(object: IUserLogoutCallback {
+            override fun onLogoutSuccess(successMessage: String) {
+                Toast.makeText(
+                    this@MainActivity,
+                    successMessage,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+
+            override fun onLogoutFailure(failureMessage: String) {
+                Toast.makeText(
+                    this@MainActivity,
+                    failureMessage,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+
         })
     }
 
