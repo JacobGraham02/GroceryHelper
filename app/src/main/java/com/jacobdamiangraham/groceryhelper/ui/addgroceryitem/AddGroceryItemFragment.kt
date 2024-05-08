@@ -2,6 +2,8 @@ package com.jacobdamiangraham.groceryhelper.ui.addgroceryitem
 
 import android.app.VoiceInteractor.Prompt
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,11 +11,13 @@ import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
 import com.jacobdamiangraham.groceryhelper.R
 import com.jacobdamiangraham.groceryhelper.databinding.FragmentAddGroceryItemBinding
+import com.jacobdamiangraham.groceryhelper.enums.AddGroceryItemInputType
 import com.jacobdamiangraham.groceryhelper.factory.PromptBuilderFactory
 import com.jacobdamiangraham.groceryhelper.interfaces.IAddGroceryItemCallback
 import com.jacobdamiangraham.groceryhelper.model.DialogInformation
@@ -115,8 +119,81 @@ class AddGroceryItemFragment: Fragment() {
             binding.addGroceryStoreNameSpinner.setSelection(storePosition)
         }
 
+        binding.addItemName.addTextChangedListener(object: TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                validate(AddGroceryItemInputType.NAME, s.toString())
+            }
+        })
+
+        binding.addItemCost.addTextChangedListener(object: TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                validate(AddGroceryItemInputType.COST, s.toString())
+            }
+        })
+
+        binding.addItemQuantity.addTextChangedListener(object: TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                validate(AddGroceryItemInputType.QUANTITY, s.toString())
+            }
+        })
 
         return root
+    }
+
+    private fun validate(addGroceryItemInputType: AddGroceryItemInputType, value: String) {
+        when (addGroceryItemInputType) {
+            AddGroceryItemInputType.NAME -> {
+                if (ValidationUtil.isValidGroceryItemString(value)) {
+                    binding.addItemName.setBackgroundResource(R.drawable.edit_text_valid)
+                    binding.addItemNameLabel.text = getString(R.string.valid_name)
+                    binding.addItemNameLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.green))
+                    binding.addItemName.setTextColor(ContextCompat.getColor(requireContext(), R.color.green))
+                } else {
+                    binding.addItemName.setBackgroundResource(R.drawable.edit_text_invalid)
+                    binding.addItemNameLabel.text = getString(R.string.invalid_name)
+                    binding.addItemNameLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+                    binding.addItemName.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+                }
+            }
+            AddGroceryItemInputType.QUANTITY -> {
+                if (ValidationUtil.isValidGroceryItemString(value)) {
+                    binding.addItemQuantity.setBackgroundResource(R.drawable.edit_text_valid)
+                    binding.addItemQuantityLabel.text = getString(R.string.valid_quantity)
+                    binding.addItemQuantityLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.green))
+                    binding.addItemQuantity.setTextColor(ContextCompat.getColor(requireContext(), R.color.green))
+                } else {
+                    binding.addItemQuantity.setBackgroundResource(R.drawable.edit_text_invalid)
+                    binding.addItemQuantityLabel.text = getString(R.string.invalid_quantity)
+                    binding.addItemQuantityLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+                    binding.addItemQuantity.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+                }
+            }
+            AddGroceryItemInputType.COST -> {
+                if (ValidationUtil.isValidGroceryItemString(value)) {
+                    binding.addItemCost.setBackgroundResource(R.drawable.edit_text_valid)
+                    binding.addItemCostLabel.text = getString(R.string.valid_cost)
+                    binding.addItemCostLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.green))
+                    binding.addItemCost.setTextColor(ContextCompat.getColor(requireContext(), R.color.green))
+                } else {
+                    binding.addItemCost.setBackgroundResource(R.drawable.edit_text_invalid)
+                    binding.addItemCostLabel.text = getString(R.string.invalid_cost)
+                    binding.addItemCostLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+                    binding.addItemCost.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+                }
+            }
+        }
     }
 
     private fun setupAddItemButton() {

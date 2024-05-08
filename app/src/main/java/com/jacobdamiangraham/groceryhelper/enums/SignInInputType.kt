@@ -1,5 +1,5 @@
 package com.jacobdamiangraham.groceryhelper.enums
 
-enum class InputType {
+enum class SignInInputType {
     EMAIL, PASSWORD, CONFIRM_PASSWORD
 }

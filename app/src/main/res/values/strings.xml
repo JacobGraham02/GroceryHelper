@@ -8,12 +8,20 @@
     <string name="grocery_list_title">%1$s</string>
     <string name="grocery_list_modify_item">Save changes for %1$s</string>
     <string name="grocery_list_title_modify">Modify %1$s</string>
+
     <string name="valid_email">Email - Valid</string>
     <string name="invalid_email">Email - Invalid</string>
     <string name="valid_password">Password - Valid</string>
     <string name="invalid_password">Password - Invalid</string>
     <string name="valid_confirm_password">Confirm password - Valid</string>
     <string name="invalid_confirm_password">Confirm password - Invalid</string>
+
+    <string name="valid_name">Name - Valid</string>
+    <string name="invalid_name">Name - Invalid</string>
+    <string name="valid_quantity">Quantity - Valid</string>
+    <string name="invalid_quantity">Quantity - Invalid</string>
+    <string name="valid_cost">Cost - Valid</string>
+    <string name="invalid_cost">Cost - Invalid</string>
 
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>

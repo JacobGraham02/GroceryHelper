@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.jacobdamiangraham.groceryhelper.R
 import com.jacobdamiangraham.groceryhelper.databinding.ActivityRegisterBinding
-import com.jacobdamiangraham.groceryhelper.enums.InputType
+import com.jacobdamiangraham.groceryhelper.enums.SignInInputType
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserRegistrationCallback
 import com.jacobdamiangraham.groceryhelper.storage.FirebaseStorage
 import com.jacobdamiangraham.groceryhelper.ui.signin.SignInView
@@ -46,7 +46,7 @@ class RegisterView: AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                validate(InputType.EMAIL, s.toString())
+                validate(SignInInputType.EMAIL, s.toString())
             }
         })
 
@@ -54,7 +54,7 @@ class RegisterView: AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                validate(InputType.PASSWORD, s.toString())
+                validate(SignInInputType.PASSWORD, s.toString())
             }
         })
 
@@ -62,14 +62,14 @@ class RegisterView: AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                validate(InputType.CONFIRM_PASSWORD, s.toString(), activityRegisterBinding.passwordInputField.text.toString())
+                validate(SignInInputType.CONFIRM_PASSWORD, s.toString(), activityRegisterBinding.passwordInputField.text.toString())
             }
         })
     }
 
-    private fun validate(inputType: InputType, value: String, confirmPassword: String? = null) {
-        when (inputType) {
-            InputType.EMAIL -> {
+    private fun validate(signInInputType: SignInInputType, value: String, confirmPassword: String? = null) {
+        when (signInInputType) {
+            SignInInputType.EMAIL -> {
                 if (ValidationUtil.isValidEmailAddress(value)) {
                     activityRegisterBinding.emailInputField.setBackgroundResource(R.drawable.edit_text_valid)
                     activityRegisterBinding.emailInputTextView.text = getString(R.string.valid_email)
@@ -83,7 +83,7 @@ class RegisterView: AppCompatActivity() {
                 }
             }
 
-            InputType.PASSWORD -> {
+            SignInInputType.PASSWORD -> {
                 if (ValidationUtil.isValidPassword(value)) {
                     activityRegisterBinding.passwordInputField.setBackgroundResource(R.drawable.edit_text_valid)
                     activityRegisterBinding.passwordInputTextView.text = getString(R.string.valid_password)
@@ -97,7 +97,7 @@ class RegisterView: AppCompatActivity() {
                 }
             }
 
-            InputType.CONFIRM_PASSWORD -> {
+            SignInInputType.CONFIRM_PASSWORD -> {
                 if (value == confirmPassword) {
                     activityRegisterBinding.confirmPasswordInputField.setBackgroundResource(R.drawable.edit_text_valid)
                     activityRegisterBinding.confirmPasswordInputTextView.text = getString(R.string.valid_confirm_password)
