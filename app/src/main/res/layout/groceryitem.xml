@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.widget.LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/verticalLinearLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -23,7 +24,7 @@
             android:layout_height="match_parent"
             android:gravity="center_horizontal"
             android:padding="2dp"
-            android:text="Name"
+            android:text="@string/name"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -41,7 +42,7 @@
             android:layout_height="match_parent"
             android:gravity="center_horizontal"
             android:padding="2dp"
-            android:text="Quantity"
+            android:text="@string/quantity"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -59,7 +60,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="start"
             android:clickable="true"
-            android:contentDescription="This is an indicator arrow"
+            android:contentDescription="@string/this_is_an_indicator_arrow"
             android:focusable="true"
             android:foregroundGravity="left"
             android:padding="4dp"
@@ -74,14 +75,15 @@
         android:layout_gravity="center"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:visibility="visible">
+        android:visibility="gone"
+        tools:visibility="gone">
 
         <TextView
             android:id="@+id/itemCostLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:text="Cost"
+            android:text="@string/cost"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -94,21 +96,38 @@
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/itemStoreNameLabel"
+            android:id="@+id/itemCategoryTextViewLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:padding="2dp"
-            android:text="Store"
+            android:text="@string/category"
             android:textSize="16sp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/storeNameTextView"
+            android:id="@+id/itemCategoryTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:text="@string/store_name"
+            android:text="@string/category_name"
             android:textSize="18sp" />
+
+        <LinearLayout
+            android:id="@+id/linearLayoutDeleteStoreItemButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/deleteStoreItemButton"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/delete_item" />
+        </LinearLayout>
+
     </LinearLayout>
+
 </android.widget.LinearLayout>

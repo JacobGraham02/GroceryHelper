@@ -5,6 +5,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -12,10 +14,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.jacobdamiangraham.groceryhelper.R
 import com.jacobdamiangraham.groceryhelper.databinding.FragmentHomeBinding
 import com.jacobdamiangraham.groceryhelper.factory.GroceryViewModelFactory
+import com.jacobdamiangraham.groceryhelper.interfaces.IDeleteGroceryItemCallback
+import com.jacobdamiangraham.groceryhelper.interfaces.IOnGroceryItemInteractionListener
+import com.jacobdamiangraham.groceryhelper.model.GroceryItem
 import com.jacobdamiangraham.groceryhelper.ui.GroceryItemAdapter
 import com.jacobdamiangraham.groceryhelper.viewmodel.GroceryViewModel
 
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(), IOnGroceryItemInteractionListener {
 
     private lateinit var viewModel: GroceryViewModel
     private lateinit var adapter: GroceryItemAdapter
@@ -35,19 +40,15 @@ class HomeFragment : Fragment() {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val storeName = arguments?.getString("storeName")
+        val storeName = arguments?.getString("storeName") ?: "food basics"
 
-        if (storeName != null && (storeName == "food basics" || storeName == "zehrs")) {
-            viewModelFactory = GroceryViewModelFactory(storeName)
-            binding.yourGroceryListTextView.text = getString(R.string.grocery_list_title, storeName)
-        } else {
-            viewModelFactory = GroceryViewModelFactory("food basics")
-            binding.yourGroceryListTextView.text = getString(R.string.grocery_list_title, "food basics")
-        }
+        viewModelFactory = GroceryViewModelFactory(storeName)
 
-        viewModel = ViewModelProvider(this, viewModelFactory).get(GroceryViewModel::class.java)
+        viewModel = ViewModelProvider(requireActivity()).get(GroceryViewModel::class.java)
 
-        adapter = GroceryItemAdapter(requireContext()) { selectedGroceryItem ->
+        binding.yourGroceryListTextView.text = getString(R.string.grocery_list_title, storeName)
+
+        adapter = GroceryItemAdapter(requireContext(), this) { selectedGroceryItem ->
             val groceryItemId = selectedGroceryItem.id
             val groceryItemName = selectedGroceryItem.name
             val groceryItemCategory = selectedGroceryItem.category
@@ -77,10 +78,15 @@ class HomeFragment : Fragment() {
         binding.recyclerViewGroceryItemsList.adapter = adapter
 
         viewModel.groceryItems.observe(viewLifecycleOwner, { items ->
-            adapter.updateGroceryItems(items)
+            val filteredItems = items.filter{ it.store == storeName } as MutableList<GroceryItem>
+            adapter.updateGroceryItems(filteredItems)
         })
 
         return root
+    }
+
+    override fun onDeleteGroceryItem(item: GroceryItem) {
+        viewModel.deleteGroceryItem(item)
     }
 
     override fun onDestroyView() {

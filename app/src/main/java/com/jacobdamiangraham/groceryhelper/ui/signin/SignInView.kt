@@ -10,7 +10,7 @@ import androidx.core.content.ContextCompat
 import com.jacobdamiangraham.groceryhelper.MainActivity
 import com.jacobdamiangraham.groceryhelper.R
 import com.jacobdamiangraham.groceryhelper.databinding.ActivitySigninBinding
-import com.jacobdamiangraham.groceryhelper.enums.InputType
+import com.jacobdamiangraham.groceryhelper.enums.SignInInputType
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserLoginCallback
 import com.jacobdamiangraham.groceryhelper.storage.FirebaseStorage
 import com.jacobdamiangraham.groceryhelper.ui.register.RegisterView
@@ -46,7 +46,7 @@ class SignInView : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                validate(InputType.EMAIL, s.toString())
+                validate(SignInInputType.EMAIL, s.toString())
             }
         })
 
@@ -54,14 +54,14 @@ class SignInView : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                validate(InputType.PASSWORD, s.toString())
+                validate(SignInInputType.PASSWORD, s.toString())
             }
         })
     }
 
-    private fun validate(inputType: InputType, value: String) {
-        when (inputType) {
-            InputType.EMAIL -> {
+    private fun validate(signInInputType: SignInInputType, value: String) {
+        when (signInInputType) {
+            SignInInputType.EMAIL -> {
                 if (ValidationUtil.isValidEmailAddress(value)) {
                     activitySignInBinding.emailInputField.setBackgroundResource(R.drawable.edit_text_valid)
                     activitySignInBinding.emailInputTextView.text = getString(R.string.valid_email)
@@ -75,7 +75,7 @@ class SignInView : AppCompatActivity() {
                 }
             }
 
-            InputType.PASSWORD -> {
+            SignInInputType.PASSWORD -> {
                 if (ValidationUtil.isValidPassword(value)) {
                     activitySignInBinding.passwordInputField.setBackgroundResource(R.drawable.edit_text_valid)
                     activitySignInBinding.passwordInputTextView.text = getString(R.string.valid_password)
@@ -88,7 +88,7 @@ class SignInView : AppCompatActivity() {
                     activitySignInBinding.passwordInputField.setTextColor(ContextCompat.getColor(this, R.color.red))
                 }
             }
-            InputType.CONFIRM_PASSWORD -> {}
+            SignInInputType.CONFIRM_PASSWORD -> {}
         }
     }
 

@@ -2,10 +2,14 @@ package com.jacobdamiangraham.groceryhelper
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -14,11 +18,15 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.jacobdamiangraham.groceryhelper.databinding.ActivityMainBinding
+import com.jacobdamiangraham.groceryhelper.factory.GroceryViewModelFactory
+import com.jacobdamiangraham.groceryhelper.factory.PromptBuilderFactory
 import com.jacobdamiangraham.groceryhelper.interfaces.IAuthStatusListener
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserLogoutCallback
+import com.jacobdamiangraham.groceryhelper.model.DialogInformation
 import com.jacobdamiangraham.groceryhelper.notification.NotificationBuilder
 import com.jacobdamiangraham.groceryhelper.storage.FirebaseStorage
 import com.jacobdamiangraham.groceryhelper.ui.signin.SignInView
+import com.jacobdamiangraham.groceryhelper.viewmodel.GroceryViewModel
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,6 +34,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var notificationBuilder: NotificationBuilder
     private val firebaseStorage: FirebaseStorage = FirebaseStorage("users")
+
+    private lateinit var viewModel: GroceryViewModel
+    private lateinit var viewModelFactory: GroceryViewModelFactory
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +52,9 @@ class MainActivity : AppCompatActivity() {
                     .setAnchorView(R.id.fab).show()
         }
 
+        viewModelFactory = GroceryViewModelFactory("food basics")
+        viewModel = ViewModelProvider(this).get(GroceryViewModel::class.java)
+
         notificationBuilder = NotificationBuilder(this)
 
         val drawerLayout: DrawerLayout = binding.drawerLayout
@@ -52,42 +66,60 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_home, R.id.nav_add_grocery_item), drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+        setSupportActionBar(binding.appBarMain.toolbar)
 
         navView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.nav_food_basics_list -> {
                     val bundle = bundleOf("storeName" to "food basics")
                     navController.navigate(R.id.nav_home, bundle)
+                    supportActionBar?.title = getString(R.string.food_basics)
                 }
                 R.id.nav_zehrs_list -> {
                     val bundle = bundleOf("storeName" to "zehrs")
                     navController.navigate(R.id.nav_home, bundle)
+                    supportActionBar?.title = getString(R.string.zehrs)
                 }
                 R.id.nav_add_grocery_item -> {
                     navController.navigate(R.id.nav_add_grocery_item)
                 }
                 R.id.nav_home -> {
-                    navController.navigate(R.id.nav_home)
+                    val bundle = bundleOf("storeName" to "food basics")
+                    navController.navigate(R.id.nav_home, bundle)
                 }
                 R.id.nav_log_out_icon -> {
-                    firebaseStorage.logoutWithFirebase(object: IUserLogoutCallback {
-                        override fun onLogoutSuccess(successMessage: String) {
-                            Toast.makeText(
-                                this@MainActivity,
-                                successMessage,
-                                Toast.LENGTH_LONG
-                            ).show()
+                    val dialogInfo = DialogInformation(
+                        title = "Confirm log out",
+                        message = "Are you sure you want to log out of your account?"
+                    )
+                    val alertDialogGenerator = PromptBuilderFactory.getAlertDialogGenerator(
+                        "confirmation"
+                    )
+                    alertDialogGenerator.configure(
+                        this,
+                        AlertDialog.Builder(this),
+                        dialogInfo,
+                        positiveButtonAction = {
+                            logOutOfAccount()
                         }
-
-                        override fun onLogoutFailure(failureMessage: String) {
-                            Toast.makeText(
-                                this@MainActivity,
-                                failureMessage,
-                                Toast.LENGTH_LONG
-                            ).show()
+                    ).show()
+                }
+                R.id.nav_delete_account -> {
+                    val dialogInfo = DialogInformation(
+                        title = "Confirm delete account",
+                        message = "Are you sure you want to delete your account?"
+                    )
+                    val alertDialogGenerator = PromptBuilderFactory.getAlertDialogGenerator(
+                        "confirmation"
+                    )
+                    alertDialogGenerator.configure(
+                        this,
+                        AlertDialog.Builder(this),
+                        dialogInfo,
+                        positiveButtonAction = {
+                            deleteFirebaseUserAccount()
                         }
-
-                    })
+                    ).show()
                 }
             }
             menuItem.isChecked = true
@@ -109,6 +141,47 @@ class MainActivity : AppCompatActivity() {
         displayNotification("Test notification title", "Test notification description")
     }
 
+    private fun deleteFirebaseUserAccount() {
+        firebaseStorage.deleteUserAccount(object : IUserLogoutCallback {
+            override fun onLogoutSuccess(successMessage: String) {
+                Toast.makeText(
+                    this@MainActivity,
+                    successMessage,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+
+            override fun onLogoutFailure(failureMessage: String) {
+                Toast.makeText(
+                    this@MainActivity,
+                    failureMessage,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        })
+    }
+
+    private fun logOutOfAccount() {
+        firebaseStorage.logoutWithFirebase(object: IUserLogoutCallback {
+            override fun onLogoutSuccess(successMessage: String) {
+                Toast.makeText(
+                    this@MainActivity,
+                    successMessage,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+
+            override fun onLogoutFailure(failureMessage: String) {
+                Toast.makeText(
+                    this@MainActivity,
+                    failureMessage,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+
+        })
+    }
+
     private fun redirectToSignInScreen() {
         val signInActivityIntent = Intent(this, SignInView::class.java)
         startActivity(signInActivityIntent)
@@ -117,6 +190,23 @@ class MainActivity : AppCompatActivity() {
 
     private fun displayNotification(title: String, description: String) {
         notificationBuilder.displayNotification(title, description)
+    }
+
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.sort_a_to_z -> viewModel.sortByNameAToZ()
+            R.id.sort_by_alphabetical_category -> viewModel.sortByCategoryAToZ()
+            R.id.sort_cost_high_to_low -> viewModel.sortByCostHighToLow()
+            R.id.sort_cost_low_to_high -> viewModel.sortByCostLowToHigh()
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onSupportNavigateUp(): Boolean {

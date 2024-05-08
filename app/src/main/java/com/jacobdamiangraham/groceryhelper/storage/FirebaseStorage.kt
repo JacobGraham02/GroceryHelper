@@ -7,23 +7,27 @@ import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.jacobdamiangraham.groceryhelper.interfaces.IAddGroceryItemCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IAuthStatusListener
+import com.jacobdamiangraham.groceryhelper.interfaces.IDeleteGroceryItemCallback
+import com.jacobdamiangraham.groceryhelper.interfaces.IMergeGroceryListOperation
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserLoginCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserLogoutCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserRegistrationCallback
 import com.jacobdamiangraham.groceryhelper.model.GroceryItem
 import com.jacobdamiangraham.groceryhelper.ui.signin.SignInView
+import java.lang.ref.Reference
 
 class FirebaseStorage(collectionName: String? = "groceryitems") {
 
     private var firebaseAuthentication: FirebaseAuth = Firebase.auth
-    private lateinit var firebaseGroceryItemCollectionInstance: CollectionReference
+    private lateinit var firebaseGroceryItemCollectionInstance: DocumentReference
     private lateinit var firebaseUserCollectionInstance: CollectionReference
-    private var mutableGroceryItemList: MutableLiveData<List<GroceryItem>> = MutableLiveData<List<GroceryItem>>()
+    private var mutableGroceryItemList: MutableLiveData<MutableList<GroceryItem>> = MutableLiveData<MutableList<GroceryItem>>()
     private lateinit var userId: String
 
     init {
@@ -35,24 +39,45 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
     private fun getCollectionOfItems(collectionName: String) {
         when (collectionName) {
             "groceryitems" -> {
-                getCollectionOfGroceryItems("groceryitems")
+                getCollectionOfGroceryItems()
             }
             "users" -> {
-                getCollectionOfUsers("users")
+                getCollectionOfUsers()
             }
         }
     }
 
-    private fun getCollectionOfGroceryItems(collectionName: String) {
+    private fun getCollectionOfGroceryItems() {
         val firebaseCurrentUser = Firebase.auth.currentUser
-        firebaseGroceryItemCollectionInstance = FirebaseFirestore.getInstance().collection(collectionName)
         if (firebaseCurrentUser != null) {
             userId = firebaseCurrentUser.uid
+            // Assuming each user has a document under "users" and their items are under "groceryitems" collection
+            firebaseGroceryItemCollectionInstance = FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(userId)
         }
     }
 
-    private fun getCollectionOfUsers(collectionName: String) {
-        firebaseUserCollectionInstance = FirebaseFirestore.getInstance().collection(collectionName)
+    private fun getCollectionOfUsers() {
+        firebaseUserCollectionInstance = FirebaseFirestore.getInstance().collection("users")
+    }
+
+    fun deleteGroceryItem(itemId: String, callback: IDeleteGroceryItemCallback) {
+        // Start a transaction to safely modify the array within the document
+        FirebaseFirestore.getInstance().runTransaction { transaction ->
+            val snapshot = transaction.get(firebaseGroceryItemCollectionInstance)
+            val groceryItems = snapshot.get("groceryItems") as? List<Map<String, Any>> ?: listOf()
+
+            val updatedItems = groceryItems.filterNot { it["id"] == itemId }
+
+            transaction.update(firebaseGroceryItemCollectionInstance, "groceryItems", updatedItems)
+            null // Kotlin requires a return for the transaction block, use null for transactions not returning a value
+        }.addOnSuccessListener {
+            callback.onDeleteSuccess("Item successfully deleted.")
+        }.addOnFailureListener { e ->
+            Log.e("FirebaseError", "Failed to delete item: ${e.message}")
+            callback.onDeleteFailure("Failed to delete item: ${e.message}")
+        }
     }
 
     private fun getGroceryItemsFromCollection(storeName: String?) {
@@ -66,16 +91,95 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
                     val groceryItems = userDocument
                         .get("groceryItems") as? List<Map<String, Any>>
                     if (groceryItems != null) {
-                        val groceryItemList = ArrayList<GroceryItem>()
-                        for (groceryItemMap in groceryItems) {
-                            val groceryItem = convertJsonToGroceryItemObjects(groceryItemMap)
-                            if (groceryItem.store == storeName) {
-                                groceryItemList.add(groceryItem)
+                        val groceryItemList = groceryItems
+                            .filter {
+                                it["store"] == storeName
                             }
-                        }
-                        mutableGroceryItemList.value = groceryItemList
+                            .map {
+                                convertJsonToGroceryItemObjects(it)
+                            }
+                        mutableGroceryItemList.value = ArrayList(groceryItemList)
                     }
                 }
+        }
+    }
+
+    fun deleteUserAccount(callback: IUserLogoutCallback) {
+        val currentUser = firebaseAuthentication.currentUser
+        if (currentUser != null) {
+            val userDocument = firebaseUserCollectionInstance.document(currentUser.uid)
+            // Delete the user document from firebase, and then delete the user from firebase authentication
+            userDocument.delete().addOnCompleteListener {
+                deleteUserTask ->
+                    if (deleteUserTask.isSuccessful) {
+                        currentUser.delete().addOnCompleteListener {
+                            deleteFirebaseUserTask ->
+                                if (deleteFirebaseUserTask.isSuccessful) {
+                                    callback.onLogoutSuccess("Your account has been successfully deleted")
+                                } else {
+                                    callback.onLogoutFailure("Failed to delete your account")
+                                }
+                        }
+                    } else {
+                        callback.onLogoutFailure("Failed to delete your user data")
+                    }
+            }
+        } else {
+            callback.onLogoutFailure("You are not currently logged in")
+        }
+    }
+
+    fun shareGroceryItemsWithUser(storeName: String, recipientUserId: String, callback: IMergeGroceryListOperation) {
+        val currentLoggedInUser = Firebase.auth.currentUser
+
+        if (currentLoggedInUser == null) {
+            callback.onFailure("User not logged in.")
+            return
+        }
+
+        // Query items from the current user's grocery list that match the store name
+        val currentUserGroceryItems = firebaseUserCollectionInstance
+            .document(currentLoggedInUser.uid)
+            .collection("groceryItems")
+            .whereEqualTo("store", storeName)
+
+        currentUserGroceryItems.get().addOnSuccessListener { currentUserSnapshot ->
+            if (currentUserSnapshot.isEmpty) {
+                callback.onFailure("No items found in your grocery list.")
+                return@addOnSuccessListener
+            }
+
+            // Reference to the recipient's grocery items collection
+            val recipientGroceryItemsRef = firebaseUserCollectionInstance
+                .document(recipientUserId)
+                .collection("groceryItems")
+
+            // Fetch recipient's current grocery items to avoid duplicates
+            recipientGroceryItemsRef.get().addOnSuccessListener { recipientSnapshot ->
+                val recipientItems = recipientSnapshot.documents.map { it.getString("id") }.toSet()
+
+                val batch = FirebaseFirestore.getInstance().batch()
+
+                currentUserSnapshot.documents.forEach { document ->
+                    val itemId = document.getString("id")
+                    if (itemId != null && !recipientItems.contains(itemId)) {
+                        // Only add if the item is not already in the recipient's list
+                        val newDocumentRef = recipientGroceryItemsRef.document() // Optionally, use itemId to overwrite/update same item
+                        batch.set(newDocumentRef, document.data!!)
+                    }
+                }
+
+                // Commit the batch to add all unique items to the recipient's grocery list
+                batch.commit().addOnSuccessListener {
+                    callback.onSuccess("Unique items from both grocery lists have been merged successfully.")
+                }.addOnFailureListener { e ->
+                    callback.onFailure("Failed to merge both grocery lists: ${e.message}")
+                }
+            }.addOnFailureListener { e ->
+                callback.onFailure("Failed to retrieve recipient's grocery list items: ${e.message}")
+            }
+        }.addOnFailureListener { e ->
+            callback.onFailure("Failed to retrieve your grocery list items: ${e.message}")
         }
     }
 
@@ -174,7 +278,7 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
         }
     }
 
-    fun getMutableLiveDataListOfGroceryItem(storeName: String?): MutableLiveData<List<GroceryItem>> {
+    fun getMutableLiveDataListOfGroceryItem(storeName: String?): MutableLiveData<MutableList<GroceryItem>> {
         getGroceryItemsFromCollection(storeName)
         return mutableGroceryItemList
     }

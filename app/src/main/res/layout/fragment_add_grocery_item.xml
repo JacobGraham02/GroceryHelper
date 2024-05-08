@@ -42,6 +42,15 @@
             android:textSize="16sp"
             android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/addItemNameRules"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/must_have_at_least_1_letter"
+            android:textAlignment="center"
+            android:textColor="#000000"
+            android:textStyle="bold" />
+
         <EditText
             android:id="@+id/addItemName"
             android:layout_width="wrap_content"
@@ -73,6 +82,15 @@
             android:textAlignment="center"
             android:textColor="#000000"
             android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/addItemQuantityRules"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/must_be_at_least_1"
+            android:textAlignment="center"
+            android:textColor="#000000"
             android:textStyle="bold" />
 
         <EditText
@@ -107,6 +125,15 @@
             android:textAlignment="center"
             android:textColor="#000000"
             android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/addItemCostRules"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/must_cost_at_least_0_00"
+            android:textAlignment="center"
+            android:textColor="#000000"
             android:textStyle="bold" />
 
         <EditText
@@ -144,14 +171,20 @@
             android:textSize="16sp"
             android:textStyle="bold" />
 
-        <EditText
-            android:id="@+id/addStoreName"
+        <TextView
+            android:id="@+id/storeNameSpinnerRules"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/optional_tap_to_type"
-            android:inputType="text"
-            android:autofillHints="" />
+            android:text="@string/cannot_be_blank"
+            android:textAlignment="center"
+            android:textColor="#000000"
+            android:textStyle="bold" />
+
+        <Spinner
+            android:id="@+id/addGroceryStoreNameSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
     </LinearLayout>
 
 
@@ -176,13 +209,19 @@
             android:textSize="16sp"
             android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/groceryItemCategorySpinnerRule"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/cannot_be_blank"
+            android:textAlignment="center"
+            android:textColor="#000000"
+            android:textStyle="bold" />
+
         <Spinner
             android:id="@+id/addGroceryItemCategorySpinner"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/required_tap_to_type"
-            android:inputType="text" />
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
     <LinearLayout
