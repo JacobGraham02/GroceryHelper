@@ -63,16 +63,19 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_home, R.id.nav_add_grocery_item), drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+        setSupportActionBar(binding.appBarMain.toolbar)
 
         navView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.nav_food_basics_list -> {
                     val bundle = bundleOf("storeName" to "food basics")
                     navController.navigate(R.id.nav_home, bundle)
+                    supportActionBar?.title = getString(R.string.food_basics)
                 }
                 R.id.nav_zehrs_list -> {
                     val bundle = bundleOf("storeName" to "zehrs")
                     navController.navigate(R.id.nav_home, bundle)
+                    supportActionBar?.title = getString(R.string.zehrs)
                 }
                 R.id.nav_add_grocery_item -> {
                     navController.navigate(R.id.nav_add_grocery_item)

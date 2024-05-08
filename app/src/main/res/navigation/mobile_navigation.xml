@@ -13,7 +13,7 @@
         <argument
             android:name="storeName"
             app:argType="string"
-            android:defaultValue="undefined"/>
+            android:defaultValue="Select an option from the menu to get started"/>
         <action
             android:id="@+id/actionHomeFragmentToAddGroceryItemFragment"
             app:destination="@id/nav_add_grocery_item">
