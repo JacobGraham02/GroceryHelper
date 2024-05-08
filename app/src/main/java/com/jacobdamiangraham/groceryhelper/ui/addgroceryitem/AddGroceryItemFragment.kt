@@ -1,17 +1,23 @@
 package com.jacobdamiangraham.groceryhelper.ui.addgroceryitem
 
 import android.app.VoiceInteractor.Prompt
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
+import android.view.inputmethod.InputMethodManager.HIDE_IMPLICIT_ONLY
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
@@ -20,10 +26,12 @@ import com.jacobdamiangraham.groceryhelper.databinding.FragmentAddGroceryItemBin
 import com.jacobdamiangraham.groceryhelper.enums.AddGroceryItemInputType
 import com.jacobdamiangraham.groceryhelper.factory.PromptBuilderFactory
 import com.jacobdamiangraham.groceryhelper.interfaces.IAddGroceryItemCallback
+import com.jacobdamiangraham.groceryhelper.interfaces.IAddGroceryStoreCallback
 import com.jacobdamiangraham.groceryhelper.model.DialogInformation
 import com.jacobdamiangraham.groceryhelper.model.GroceryItem
 import com.jacobdamiangraham.groceryhelper.storage.FirebaseStorage
 import com.jacobdamiangraham.groceryhelper.utils.ValidationUtil
+import java.util.Locale
 import java.util.UUID
 
 class AddGroceryItemFragment: Fragment() {
@@ -34,6 +42,10 @@ class AddGroceryItemFragment: Fragment() {
     private lateinit var viewModel: AddGroceryItemViewModel
 
     private val firebaseStorage: FirebaseStorage = FirebaseStorage("users")
+
+    private var storeNames = mutableListOf<String>()
+
+    private lateinit var storeNamesSpinnerAdapter: ArrayAdapter<String>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -81,11 +93,6 @@ class AddGroceryItemFragment: Fragment() {
             "Vegetable"
         )
 
-        val arrayListGroceryStoreNameCategory = arrayListOf(
-            "food basics",
-            "zehrs"
-        )
-
         for (index in arrayListBindingElements.indices) {
             val editText: EditText = arrayListBindingElements[index]
             val itemValue = arrayListGroceryItemArgs[index]
@@ -97,26 +104,21 @@ class AddGroceryItemFragment: Fragment() {
             }
         }
 
+        setupAddItemButton()
+        setupCategorySpinner()
+        setupStoreNameSpinner()
+        loadStoreNamesIntoSpinner(groceryItemStore)
+
         if (groceryItemArgs.groceryItemName != "undefined") {
             binding.addItemButton.text = getString(R.string.grocery_list_modify_item, groceryItemArgs.groceryItemName)
             binding.addItemPageLabel.text = getString(R.string.grocery_list_title_modify, groceryItemArgs.groceryItemName)
         }
-
-        setupCategorySpinner()
-        setupStoreNameSpinner()
-        setupAddItemButton()
 
         if (arrayListGroceryItemCategory.contains(groceryItemCategory)) {
             val categoryAdapter =
                 binding.addGroceryItemCategorySpinner.adapter as ArrayAdapter<String>
             val categoryPosition = categoryAdapter.getPosition(groceryItemCategory)
             binding.addGroceryItemCategorySpinner.setSelection(categoryPosition)
-        }
-        if (arrayListGroceryStoreNameCategory.contains(groceryItemStore)) {
-            val storeAdapter =
-                binding.addGroceryStoreNameSpinner.adapter as ArrayAdapter<String>
-            val storePosition = storeAdapter.getPosition(groceryItemStore)
-            binding.addGroceryStoreNameSpinner.setSelection(storePosition)
         }
 
         binding.addItemName.addTextChangedListener(object: TextWatcher {
@@ -148,6 +150,42 @@ class AddGroceryItemFragment: Fragment() {
                 validate(AddGroceryItemInputType.QUANTITY, s.toString())
             }
         })
+
+        binding.addNewStore.setOnEditorActionListener { v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                val newStoreName = v.text.toString()
+
+                if (ValidationUtil.isValidGroceryItemString(newStoreName)) {
+                    addStoreNameToSpinner(newStoreName)
+                    firebaseStorage.addGroceryStoreToUser(
+                        newStoreName,
+                        object : IAddGroceryStoreCallback {
+                            override fun onAddStoreSuccess(successMessage: String) {
+                                Toast.makeText(
+                                    requireContext(),
+                                    successMessage,
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+
+                            override fun onAddStoreFailure(failureMessage: String) {
+                                Toast.makeText(
+                                    requireContext(),
+                                    failureMessage,
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        })
+                }
+            } else {
+                Toast.
+                    makeText(context,
+                    "Invalid store name",
+                    Toast.LENGTH_LONG)
+                        .show()
+            }
+            true
+        }
 
         return root
     }
@@ -242,7 +280,7 @@ class AddGroceryItemFragment: Fragment() {
                 positiveButtonAction = {
                     addGroceryItemToFirebase(newGroceryItem)
                 }
-            )
+            ).show()
         }
     }
 
@@ -286,13 +324,50 @@ class AddGroceryItemFragment: Fragment() {
     }
 
     private fun setupStoreNameSpinner() {
-        ArrayAdapter.createFromResource(
+        storeNamesSpinnerAdapter = ArrayAdapter(
             requireContext(),
-            R.array.stores,
+            android.R.layout.simple_spinner_item,
+            storeNames
+        )
+        storeNamesSpinnerAdapter.setDropDownViewResource(
             android.R.layout.simple_spinner_item
-        ).also { adapter ->
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            binding.addGroceryStoreNameSpinner.adapter = adapter
+        )
+        binding.addGroceryStoreNameSpinner.adapter = storeNamesSpinnerAdapter
+    }
+
+    private fun loadStoreNamesIntoSpinner(storeName: String) {
+        firebaseStorage.getGroceryStoreNames {
+            stores ->
+                storeNames.clear()
+                storeNames.addAll(stores)
+                storeNamesSpinnerAdapter.notifyDataSetChanged()
+                setSelectedStoreName(storeName)
+        }
+    }
+
+    private fun setSelectedStoreName(storeName: String) {
+        Log.d("Debug", "Attempting to set store name: $storeName")
+        Log.d("Debug", "Current store names in the list: $storeNames")
+
+        val normalizedStoreName = storeName.trim().lowercase(Locale.ROOT)
+        val normalizedStoreNames = storeNames.map { it.trim().lowercase(Locale.ROOT) }
+        val storePositionInSpinner = normalizedStoreNames.indexOf(normalizedStoreName)
+
+        Log.d("Debug", "Normalized store name: $normalizedStoreName")
+        Log.d("Debug", "Store position in spinner: $storePositionInSpinner")
+
+        if (storePositionInSpinner != -1) {
+            binding.addGroceryStoreNameSpinner.setSelection(storePositionInSpinner)
+        } else {
+            Log.d("Debug", "Store name '$storeName' not found in list.")
+        }
+    }
+
+    private fun addStoreNameToSpinner(newStoreName: String) {
+        if (!storeNames.contains(newStoreName)) {
+            storeNames.add(newStoreName)
+            storeNamesSpinnerAdapter.notifyDataSetChanged()
+            binding.addGroceryStoreNameSpinner.setSelection(storeNames.size-1)
         }
     }
 

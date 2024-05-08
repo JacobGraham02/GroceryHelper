@@ -13,17 +13,6 @@
             android:id="@+id/nav_add_grocery_item"
             android:icon="@drawable/add_grocery_item_icon"
             android:title="@string/add_item_to_list" />
-
-        <item
-            android:id="@+id/nav_food_basics_list"
-            android:icon="@drawable/food_basics_icon"
-            android:title="@string/food_basics"/>
-
-        <item
-            android:id="@+id/nav_zehrs_list"
-            android:icon="@drawable/zehrs_icon"
-            android:title="@string/zehrs" />
-
         <item
             android:id="@+id/nav_log_out_icon"
             android:icon="@drawable/log_out_icon"
@@ -33,5 +22,9 @@
             android:id="@+id/nav_delete_account"
             android:icon="@drawable/account_delete_icon"
             android:title="@string/delete_account" />
+    </group>
+
+    <group android:id="@+id/store_group">
+        <!-- Placeholder for dynamic items -->
     </group>
 </menu>

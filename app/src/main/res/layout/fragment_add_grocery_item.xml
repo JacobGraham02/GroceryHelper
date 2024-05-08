@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.addgroceryitem.AddGroceryItemFragment"
     android:background="#FFFFFF"
-    android:backgroundTint="#FFFFFF">
+    android:backgroundTint="#FFFFFF"
+    tools:context=".ui.addgroceryitem.AddGroceryItemFragment">
 
     <TextView
         android:id="@+id/addItemPageLabel"
@@ -56,11 +56,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
+            android:autofillHints=""
             android:ems="10"
             android:hint="@string/required_tap_to_type"
             android:inputType="text|textAutoComplete|textAutoCorrect"
-            android:textAlignment="viewStart"
-            android:autofillHints="" />
+            android:textAlignment="viewStart" />
 
     </LinearLayout>
 
@@ -97,12 +97,12 @@
             android:id="@+id/addItemQuantity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:autofillHints=""
             android:ems="10"
             android:hint="@string/required_tap_to_type"
             android:inputType="number|numberSigned"
             android:textAlignment="viewStart"
-            android:textColor="#000000"
-            android:autofillHints="" />
+            android:textColor="#000000" />
 
     </LinearLayout>
 
@@ -140,12 +140,13 @@
             android:id="@+id/addItemCost"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:autofillHints=""
             android:ems="10"
             android:hint="@string/optional_tap_to_type"
             android:inputType="number|numberSigned"
             android:textAlignment="viewStart"
             android:textColor="#000000"
-            android:autofillHints="" />
+            android:nextFocusDown="@id/addItemButton"/>
 
     </LinearLayout>
 
@@ -155,35 +156,75 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:background="#FFFFFF"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:showDividers="none"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/itemCostLinearLayout">
 
-        <TextView
-            android:id="@+id/storeNameTextView"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/store_name"
-            android:textAlignment="center"
-            android:textColor="#000000"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/storeNameSpinnerRules"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/cannot_be_blank"
-            android:textAlignment="center"
-            android:textColor="#000000"
-            android:textStyle="bold" />
+            <TextView
+                android:id="@+id/storeNameTextView2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/store_name"
+                android:textAlignment="center"
+                android:textColor="#000000"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
-        <Spinner
-            android:id="@+id/addGroceryStoreNameSpinner"
+            <TextView
+                android:id="@+id/storeNameSpinnerRules2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/cannot_be_blank"
+                android:textAlignment="center"
+                android:textColor="#000000"
+                android:textStyle="bold" />
+
+            <Spinner
+                android:id="@+id/addGroceryStoreNameSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/addNewStoreLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/add_new_store"
+                android:textAlignment="center"
+                android:textColor="#000000"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/addNewStoreText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/cannot_be_blank"
+                android:textAlignment="center"
+                android:textColor="#000000"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/addNewStore"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="@string/optional_tap_to_type"
+                android:inputType="text"
+                android:imeOptions="actionDone"/>
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -192,8 +233,8 @@
         android:id="@+id/addItemCategoryLinearLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_marginTop="30dp"
+        android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@+id/itemStoreNameLinearLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -237,10 +278,10 @@
 
         <Button
             android:id="@+id/addItemButton"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/add_item"
-            style="?android:attr/buttonBarButtonStyle"/>
+            android:text="@string/add_item" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

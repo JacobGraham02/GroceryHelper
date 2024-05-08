@@ -12,6 +12,7 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.jacobdamiangraham.groceryhelper.interfaces.IAddGroceryItemCallback
+import com.jacobdamiangraham.groceryhelper.interfaces.IAddGroceryStoreCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IAuthStatusListener
 import com.jacobdamiangraham.groceryhelper.interfaces.IDeleteGroceryItemCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IMergeGroceryListOperation
@@ -223,6 +224,43 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
                     throw IllegalArgumentException(completedCreateUserTask.exception)
                 }
             }
+    }
+
+    fun addGroceryStoreToUser(storeName: String, callback: IAddGroceryStoreCallback) {
+        val currentUser = firebaseAuthentication.currentUser
+        if (currentUser != null) {
+            val userDocumentReference = firebaseUserCollectionInstance
+                .document(currentUser.uid)
+            userDocumentReference.update("groceryStores", FieldValue.arrayUnion(storeName))
+                .addOnSuccessListener {
+                    callback.onAddStoreSuccess("You successfully added a new store")
+                }
+                .addOnFailureListener {
+                    callback.onAddStoreFailure("Failed to add a new store")
+                }
+        }
+    }
+
+    fun getGroceryStoreNames(callback: (List<String>) -> Unit) {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser != null) {
+            val userStoresReference = firebaseUserCollectionInstance
+                .document(currentUser.uid)
+            userStoresReference
+                .get()
+                .addOnSuccessListener {
+                    documentSnapshot ->
+                        if (documentSnapshot.exists()) {
+                            val stores = documentSnapshot.get("groceryStores") as? List<String> ?: listOf()
+                            callback(stores)
+                        } else {
+                            callback(listOf())
+                        }
+                }
+                .addOnFailureListener {
+                    callback(listOf())
+                }
+        }
     }
 
     fun logInUserWithFirebase(email: String, password: String, callback: IUserLoginCallback) {

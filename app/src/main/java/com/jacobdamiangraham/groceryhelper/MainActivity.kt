@@ -68,24 +68,12 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
         setSupportActionBar(binding.appBarMain.toolbar)
 
+        loadAndUpdateStoreNames()
+
         navView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
-                R.id.nav_food_basics_list -> {
-                    val bundle = bundleOf("storeName" to "food basics")
-                    navController.navigate(R.id.nav_home, bundle)
-                    supportActionBar?.title = getString(R.string.food_basics)
-                }
-                R.id.nav_zehrs_list -> {
-                    val bundle = bundleOf("storeName" to "zehrs")
-                    navController.navigate(R.id.nav_home, bundle)
-                    supportActionBar?.title = getString(R.string.zehrs)
-                }
                 R.id.nav_add_grocery_item -> {
                     navController.navigate(R.id.nav_add_grocery_item)
-                }
-                R.id.nav_home -> {
-                    val bundle = bundleOf("storeName" to "food basics")
-                    navController.navigate(R.id.nav_home, bundle)
                 }
                 R.id.nav_log_out_icon -> {
                     val dialogInfo = DialogInformation(
@@ -139,6 +127,36 @@ class MainActivity : AppCompatActivity() {
         })
 
         displayNotification("Test notification title", "Test notification description")
+    }
+
+    private fun loadAndUpdateStoreNames() {
+        firebaseStorage.getGroceryStoreNames { storeNames ->
+            if (storeNames.isNotEmpty()) {
+                updateNavigationMenu(storeNames)
+                Toast.makeText(this, "Welcome to Grocery Helper!", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(this, "No stores available to display.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun updateNavigationMenu(storeList: List<String>) {
+        val menu = binding.navView.menu
+        val storeGroup = menu.addSubMenu("Stores")
+
+        storeList.forEach {
+            storeName ->
+                storeGroup.add(R.id.nav_home, Menu.NONE, Menu.NONE, storeName)
+                    .setIcon(R.drawable.home_icon)
+                    .setOnMenuItemClickListener {
+                        val bundle = bundleOf("storeName" to storeName)
+                        findNavController(R.id.nav_host_fragment_content_main).navigate(R.id.nav_home, bundle)
+                        binding.drawerLayout.closeDrawers()
+                        true
+                    }
+        }
+
+        binding.navView.invalidate()
     }
 
     private fun deleteFirebaseUserAccount() {
