@@ -40,17 +40,13 @@ class HomeFragment : Fragment(), IOnGroceryItemInteractionListener {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val storeName = arguments?.getString("storeName")
+        val storeName = arguments?.getString("storeName") ?: "food basics"
 
-        if (storeName != null && (storeName == "food basics" || storeName == "zehrs")) {
-            viewModelFactory = GroceryViewModelFactory(storeName)
-            binding.yourGroceryListTextView.text = getString(R.string.grocery_list_title, storeName)
-        } else {
-            viewModelFactory = GroceryViewModelFactory("food basics")
-            binding.yourGroceryListTextView.text = getString(R.string.grocery_list_title, "food basics")
-        }
+        viewModelFactory = GroceryViewModelFactory(storeName)
 
         viewModel = ViewModelProvider(requireActivity()).get(GroceryViewModel::class.java)
+
+        binding.yourGroceryListTextView.text = getString(R.string.grocery_list_title, storeName)
 
         adapter = GroceryItemAdapter(requireContext(), this) { selectedGroceryItem ->
             val groceryItemId = selectedGroceryItem.id
@@ -82,7 +78,8 @@ class HomeFragment : Fragment(), IOnGroceryItemInteractionListener {
         binding.recyclerViewGroceryItemsList.adapter = adapter
 
         viewModel.groceryItems.observe(viewLifecycleOwner, { items ->
-            adapter.updateGroceryItems(items)
+            val filteredItems = items.filter{ it.store == storeName } as MutableList<GroceryItem>
+            adapter.updateGroceryItems(filteredItems)
         })
 
         return root

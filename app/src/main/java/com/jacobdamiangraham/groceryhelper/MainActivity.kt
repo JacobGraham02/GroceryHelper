@@ -78,7 +78,8 @@ class MainActivity : AppCompatActivity() {
                     navController.navigate(R.id.nav_add_grocery_item)
                 }
                 R.id.nav_home -> {
-                    navController.navigate(R.id.nav_home)
+                    val bundle = bundleOf("storeName" to "food basics")
+                    navController.navigate(R.id.nav_home, bundle)
                 }
                 R.id.nav_log_out_icon -> {
                     firebaseStorage.logoutWithFirebase(object: IUserLogoutCallback {

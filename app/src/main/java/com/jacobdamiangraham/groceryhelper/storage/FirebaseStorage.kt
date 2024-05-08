@@ -80,6 +80,30 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
         }
     }
 
+//    private fun getGroceryItemsFromCollection(storeName: String?) {
+//        val currentFirebaseUser = Firebase.auth.currentUser
+//        if (currentFirebaseUser != null) {
+//            val firebaseUserId = currentFirebaseUser.uid
+//            firebaseUserCollectionInstance
+//                .document(firebaseUserId)
+//                .get()
+//                .addOnSuccessListener { userDocument ->
+//                    val groceryItems = userDocument
+//                        .get("groceryItems") as? List<Map<String, Any>>
+//                    if (groceryItems != null) {
+//                        val groceryItemList = ArrayList<GroceryItem>()
+//                        for (groceryItemMap in groceryItems) {
+//                            val groceryItem = convertJsonToGroceryItemObjects(groceryItemMap)
+//                            if (groceryItem.store == storeName) {
+//                                groceryItemList.add(groceryItem)
+//                            }
+//                        }
+//                        mutableGroceryItemList.value = groceryItemList
+//                    }
+//                }
+//        }
+//    }
+
     private fun getGroceryItemsFromCollection(storeName: String?) {
         val currentFirebaseUser = Firebase.auth.currentUser
         if (currentFirebaseUser != null) {
@@ -91,18 +115,19 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
                     val groceryItems = userDocument
                         .get("groceryItems") as? List<Map<String, Any>>
                     if (groceryItems != null) {
-                        val groceryItemList = ArrayList<GroceryItem>()
-                        for (groceryItemMap in groceryItems) {
-                            val groceryItem = convertJsonToGroceryItemObjects(groceryItemMap)
-                            if (groceryItem.store == storeName) {
-                                groceryItemList.add(groceryItem)
+                        val groceryItemList = groceryItems
+                            .filter {
+                                it["store"] == storeName
                             }
-                        }
-                        mutableGroceryItemList.value = groceryItemList
+                            .map {
+                                convertJsonToGroceryItemObjects(it)
+                            }
+                        mutableGroceryItemList.value = ArrayList(groceryItemList)
                     }
                 }
         }
     }
+
 
     fun shareGroceryItemsWithUser(storeName: String, recipientUserId: String, callback: IMergeGroceryListOperation) {
         val currentLoggedInUser = Firebase.auth.currentUser
