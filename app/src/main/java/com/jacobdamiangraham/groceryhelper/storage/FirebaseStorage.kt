@@ -80,30 +80,6 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
         }
     }
 
-//    private fun getGroceryItemsFromCollection(storeName: String?) {
-//        val currentFirebaseUser = Firebase.auth.currentUser
-//        if (currentFirebaseUser != null) {
-//            val firebaseUserId = currentFirebaseUser.uid
-//            firebaseUserCollectionInstance
-//                .document(firebaseUserId)
-//                .get()
-//                .addOnSuccessListener { userDocument ->
-//                    val groceryItems = userDocument
-//                        .get("groceryItems") as? List<Map<String, Any>>
-//                    if (groceryItems != null) {
-//                        val groceryItemList = ArrayList<GroceryItem>()
-//                        for (groceryItemMap in groceryItems) {
-//                            val groceryItem = convertJsonToGroceryItemObjects(groceryItemMap)
-//                            if (groceryItem.store == storeName) {
-//                                groceryItemList.add(groceryItem)
-//                            }
-//                        }
-//                        mutableGroceryItemList.value = groceryItemList
-//                    }
-//                }
-//        }
-//    }
-
     private fun getGroceryItemsFromCollection(storeName: String?) {
         val currentFirebaseUser = Firebase.auth.currentUser
         if (currentFirebaseUser != null) {
@@ -128,6 +104,30 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
         }
     }
 
+    fun deleteUserAccount(callback: IUserLogoutCallback) {
+        val currentUser = firebaseAuthentication.currentUser
+        if (currentUser != null) {
+            val userDocument = firebaseUserCollectionInstance.document(currentUser.uid)
+            // Delete the user document from firebase, and then delete the user from firebase authentication
+            userDocument.delete().addOnCompleteListener {
+                deleteUserTask ->
+                    if (deleteUserTask.isSuccessful) {
+                        currentUser.delete().addOnCompleteListener {
+                            deleteFirebaseUserTask ->
+                                if (deleteFirebaseUserTask.isSuccessful) {
+                                    callback.onLogoutSuccess("Your account has been successfully deleted")
+                                } else {
+                                    callback.onLogoutFailure("Failed to delete your account")
+                                }
+                        }
+                    } else {
+                        callback.onLogoutFailure("Failed to delete your user data")
+                    }
+            }
+        } else {
+            callback.onLogoutFailure("You are not currently logged in")
+        }
+    }
 
     fun shareGroceryItemsWithUser(storeName: String, recipientUserId: String, callback: IMergeGroceryListOperation) {
         val currentLoggedInUser = Firebase.auth.currentUser

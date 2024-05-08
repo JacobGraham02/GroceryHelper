@@ -28,5 +28,10 @@
             android:id="@+id/nav_log_out_icon"
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/log_out" />
+
+        <item
+            android:id="@+id/nav_delete_account"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/delete_account" />
     </group>
 </menu>

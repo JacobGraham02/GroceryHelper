@@ -104,6 +104,25 @@ class MainActivity : AppCompatActivity() {
 
                     })
                 }
+                R.id.nav_delete_account -> {
+                    firebaseStorage.deleteUserAccount(object : IUserLogoutCallback {
+                        override fun onLogoutSuccess(successMessage: String) {
+                            Toast.makeText(
+                                this@MainActivity,
+                                successMessage,
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+
+                        override fun onLogoutFailure(failureMessage: String) {
+                            Toast.makeText(
+                                this@MainActivity,
+                                failureMessage,
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    })
+                }
             }
             menuItem.isChecked = true
             drawerLayout.closeDrawers()

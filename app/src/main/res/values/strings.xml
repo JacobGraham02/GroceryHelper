@@ -60,6 +60,7 @@
     <string name="sort_cost_high_to_low">Sort cost high to low</string>
     <string name="sort_names_z_to_a">Sort names Z to A</string>
     <string name="sort_names_a_to_z">Sort names A to Z</string>
+    <string name="delete_account">Delete account</string>
     <string-array name="categories">
         <item>Baking</item>
         <item>Canned goods</item>
