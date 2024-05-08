@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.drawerlayout.widget.DrawerLayout
@@ -18,8 +19,10 @@ import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.jacobdamiangraham.groceryhelper.databinding.ActivityMainBinding
 import com.jacobdamiangraham.groceryhelper.factory.GroceryViewModelFactory
+import com.jacobdamiangraham.groceryhelper.factory.PromptBuilderFactory
 import com.jacobdamiangraham.groceryhelper.interfaces.IAuthStatusListener
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserLogoutCallback
+import com.jacobdamiangraham.groceryhelper.model.DialogInformation
 import com.jacobdamiangraham.groceryhelper.notification.NotificationBuilder
 import com.jacobdamiangraham.groceryhelper.storage.FirebaseStorage
 import com.jacobdamiangraham.groceryhelper.ui.signin.SignInView
@@ -105,23 +108,21 @@ class MainActivity : AppCompatActivity() {
                     })
                 }
                 R.id.nav_delete_account -> {
-                    firebaseStorage.deleteUserAccount(object : IUserLogoutCallback {
-                        override fun onLogoutSuccess(successMessage: String) {
-                            Toast.makeText(
-                                this@MainActivity,
-                                successMessage,
-                                Toast.LENGTH_LONG
-                            ).show()
+                    val dialogInfo = DialogInformation(
+                        title = "Confirm delete account",
+                        message = "Are you sure you want to delete your account?"
+                    )
+                    val alertDialogGenerator = PromptBuilderFactory.getAlertDialogGenerator(
+                        "confirmation"
+                    )
+                    alertDialogGenerator.configure(
+                        this,
+                        AlertDialog.Builder(this),
+                        dialogInfo,
+                        positiveButtonAction = {
+                            deleteFirebaseUserAccount()
                         }
-
-                        override fun onLogoutFailure(failureMessage: String) {
-                            Toast.makeText(
-                                this@MainActivity,
-                                failureMessage,
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                    })
+                    ).show()
                 }
             }
             menuItem.isChecked = true
@@ -141,6 +142,26 @@ class MainActivity : AppCompatActivity() {
         })
 
         displayNotification("Test notification title", "Test notification description")
+    }
+
+    private fun deleteFirebaseUserAccount() {
+        firebaseStorage.deleteUserAccount(object : IUserLogoutCallback {
+            override fun onLogoutSuccess(successMessage: String) {
+                Toast.makeText(
+                    this@MainActivity,
+                    successMessage,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+
+            override fun onLogoutFailure(failureMessage: String) {
+                Toast.makeText(
+                    this@MainActivity,
+                    failureMessage,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        })
     }
 
     private fun redirectToSignInScreen() {
