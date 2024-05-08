@@ -31,7 +31,7 @@ object ValidationUtil {
     }
 
     fun isValidCost(cost: Float): Boolean {
-        return cost >= 0.01
+        return cost >= 0.00
     }
 
     fun validateGroceryItemInputs(itemName: String, quantity: Int, category: String, store: String, cost: Float): Boolean {
