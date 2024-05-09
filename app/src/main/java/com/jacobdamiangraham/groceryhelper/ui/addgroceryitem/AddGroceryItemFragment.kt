@@ -302,7 +302,7 @@ class AddGroceryItemFragment: Fragment() {
 
     private fun addGroceryItemToFirebase(groceryItem: GroceryItem) {
         try {
-            firebaseStorage.addGroceryItemToFirebase2(
+            firebaseStorage.addGroceryItemToFirebase(
                 groceryItem,
                 object : IAddGroceryItemCallback {
                     override fun onAddSuccess(successMessage: String) {

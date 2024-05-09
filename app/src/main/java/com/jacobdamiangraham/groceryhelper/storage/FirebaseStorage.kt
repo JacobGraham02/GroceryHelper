@@ -263,7 +263,7 @@ class FirebaseStorage() {
             }
     }
 
-    fun addGroceryItemToFirebase2(groceryItem: GroceryItem, callback: IAddGroceryItemCallback) {
+    fun addGroceryItemToFirebase(groceryItem: GroceryItem, callback: IAddGroceryItemCallback) {
         val currentFirebaseUser = Firebase.auth.currentUser
         val currentFirebaseUserUid = currentFirebaseUser?.uid
 
@@ -318,40 +318,6 @@ class FirebaseStorage() {
                         }
                     }
                 }
-        }
-    }
-
-    fun addGroceryItemToFirebase(groceryItem: GroceryItem, callback: IAddGroceryItemCallback) {
-        val currentFirebaseUser = Firebase.auth.currentUser
-        val currentFirebaseUserUid = currentFirebaseUser?.uid
-
-        if (currentFirebaseUserUid != null) {
-            val userDocumentReference = FirebaseFirestore
-                .getInstance()
-                .collection("users")
-                .document(currentFirebaseUserUid)
-
-            // First, delete the existing grocery item
-            deleteGroceryItem(groceryItem, object : IDeleteGroceryItemCallback {
-                override fun onDeleteSuccess(successMessage: String) {
-                    // After successful deletion, add the new grocery item
-                    userDocumentReference.update("groceryItems", FieldValue.arrayUnion(groceryItem))
-                        .addOnSuccessListener {
-                            callback.onAddSuccess("Grocery item added successfully")
-                        }
-                        .addOnFailureListener { e ->
-                            callback.onAddFailure("Failed to add grocery item: ${e.message}")
-                        }
-                }
-
-                override fun onDeleteFailure(failureMessage: String) {
-                    // If deletion fails, do not attempt to add the new item
-                    Log.w("ApplicationErrors", failureMessage)
-                    callback.onAddFailure("Failed to delete existing item: $failureMessage")
-                }
-            })
-        } else {
-            callback.onAddFailure("You are not logged in")
         }
     }
 
