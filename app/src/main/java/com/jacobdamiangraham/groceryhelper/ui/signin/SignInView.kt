@@ -19,7 +19,7 @@ import com.jacobdamiangraham.groceryhelper.utils.ValidationUtil
 class SignInView : AppCompatActivity() {
 
     private lateinit var activitySignInBinding: ActivitySigninBinding
-    private val firebaseStorage: FirebaseStorage = FirebaseStorage("users")
+    private val firebaseStorage: FirebaseStorage = FirebaseStorage()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

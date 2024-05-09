@@ -18,7 +18,7 @@ import com.jacobdamiangraham.groceryhelper.utils.ValidationUtil
 class RegisterView: AppCompatActivity() {
 
     private lateinit var activityRegisterBinding: ActivityRegisterBinding
-    private val firebaseStorage: FirebaseStorage = FirebaseStorage("users")
+    private val firebaseStorage: FirebaseStorage = FirebaseStorage()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

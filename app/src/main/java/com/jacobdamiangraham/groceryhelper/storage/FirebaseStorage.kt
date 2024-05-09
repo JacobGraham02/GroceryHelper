@@ -21,9 +21,8 @@ import com.jacobdamiangraham.groceryhelper.interfaces.IUserLogoutCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserRegistrationCallback
 import com.jacobdamiangraham.groceryhelper.model.GroceryItem
 import com.jacobdamiangraham.groceryhelper.ui.signin.SignInView
-import java.lang.ref.Reference
 
-class FirebaseStorage(collectionName: String? = "groceryitems") {
+class FirebaseStorage() {
 
     private var firebaseAuthentication: FirebaseAuth = Firebase.auth
     private lateinit var firebaseGroceryItemCollectionInstance: DocumentReference
@@ -32,20 +31,8 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
     private lateinit var userId: String
 
     init {
-        if (collectionName != null) {
-            getCollectionOfItems(collectionName)
-        }
-    }
-
-    private fun getCollectionOfItems(collectionName: String) {
-        when (collectionName) {
-            "groceryitems" -> {
-                getCollectionOfGroceryItems()
-            }
-            "users" -> {
-                getCollectionOfUsers()
-            }
-        }
+        getCollectionOfGroceryItems()
+        getCollectionOfUsers()
     }
 
     private fun getCollectionOfGroceryItems() {
@@ -63,13 +50,14 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
         firebaseUserCollectionInstance = FirebaseFirestore.getInstance().collection("users")
     }
 
-    fun deleteGroceryItem(itemId: String, callback: IDeleteGroceryItemCallback) {
+    fun deleteGroceryItem(groceryItem: GroceryItem, callback: IDeleteGroceryItemCallback) {
         // Start a transaction to safely modify the array within the document
+        val groceryItemId = groceryItem.id
         FirebaseFirestore.getInstance().runTransaction { transaction ->
             val snapshot = transaction.get(firebaseGroceryItemCollectionInstance)
             val groceryItems = snapshot.get("groceryItems") as? List<Map<String, Any>> ?: listOf()
 
-            val updatedItems = groceryItems.filterNot { it["id"] == itemId }
+            val updatedItems = groceryItems.filterNot { it["id"] == groceryItemId }
 
             transaction.update(firebaseGroceryItemCollectionInstance, "groceryItems", updatedItems)
             null // Kotlin requires a return for the transaction block, use null for transactions not returning a value
@@ -280,18 +268,31 @@ class FirebaseStorage(collectionName: String? = "groceryitems") {
         val currentFirebaseUserUid = currentFirebaseUser?.uid
 
         if (currentFirebaseUserUid != null) {
-            val userDocumentReference =
-                FirebaseFirestore
-                    .getInstance()
-                    .collection("users")
-                    .document(currentFirebaseUserUid)
-            userDocumentReference.update("groceryItems", FieldValue.arrayUnion(groceryItem))
-                .addOnSuccessListener {
-                    callback.onAddSuccess("Grocery item added successfully")
+            // Reference to the user's document
+            val userDocumentReference = FirebaseFirestore
+                .getInstance()
+                .collection("users")
+                .document(currentFirebaseUserUid)
+
+            // First, delete the existing grocery item
+            deleteGroceryItem(groceryItem, object : IDeleteGroceryItemCallback {
+                override fun onDeleteSuccess(successMessage: String) {
+                    // After successful deletion, add the new grocery item
+                    userDocumentReference.update("groceryItems", FieldValue.arrayUnion(groceryItem))
+                        .addOnSuccessListener {
+                            callback.onAddSuccess("Grocery item added successfully")
+                        }
+                        .addOnFailureListener { e ->
+                            callback.onAddFailure("Failed to add grocery item: ${e.message}")
+                        }
                 }
-                .addOnFailureListener {
-                    callback.onAddFailure("Failed to add grocery item")
+
+                override fun onDeleteFailure(failureMessage: String) {
+                    // If deletion fails, do not attempt to add the new item
+                    Log.w("ApplicationErrors", failureMessage)
+//                    callback.onAddFailure("Failed to delete existing item: $failureMessage")
                 }
+            })
         } else {
             callback.onAddFailure("You are not logged in")
         }

@@ -41,11 +41,13 @@ class AddGroceryItemFragment: Fragment() {
 
     private lateinit var viewModel: AddGroceryItemViewModel
 
-    private val firebaseStorage: FirebaseStorage = FirebaseStorage("users")
+    private val firebaseStorage: FirebaseStorage = FirebaseStorage()
 
     private var storeNames = mutableListOf<String>()
 
     private lateinit var storeNamesSpinnerAdapter: ArrayAdapter<String>
+
+    private lateinit var groceryItemId: String
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -76,6 +78,7 @@ class AddGroceryItemFragment: Fragment() {
 
         val groceryItemCategory = groceryItemArgs.groceryItemCategory
         val groceryItemStore = groceryItemArgs.groceryItemStore
+        groceryItemId = groceryItemArgs.groceryItemId
 
         val arrayListGroceryItemCategory = arrayListOf(
             "Baking",
@@ -242,6 +245,8 @@ class AddGroceryItemFragment: Fragment() {
             val groceryItemStore = binding.addGroceryStoreNameSpinner.selectedItem?.toString() ?: ""
             val groceryItemCategory = binding.addGroceryItemCategorySpinner.selectedItem?.toString() ?: ""
 
+            val groceryItemIdToUpdate = if (groceryItemId.isBlank()) UUID.randomUUID().toString() else groceryItemId
+
             if (!(ValidationUtil.validateGroceryItemInputs(
                     groceryItemName,
                     groceryItemQuantity,
@@ -257,10 +262,9 @@ class AddGroceryItemFragment: Fragment() {
                 return@setOnClickListener
             }
 
-            val groceryItemUUID = UUID.randomUUID()
             val newGroceryItem = GroceryItem(
                 groceryItemName,
-                groceryItemUUID.toString(),
+                groceryItemIdToUpdate,
                 groceryItemCategory,
                 groceryItemStore,
                 groceryItemQuantity,
@@ -346,20 +350,12 @@ class AddGroceryItemFragment: Fragment() {
     }
 
     private fun setSelectedStoreName(storeName: String) {
-        Log.d("Debug", "Attempting to set store name: $storeName")
-        Log.d("Debug", "Current store names in the list: $storeNames")
-
         val normalizedStoreName = storeName.trim().lowercase(Locale.ROOT)
         val normalizedStoreNames = storeNames.map { it.trim().lowercase(Locale.ROOT) }
         val storePositionInSpinner = normalizedStoreNames.indexOf(normalizedStoreName)
 
-        Log.d("Debug", "Normalized store name: $normalizedStoreName")
-        Log.d("Debug", "Store position in spinner: $storePositionInSpinner")
-
         if (storePositionInSpinner != -1) {
             binding.addGroceryStoreNameSpinner.setSelection(storePositionInSpinner)
-        } else {
-            Log.d("Debug", "Store name '$storeName' not found in list.")
         }
     }
 

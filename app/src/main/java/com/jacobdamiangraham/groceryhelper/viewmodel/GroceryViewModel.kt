@@ -9,9 +9,8 @@ import com.jacobdamiangraham.groceryhelper.repository.GroceryItemsRepository
 import com.jacobdamiangraham.groceryhelper.storage.FirebaseStorage
 
 class GroceryViewModel(storeName: String? = "food basics"): ViewModel() {
-    private val firebaseStorageUsers: FirebaseStorage = FirebaseStorage("users")
-    private val firebaseStorageGroceryItems: FirebaseStorage = FirebaseStorage()
-    private val repository = GroceryItemsRepository(firebaseStorageUsers)
+    private val firebaseStorage: FirebaseStorage = FirebaseStorage()
+    private val repository = GroceryItemsRepository(firebaseStorage)
 
     val groceryItems: MutableLiveData<MutableList<GroceryItem>> = repository.getMutableListOfGroceryItems(storeName)
 
@@ -36,7 +35,7 @@ class GroceryViewModel(storeName: String? = "food basics"): ViewModel() {
     }
 
     fun deleteGroceryItem(item: GroceryItem) {
-        firebaseStorageGroceryItems.deleteGroceryItem(item.id, object : IDeleteGroceryItemCallback {
+        firebaseStorage.deleteGroceryItem(item, object : IDeleteGroceryItemCallback {
             override fun onDeleteSuccess(successMessage: String) {
 
             }
