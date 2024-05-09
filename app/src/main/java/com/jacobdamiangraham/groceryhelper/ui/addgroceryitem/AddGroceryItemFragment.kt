@@ -162,6 +162,18 @@ class AddGroceryItemFragment: Fragment() {
 
                 if (ValidationUtil.isValidGroceryItemString(newStoreName)) {
                     addStoreNameToSpinner(newStoreName)
+                    firebaseStorage.getGroceryStoreNames {
+                        stores ->
+                            val groceryStoreExists = stores.contains(newStoreName)
+                            if (groceryStoreExists) {
+                                Toast.makeText(
+                                    requireContext(),
+                                    "This store already exists",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                return@getGroceryStoreNames
+                            }
+                    }
                     firebaseStorage.addGroceryStoreToUser(
                         newStoreName,
                         object : IAddGroceryStoreCallback {
