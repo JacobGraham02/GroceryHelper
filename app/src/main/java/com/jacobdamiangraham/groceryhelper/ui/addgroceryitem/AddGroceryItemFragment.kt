@@ -179,6 +179,7 @@ class AddGroceryItemFragment: Fragment() {
                             }
                         })
                 }
+                closeKeyboard(v)
             } else {
                 Toast.
                     makeText(context,
@@ -190,6 +191,11 @@ class AddGroceryItemFragment: Fragment() {
         }
 
         return root
+    }
+
+    private fun closeKeyboard(view: View) {
+        val inputMethodManager = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        inputMethodManager?.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
     private fun validate(addGroceryItemInputType: AddGroceryItemInputType, value: String) {
@@ -312,6 +318,7 @@ class AddGroceryItemFragment: Fragment() {
                             Toast.LENGTH_LONG
                         )
                             .show()
+                        findNavController().navigateUp()
                     }
 
                     override fun onAddFailure(failureMessage: String) {

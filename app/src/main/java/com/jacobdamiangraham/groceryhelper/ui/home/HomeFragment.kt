@@ -11,12 +11,14 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.ktx.Firebase
 import com.jacobdamiangraham.groceryhelper.R
 import com.jacobdamiangraham.groceryhelper.databinding.FragmentHomeBinding
 import com.jacobdamiangraham.groceryhelper.factory.GroceryViewModelFactory
 import com.jacobdamiangraham.groceryhelper.interfaces.IDeleteGroceryItemCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IOnGroceryItemInteractionListener
 import com.jacobdamiangraham.groceryhelper.model.GroceryItem
+import com.jacobdamiangraham.groceryhelper.storage.FirebaseStorage
 import com.jacobdamiangraham.groceryhelper.ui.GroceryItemAdapter
 import com.jacobdamiangraham.groceryhelper.viewmodel.GroceryViewModel
 
@@ -25,6 +27,7 @@ class HomeFragment : Fragment(), IOnGroceryItemInteractionListener {
     private lateinit var viewModel: GroceryViewModel
     private lateinit var adapter: GroceryItemAdapter
     private lateinit var viewModelFactory: GroceryViewModelFactory
+    private val firebaseStorage: FirebaseStorage = FirebaseStorage()
 
     private var _binding: FragmentHomeBinding? = null
 
