@@ -22,6 +22,8 @@
     <string name="invalid_quantity">Quantity - Invalid</string>
     <string name="valid_cost">Cost - Valid</string>
     <string name="invalid_cost">Cost - Invalid</string>
+    <string name="valid_store">Store - Valid</string>
+    <string name="invalid_store">Store - Invalid</string>
 
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
@@ -69,10 +71,14 @@
     <string name="sort_names_z_to_a">Sort names Z to A</string>
     <string name="sort_names_a_to_z">Sort names A to Z</string>
     <string name="delete_account">Delete account</string>
+    <string name="optional">Optional</string>
     <string name="cannot_be_blank">Cannot be blank</string>
     <string name="must_cost_at_least_0_00">Must cost at least $0.00</string>
     <string name="must_be_at_least_1">Must be at least 1</string>
     <string name="must_have_at_least_1_letter">Must have at least 1 letter</string>
+    <string name="add_new_store">Add new store</string>
+    <string name="item_cost_dollar_sign">$ </string>
+    <string name="your_grocery_list">Your grocery list</string>
     <string-array name="categories">
         <item>Baking</item>
         <item>Canned goods</item>
@@ -93,4 +99,6 @@
         <item>food basics</item>
         <item>zehrs</item>
     </string-array>
+
+    <item name="store_group" type="id"/>
 </resources>

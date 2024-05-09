@@ -18,7 +18,7 @@ import com.jacobdamiangraham.groceryhelper.utils.ValidationUtil
 class RegisterView: AppCompatActivity() {
 
     private lateinit var activityRegisterBinding: ActivityRegisterBinding
-    private val firebaseStorage: FirebaseStorage = FirebaseStorage("users")
+    private val firebaseStorage: FirebaseStorage = FirebaseStorage()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -98,7 +98,7 @@ class RegisterView: AppCompatActivity() {
             }
 
             SignInInputType.CONFIRM_PASSWORD -> {
-                if (value == confirmPassword) {
+                if (ValidationUtil.isValidPassword(confirmPassword!!) && (value == confirmPassword)) {
                     activityRegisterBinding.confirmPasswordInputField.setBackgroundResource(R.drawable.edit_text_valid)
                     activityRegisterBinding.confirmPasswordInputTextView.text = getString(R.string.valid_confirm_password)
                     activityRegisterBinding.confirmPasswordInputTextView.setTextColor(ContextCompat.getColor(this, R.color.green))
@@ -122,7 +122,7 @@ class RegisterView: AppCompatActivity() {
             Toast.makeText(
                 this,
                 "Password and confirm password do not match",
-                Toast.LENGTH_LONG)
+                Toast.LENGTH_SHORT)
                 .show()
             return
         }
@@ -134,7 +134,7 @@ class RegisterView: AppCompatActivity() {
             Toast.makeText(
                 this,
                 "Please enter a valid email and password",
-                Toast.LENGTH_LONG)
+                Toast.LENGTH_SHORT)
                 .show()
             return
         }
@@ -144,7 +144,7 @@ class RegisterView: AppCompatActivity() {
                 Toast.makeText(
                     this@RegisterView,
                     successMessage,
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 )
                     .show()
                 backToLoginActivity()
@@ -154,11 +154,18 @@ class RegisterView: AppCompatActivity() {
                 Toast.makeText(
                     this@RegisterView,
                     errorMessage,
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 )
                     .show()
+                clearRegisterFields()
             }
         })
+    }
+
+    private fun clearRegisterFields() {
+        activityRegisterBinding.emailInputField.text = null
+        activityRegisterBinding.passwordInputField.text = null
+        activityRegisterBinding.confirmPasswordInputField.text = null
     }
 
     private fun backToLoginActivity() {

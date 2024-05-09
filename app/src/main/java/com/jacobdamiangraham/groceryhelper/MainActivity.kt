@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private lateinit var notificationBuilder: NotificationBuilder
-    private val firebaseStorage: FirebaseStorage = FirebaseStorage("users")
+    private val firebaseStorage: FirebaseStorage = FirebaseStorage()
 
     private lateinit var viewModel: GroceryViewModel
     private lateinit var viewModelFactory: GroceryViewModelFactory
@@ -45,12 +45,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setSupportActionBar(binding.appBarMain.toolbar)
-
-        binding.appBarMain.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null)
-                    .setAnchorView(R.id.fab).show()
-        }
 
         viewModelFactory = GroceryViewModelFactory("food basics")
         viewModel = ViewModelProvider(this).get(GroceryViewModel::class.java)
@@ -68,24 +62,15 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
         setSupportActionBar(binding.appBarMain.toolbar)
 
+        loadAndUpdateStoreNames()
+
         navView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
-                R.id.nav_food_basics_list -> {
-                    val bundle = bundleOf("storeName" to "food basics")
-                    navController.navigate(R.id.nav_home, bundle)
-                    supportActionBar?.title = getString(R.string.food_basics)
-                }
-                R.id.nav_zehrs_list -> {
-                    val bundle = bundleOf("storeName" to "zehrs")
-                    navController.navigate(R.id.nav_home, bundle)
-                    supportActionBar?.title = getString(R.string.zehrs)
+                R.id.nav_home -> {
+                    navController.navigate(R.id.nav_home)
                 }
                 R.id.nav_add_grocery_item -> {
                     navController.navigate(R.id.nav_add_grocery_item)
-                }
-                R.id.nav_home -> {
-                    val bundle = bundleOf("storeName" to "food basics")
-                    navController.navigate(R.id.nav_home, bundle)
                 }
                 R.id.nav_log_out_icon -> {
                     val dialogInfo = DialogInformation(
@@ -132,13 +117,44 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(
                     this@MainActivity,
                     onUserUnauthenticatedMessage,
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 ).show()
                 redirectToSignInScreen()
             }
         })
+    }
 
-        displayNotification("Test notification title", "Test notification description")
+    private fun loadAndUpdateStoreNames() {
+        firebaseStorage.getGroceryStoreNames { storeNames ->
+            if (storeNames.isNotEmpty()) {
+                updateNavigationMenu(storeNames)
+            }
+        }
+    }
+
+    private fun updateNavigationMenu(storeList: List<String>) {
+        val navMenu = binding.navView.menu
+
+        var storeGroup = navMenu.findItem(R.id.store_group)?.subMenu
+
+        if (storeGroup == null) {
+            storeGroup = navMenu.addSubMenu(Menu.NONE, R.id.store_group, Menu.NONE, "Stores")
+        } else {
+            storeGroup.clear()
+        }
+
+        storeList.forEach { storeName ->
+            storeGroup?.add(R.id.store_group, Menu.NONE, Menu.NONE, storeName)
+                ?.setIcon(R.drawable.home_icon)
+                ?.setOnMenuItemClickListener {
+                    val bundle = bundleOf("storeName" to storeName)
+                    findNavController(R.id.nav_host_fragment_content_main).navigate(R.id.nav_home, bundle)
+                    binding.drawerLayout.closeDrawers()
+                    true
+                }
+        }
+
+        binding.navView.invalidate()
     }
 
     private fun deleteFirebaseUserAccount() {
@@ -147,7 +163,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(
                     this@MainActivity,
                     successMessage,
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 ).show()
             }
 
@@ -155,7 +171,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(
                     this@MainActivity,
                     failureMessage,
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 ).show()
             }
         })
@@ -167,7 +183,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(
                     this@MainActivity,
                     successMessage,
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 ).show()
             }
 
@@ -175,7 +191,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(
                     this@MainActivity,
                     failureMessage,
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 ).show()
             }
 
