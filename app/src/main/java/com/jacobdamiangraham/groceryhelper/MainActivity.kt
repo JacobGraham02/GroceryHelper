@@ -125,8 +125,6 @@ class MainActivity : AppCompatActivity() {
                 redirectToSignInScreen()
             }
         })
-
-        displayNotification("Test notification title", "Test notification description")
     }
 
     private fun loadAndUpdateStoreNames() {
