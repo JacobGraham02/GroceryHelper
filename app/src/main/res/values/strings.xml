@@ -77,6 +77,7 @@
     <string name="must_be_at_least_1">Must be at least 1</string>
     <string name="must_have_at_least_1_letter">Must have at least 1 letter</string>
     <string name="add_new_store">Add new store</string>
+    <string name="item_cost_dollar_sign">$ </string>
     <string-array name="categories">
         <item>Baking</item>
         <item>Canned goods</item>
