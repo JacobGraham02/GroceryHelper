@@ -21,7 +21,7 @@
             android:id="@+id/yourGroceryListTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Your grocery list"
+            android:text="@string/your_grocery_list"
             android:layout_marginBottom="5dp"
             android:textAlignment="center"
             android:textColor="#000000"

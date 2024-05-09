@@ -46,12 +46,6 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.appBarMain.toolbar)
 
-        binding.appBarMain.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null)
-                    .setAnchorView(R.id.fab).show()
-        }
-
         viewModelFactory = GroceryViewModelFactory("food basics")
         viewModel = ViewModelProvider(this).get(GroceryViewModel::class.java)
 
