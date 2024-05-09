@@ -154,7 +154,7 @@
                 android:layout_height="wrap_content"
                 android:autofillHints=""
                 android:hint="@string/optional_tap_to_type"
-                android:inputType="number|numberDecimal"
+                android:inputType="numberDecimal"
                 android:nextFocusDown="@id/addItemButton"
                 android:textAlignment="viewStart"
                 android:textColor="#000000" />

@@ -117,7 +117,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(
                     this@MainActivity,
                     onUserUnauthenticatedMessage,
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 ).show()
                 redirectToSignInScreen()
             }
@@ -128,8 +128,6 @@ class MainActivity : AppCompatActivity() {
         firebaseStorage.getGroceryStoreNames { storeNames ->
             if (storeNames.isNotEmpty()) {
                 updateNavigationMenu(storeNames)
-            } else {
-                Toast.makeText(this, "No stores available to display.", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -165,7 +163,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(
                     this@MainActivity,
                     successMessage,
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 ).show()
             }
 
@@ -173,7 +171,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(
                     this@MainActivity,
                     failureMessage,
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 ).show()
             }
         })
@@ -185,7 +183,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(
                     this@MainActivity,
                     successMessage,
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 ).show()
             }
 
@@ -193,7 +191,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(
                     this@MainActivity,
                     failureMessage,
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 ).show()
             }
 

@@ -100,7 +100,7 @@ class SignInView : AppCompatActivity() {
             Toast.makeText(
                 this,
                 "Both the email and password field must not be empty",
-                Toast.LENGTH_LONG
+                Toast.LENGTH_SHORT
             )
                 .show()
             return
@@ -113,7 +113,7 @@ class SignInView : AppCompatActivity() {
             Toast.makeText(
                 this,
                 "Please enter a valid email and password",
-                Toast.LENGTH_LONG
+                Toast.LENGTH_SHORT
             )
                 .show()
         }
@@ -123,7 +123,7 @@ class SignInView : AppCompatActivity() {
                 Toast.makeText(
                     this@SignInView,
                     successMessage,
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 )
                     .show()
                 redirectToMainActivity()
@@ -133,7 +133,7 @@ class SignInView : AppCompatActivity() {
                 Toast.makeText(
                     this@SignInView,
                     failureMessage,
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 )
                     .show()
             }

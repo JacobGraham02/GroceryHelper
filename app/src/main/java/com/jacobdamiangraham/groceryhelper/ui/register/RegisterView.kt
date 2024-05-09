@@ -122,7 +122,7 @@ class RegisterView: AppCompatActivity() {
             Toast.makeText(
                 this,
                 "Password and confirm password do not match",
-                Toast.LENGTH_LONG)
+                Toast.LENGTH_SHORT)
                 .show()
             return
         }
@@ -134,7 +134,7 @@ class RegisterView: AppCompatActivity() {
             Toast.makeText(
                 this,
                 "Please enter a valid email and password",
-                Toast.LENGTH_LONG)
+                Toast.LENGTH_SHORT)
                 .show()
             return
         }
@@ -144,7 +144,7 @@ class RegisterView: AppCompatActivity() {
                 Toast.makeText(
                     this@RegisterView,
                     successMessage,
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 )
                     .show()
                 backToLoginActivity()
@@ -154,7 +154,7 @@ class RegisterView: AppCompatActivity() {
                 Toast.makeText(
                     this@RegisterView,
                     errorMessage,
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 )
                     .show()
                 clearRegisterFields()

@@ -169,7 +169,7 @@ class AddGroceryItemFragment: Fragment() {
                                 Toast.makeText(
                                     requireContext(),
                                     "This store already exists",
-                                    Toast.LENGTH_LONG
+                                    Toast.LENGTH_SHORT
                                 ).show()
                                 return@getGroceryStoreNames
                             }
@@ -181,7 +181,7 @@ class AddGroceryItemFragment: Fragment() {
                                 Toast.makeText(
                                     requireContext(),
                                     successMessage,
-                                    Toast.LENGTH_LONG
+                                    Toast.LENGTH_SHORT
                                 ).show()
                             }
 
@@ -189,7 +189,7 @@ class AddGroceryItemFragment: Fragment() {
                                 Toast.makeText(
                                     requireContext(),
                                     failureMessage,
-                                    Toast.LENGTH_LONG
+                                    Toast.LENGTH_SHORT
                                 ).show()
                             }
                         })
@@ -199,7 +199,7 @@ class AddGroceryItemFragment: Fragment() {
                 Toast.
                     makeText(context,
                     "Invalid store name",
-                    Toast.LENGTH_LONG)
+                    Toast.LENGTH_SHORT)
                         .show()
             }
             true
@@ -281,7 +281,7 @@ class AddGroceryItemFragment: Fragment() {
                 Toast.makeText(
                     context,
                     "Please enter valid data",
-                    Toast.LENGTH_LONG)
+                    Toast.LENGTH_SHORT)
                     .show()
                 return@setOnClickListener
             }
@@ -330,7 +330,7 @@ class AddGroceryItemFragment: Fragment() {
                         Toast.makeText(
                             context,
                             successMessage,
-                            Toast.LENGTH_LONG
+                            Toast.LENGTH_SHORT
                         )
                             .show()
                         clearInputFields()
@@ -340,7 +340,7 @@ class AddGroceryItemFragment: Fragment() {
                         Toast.makeText(
                             context,
                             failureMessage,
-                            Toast.LENGTH_LONG
+                            Toast.LENGTH_SHORT
                         )
                             .show()
                     }
