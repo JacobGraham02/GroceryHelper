@@ -237,22 +237,21 @@ class FirebaseStorage() {
     fun getGroceryStoreNames(callback: (List<String>) -> Unit) {
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser != null) {
-            val userStoresReference = firebaseUserCollectionInstance
+            val userGroceryStoresReference = firebaseUserCollectionInstance
                 .document(currentUser.uid)
-            userStoresReference
-                .get()
-                .addOnSuccessListener {
-                    documentSnapshot ->
-                        if (documentSnapshot.exists()) {
-                            val stores = documentSnapshot.get("groceryStores") as? List<String> ?: listOf()
-                            callback(stores)
-                        } else {
-                            callback(listOf())
-                        }
-                }
-                .addOnFailureListener {
+
+            userGroceryStoresReference.addSnapshotListener { snapshot, exception ->
+                if (exception != null) {
                     callback(listOf())
+                    return@addSnapshotListener
                 }
+
+                val groceryStores = snapshot
+                    ?.get("groceryStores")
+                    as? List<String> ?: emptyList()
+
+                callback(groceryStores)
+            }
         }
     }
 

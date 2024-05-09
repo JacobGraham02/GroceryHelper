@@ -66,6 +66,9 @@ class MainActivity : AppCompatActivity() {
 
         navView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
+                R.id.nav_home -> {
+                    navController.navigate(R.id.nav_home)
+                }
                 R.id.nav_add_grocery_item -> {
                     navController.navigate(R.id.nav_add_grocery_item)
                 }
@@ -125,7 +128,6 @@ class MainActivity : AppCompatActivity() {
         firebaseStorage.getGroceryStoreNames { storeNames ->
             if (storeNames.isNotEmpty()) {
                 updateNavigationMenu(storeNames)
-                Toast.makeText(this, "Welcome to Grocery Helper!", Toast.LENGTH_LONG).show()
             } else {
                 Toast.makeText(this, "No stores available to display.", Toast.LENGTH_SHORT).show()
             }
@@ -133,19 +135,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateNavigationMenu(storeList: List<String>) {
-        val menu = binding.navView.menu
-        val storeGroup = menu.addSubMenu("Stores")
+        val navMenu = binding.navView.menu
 
-        storeList.forEach {
-            storeName ->
-                storeGroup.add(R.id.nav_home, Menu.NONE, Menu.NONE, storeName)
-                    .setIcon(R.drawable.home_icon)
-                    .setOnMenuItemClickListener {
-                        val bundle = bundleOf("storeName" to storeName)
-                        findNavController(R.id.nav_host_fragment_content_main).navigate(R.id.nav_home, bundle)
-                        binding.drawerLayout.closeDrawers()
-                        true
-                    }
+        var storeGroup = navMenu.findItem(R.id.store_group)?.subMenu
+
+        if (storeGroup == null) {
+            storeGroup = navMenu.addSubMenu(Menu.NONE, R.id.store_group, Menu.NONE, "Stores")
+        } else {
+            storeGroup.clear()
+        }
+
+        storeList.forEach { storeName ->
+            storeGroup?.add(R.id.store_group, Menu.NONE, Menu.NONE, storeName)
+                ?.setIcon(R.drawable.home_icon)
+                ?.setOnMenuItemClickListener {
+                    val bundle = bundleOf("storeName" to storeName)
+                    findNavController(R.id.nav_host_fragment_content_main).navigate(R.id.nav_home, bundle)
+                    binding.drawerLayout.closeDrawers()
+                    true
+                }
         }
 
         binding.navView.invalidate()

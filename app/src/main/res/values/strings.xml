@@ -99,4 +99,6 @@
         <item>food basics</item>
         <item>zehrs</item>
     </string-array>
+
+    <item name="store_group" type="id"/>
 </resources>
