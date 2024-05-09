@@ -5,6 +5,7 @@ import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
@@ -203,13 +204,17 @@ class FirebaseStorage() {
                                 callback.onRegistrationSuccess("Registration successful")
                             }
                             .addOnFailureListener { exception ->
-                                callback.onRegistrationFailure("Registration failure: ${exception.message}")
+                                callback.onRegistrationFailure("Registration failed. Please try again")
                             }
                     } else {
                         callback.onRegistrationFailure("User registration failed. Please try again")
                     }
                 } else {
-                    throw IllegalArgumentException(completedCreateUserTask.exception)
+                    if (completedCreateUserTask.exception is FirebaseAuthUserCollisionException) {
+                        callback.onRegistrationFailure("This email is already in use. Please use a different email")
+                    } else {
+                        callback.onRegistrationFailure("Registration failure. Please contact app developer")
+                    }
                 }
             }
     }

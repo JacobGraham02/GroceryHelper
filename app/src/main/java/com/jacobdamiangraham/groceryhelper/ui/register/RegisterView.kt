@@ -98,7 +98,7 @@ class RegisterView: AppCompatActivity() {
             }
 
             SignInInputType.CONFIRM_PASSWORD -> {
-                if (value == confirmPassword) {
+                if (ValidationUtil.isValidPassword(confirmPassword!!) && (value == confirmPassword)) {
                     activityRegisterBinding.confirmPasswordInputField.setBackgroundResource(R.drawable.edit_text_valid)
                     activityRegisterBinding.confirmPasswordInputTextView.text = getString(R.string.valid_confirm_password)
                     activityRegisterBinding.confirmPasswordInputTextView.setTextColor(ContextCompat.getColor(this, R.color.green))
@@ -157,8 +157,15 @@ class RegisterView: AppCompatActivity() {
                     Toast.LENGTH_LONG
                 )
                     .show()
+                clearRegisterFields()
             }
         })
+    }
+
+    private fun clearRegisterFields() {
+        activityRegisterBinding.emailInputField.text = null
+        activityRegisterBinding.passwordInputField.text = null
+        activityRegisterBinding.confirmPasswordInputField.text = null
     }
 
     private fun backToLoginActivity() {
