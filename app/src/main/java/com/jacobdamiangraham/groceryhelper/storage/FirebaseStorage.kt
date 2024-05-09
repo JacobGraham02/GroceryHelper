@@ -263,12 +263,69 @@ class FirebaseStorage() {
             }
     }
 
+    fun addGroceryItemToFirebase2(groceryItem: GroceryItem, callback: IAddGroceryItemCallback) {
+        val currentFirebaseUser = Firebase.auth.currentUser
+        val currentFirebaseUserUid = currentFirebaseUser?.uid
+
+        if (currentFirebaseUserUid != null) {
+            val userDocumentReference = FirebaseFirestore
+                .getInstance()
+                .collection("users")
+                .document(currentFirebaseUserUid)
+
+            firebaseUserCollectionInstance
+                .document(currentFirebaseUserUid)
+                .get()
+                .addOnSuccessListener { userDocument ->
+                    val groceryItems = userDocument.get("groceryItems") as? List<Map<String, Any>>
+                    if (groceryItems != null) {
+                        val itemExistsByName = groceryItems.any { it["name"] == groceryItem.name }
+                        val itemExistsById = groceryItems.any {
+                            Log.d("FirebaseDebug", "Existing item ID: ${it["id"]}, New item ID: ${groceryItem.id}")
+                            it["id"] == groceryItem.id }
+
+                        if (itemExistsById && itemExistsByName) {
+                            // First, delete the existing grocery item
+                            deleteGroceryItem(groceryItem, object : IDeleteGroceryItemCallback {
+                                override fun onDeleteSuccess(successMessage: String) {
+                                    // After successful deletion, add the new grocery item
+                                    userDocumentReference.update(
+                                        "groceryItems",
+                                        FieldValue.arrayUnion(groceryItem)
+                                    )
+                                        .addOnSuccessListener {
+                                            callback.onAddSuccess("Grocery item added successfully")
+                                        }
+                                        .addOnFailureListener { e ->
+                                            callback.onAddFailure("Failed to add grocery item: ${e.message}")
+                                        }
+                                }
+
+                                override fun onDeleteFailure(failureMessage: String) {
+                                    // If deletion fails, do not attempt to add the new item
+                                    Log.w("ApplicationErrors", failureMessage)
+                                    callback.onAddFailure("Failed to delete existing item: $failureMessage")
+                                }
+                            })
+                        } else if (itemExistsByName){
+                            callback.onAddFailure("This item already exists")
+                        } else {
+                            userDocumentReference.update(
+                                "groceryItems",
+                                FieldValue.arrayUnion(groceryItem)
+                            )
+                            callback.onAddSuccess("Successfully added new item")
+                        }
+                    }
+                }
+        }
+    }
+
     fun addGroceryItemToFirebase(groceryItem: GroceryItem, callback: IAddGroceryItemCallback) {
         val currentFirebaseUser = Firebase.auth.currentUser
         val currentFirebaseUserUid = currentFirebaseUser?.uid
 
         if (currentFirebaseUserUid != null) {
-            // Reference to the user's document
             val userDocumentReference = FirebaseFirestore
                 .getInstance()
                 .collection("users")
@@ -290,7 +347,7 @@ class FirebaseStorage() {
                 override fun onDeleteFailure(failureMessage: String) {
                     // If deletion fails, do not attempt to add the new item
                     Log.w("ApplicationErrors", failureMessage)
-//                    callback.onAddFailure("Failed to delete existing item: $failureMessage")
+                    callback.onAddFailure("Failed to delete existing item: $failureMessage")
                 }
             })
         } else {

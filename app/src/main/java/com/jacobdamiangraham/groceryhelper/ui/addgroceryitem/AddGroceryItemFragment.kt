@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.jacobdamiangraham.groceryhelper.R
 import com.jacobdamiangraham.groceryhelper.databinding.FragmentAddGroceryItemBinding
@@ -46,8 +47,6 @@ class AddGroceryItemFragment: Fragment() {
     private var storeNames = mutableListOf<String>()
 
     private lateinit var storeNamesSpinnerAdapter: ArrayAdapter<String>
-
-    private lateinit var groceryItemId: String
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -78,7 +77,7 @@ class AddGroceryItemFragment: Fragment() {
 
         val groceryItemCategory = groceryItemArgs.groceryItemCategory
         val groceryItemStore = groceryItemArgs.groceryItemStore
-        groceryItemId = groceryItemArgs.groceryItemId
+        val groceryItemId = groceryItemArgs.groceryItemId
 
         val arrayListGroceryItemCategory = arrayListOf(
             "Baking",
@@ -107,7 +106,7 @@ class AddGroceryItemFragment: Fragment() {
             }
         }
 
-        setupAddItemButton()
+        setupAddItemButton(groceryItemId)
         setupCategorySpinner()
         setupStoreNameSpinner()
         loadStoreNamesIntoSpinner(groceryItemStore)
@@ -237,7 +236,7 @@ class AddGroceryItemFragment: Fragment() {
         }
     }
 
-    private fun setupAddItemButton() {
+    private fun setupAddItemButton(groceryItemId: String) {
         binding.addItemButton.setOnClickListener {
             val groceryItemName = binding.addItemName.text?.toString() ?: ""
             val groceryItemQuantity = binding.addItemQuantity.text?.toString()?.toIntOrNull() ?: 0
@@ -245,7 +244,11 @@ class AddGroceryItemFragment: Fragment() {
             val groceryItemStore = binding.addGroceryStoreNameSpinner.selectedItem?.toString() ?: ""
             val groceryItemCategory = binding.addGroceryItemCategorySpinner.selectedItem?.toString() ?: ""
 
-            val groceryItemIdToUpdate = if (groceryItemId.isBlank()) UUID.randomUUID().toString() else groceryItemId
+            val validGroceryItemId = if (groceryItemId.isBlank() || !isValidUUID(groceryItemId)) {
+                UUID.randomUUID().toString()
+            } else {
+                groceryItemId
+            }
 
             if (!(ValidationUtil.validateGroceryItemInputs(
                     groceryItemName,
@@ -264,7 +267,7 @@ class AddGroceryItemFragment: Fragment() {
 
             val newGroceryItem = GroceryItem(
                 groceryItemName,
-                groceryItemIdToUpdate,
+                validGroceryItemId,
                 groceryItemCategory,
                 groceryItemStore,
                 groceryItemQuantity,
@@ -288,9 +291,18 @@ class AddGroceryItemFragment: Fragment() {
         }
     }
 
+    private fun isValidUUID(uuid: String): Boolean {
+        return try {
+            UUID.fromString(uuid)
+            true
+        } catch (e: IllegalArgumentException) {
+            false
+        }
+    }
+
     private fun addGroceryItemToFirebase(groceryItem: GroceryItem) {
         try {
-            firebaseStorage.addGroceryItemToFirebase(
+            firebaseStorage.addGroceryItemToFirebase2(
                 groceryItem,
                 object : IAddGroceryItemCallback {
                     override fun onAddSuccess(successMessage: String) {
