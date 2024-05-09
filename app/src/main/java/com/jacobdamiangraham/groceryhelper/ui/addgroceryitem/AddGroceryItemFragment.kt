@@ -2,6 +2,7 @@ package com.jacobdamiangraham.groceryhelper.ui.addgroceryitem
 
 import android.app.VoiceInteractor.Prompt
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -22,6 +23,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.jacobdamiangraham.groceryhelper.MainActivity
 import com.jacobdamiangraham.groceryhelper.R
 import com.jacobdamiangraham.groceryhelper.databinding.FragmentAddGroceryItemBinding
 import com.jacobdamiangraham.groceryhelper.enums.AddGroceryItemInputType
@@ -86,6 +88,7 @@ class AddGroceryItemFragment: Fragment() {
             "Condiments",
             "Dairy",
             "Deli",
+            "Fruit",
             "Meat",
             "Pasta",
             "Rice",
@@ -318,7 +321,7 @@ class AddGroceryItemFragment: Fragment() {
                             Toast.LENGTH_LONG
                         )
                             .show()
-                        findNavController().navigateUp()
+                        clearInputFields()
                     }
 
                     override fun onAddFailure(failureMessage: String) {
@@ -333,6 +336,15 @@ class AddGroceryItemFragment: Fragment() {
         } catch (e: Exception) {
             throw Error("There was an error when attempting to insert grocery item into firebase: ${e}")
         }
+    }
+
+    private fun clearInputFields() {
+        binding.addItemName.text = null
+        binding.addItemQuantity.text = null
+        binding.addItemCost.text = null
+        binding.addGroceryItemCategorySpinner.setSelection(0)
+        binding.addGroceryStoreNameSpinner.setSelection(0)
+        binding.addNewStore.text = null
     }
 
     private fun setupCategorySpinner() {

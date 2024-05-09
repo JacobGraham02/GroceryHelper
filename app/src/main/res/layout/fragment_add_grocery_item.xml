@@ -228,7 +228,7 @@
                 android:id="@+id/addNewStoreText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/cannot_be_blank"
+                android:text="@string/optional"
                 android:textAlignment="center"
                 android:textColor="#000000"
                 android:textStyle="bold" />
