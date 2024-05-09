@@ -268,6 +268,7 @@ class FirebaseStorage() {
     }
 
     fun addGroceryItemToFirebase(groceryItem: GroceryItem, callback: IAddGroceryItemCallback) {
+        Log.w("addGroceryItemToFirebase", "Function was called")
         val currentFirebaseUser = Firebase.auth.currentUser
         val currentFirebaseUserUid = currentFirebaseUser?.uid
 
@@ -282,6 +283,15 @@ class FirebaseStorage() {
                 .get()
                 .addOnSuccessListener { userDocument ->
                     val groceryItems = userDocument.get("groceryItems") as? List<Map<String, Any>>
+                    if (groceryItems == null) {
+                        userDocumentReference.update("groceryItems", listOf(groceryItem))
+                            .addOnSuccessListener {
+                                callback.onAddSuccess("Grocery item added successfully")
+                            }
+                            .addOnFailureListener { e ->
+                                callback.onAddFailure("Failed to initialize grocery items: ${e.message}")
+                            }
+                    }
                     if (groceryItems != null) {
                         val itemExistsByName = groceryItems.any { it["name"] == groceryItem.name }
                         val itemExistsById = groceryItems.any {

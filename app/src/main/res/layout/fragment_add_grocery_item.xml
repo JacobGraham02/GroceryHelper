@@ -19,7 +19,8 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:importantForAutofill="no"/>
 
     <LinearLayout
         android:id="@+id/itemNameLinearLayout"
@@ -30,7 +31,8 @@
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/addItemPageLabel">
+        app:layout_constraintTop_toBottomOf="@+id/addItemPageLabel"
+        android:importantForAutofill="no">
 
         <TextView
             android:id="@+id/addItemNameLabel"
@@ -40,7 +42,8 @@
             android:textAlignment="center"
             android:textColor="#000000"
             android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:importantForAutofill="no"/>
 
         <TextView
             android:id="@+id/addItemNameRules"
@@ -49,17 +52,18 @@
             android:text="@string/must_have_at_least_1_letter"
             android:textAlignment="center"
             android:textColor="#000000"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:importantForAutofill="no"/>
 
         <EditText
             android:id="@+id/addItemName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:autofillHints=""
             android:hint="@string/required_tap_to_type"
             android:inputType="text|textAutoComplete|textAutoCorrect"
-            android:textAlignment="viewStart" />
+            android:textAlignment="viewStart"
+            android:importantForAutofill="no"/>
 
     </LinearLayout>
 
@@ -81,7 +85,8 @@
             android:textAlignment="center"
             android:textColor="#000000"
             android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:importantForAutofill="no"/>
 
         <TextView
             android:id="@+id/addItemQuantityRules"
@@ -90,17 +95,18 @@
             android:text="@string/must_be_at_least_1"
             android:textAlignment="center"
             android:textColor="#000000"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:importantForAutofill="no"/>
 
         <EditText
             android:id="@+id/addItemQuantity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:autofillHints=""
             android:hint="@string/required_tap_to_type"
-            android:inputType="number|numberSigned"
+            android:inputType="numberDecimal"
             android:textAlignment="viewStart"
-            android:textColor="#000000" />
+            android:textColor="#000000"
+            android:importantForAutofill="no"/>
 
     </LinearLayout>
 
@@ -123,7 +129,8 @@
             android:textAlignment="center"
             android:textColor="#000000"
             android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:importantForAutofill="no"/>
 
         <TextView
             android:id="@+id/addItemCostRules"
@@ -132,7 +139,8 @@
             android:text="@string/must_cost_at_least_0_00"
             android:textAlignment="center"
             android:textColor="#000000"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:importantForAutofill="no"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -147,17 +155,17 @@
                 android:textAlignment="center"
                 android:textColor="#000000"
                 android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:importantForAutofill="no"/>
             <EditText
                 android:id="@+id/addItemCost"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:autofillHints=""
                 android:hint="@string/optional_tap_to_type"
                 android:inputType="numberDecimal"
                 android:nextFocusDown="@id/addItemButton"
-                android:textAlignment="viewStart"
-                android:textColor="#000000" />
+                android:textColor="#000000"
+                android:importantForAutofill="no"/>
         </LinearLayout>
 
     </LinearLayout>
@@ -187,7 +195,8 @@
                 android:textAlignment="center"
                 android:textColor="#000000"
                 android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:importantForAutofill="no"/>
 
             <TextView
                 android:id="@+id/storeNameSpinnerRules2"
@@ -196,12 +205,14 @@
                 android:text="@string/cannot_be_blank"
                 android:textAlignment="center"
                 android:textColor="#000000"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:importantForAutofill="no"/>
 
             <Spinner
                 android:id="@+id/addGroceryStoreNameSpinner"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:importantForAutofill="no"/>
         </LinearLayout>
 
         <LinearLayout
@@ -217,7 +228,8 @@
                 android:textAlignment="center"
                 android:textColor="#000000"
                 android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:importantForAutofill="no"/>
 
             <TextView
                 android:id="@+id/addNewStoreText"
@@ -226,14 +238,15 @@
                 android:text="@string/optional"
                 android:textAlignment="center"
                 android:textColor="#000000"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:importantForAutofill="no"/>
 
             <EditText
                 android:id="@+id/addNewStore"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/optional_tap_to_type"
-                android:inputType="text"
+                android:importantForAutofill="no"
                 android:imeOptions="actionDone"/>
         </LinearLayout>
 
@@ -259,7 +272,8 @@
             android:textAlignment="center"
             android:textColor="#000000"
             android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:importantForAutofill="no"/>
 
         <TextView
             android:id="@+id/groceryItemCategorySpinnerRule"
@@ -268,12 +282,14 @@
             android:text="@string/cannot_be_blank"
             android:textAlignment="center"
             android:textColor="#000000"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:importantForAutofill="no"/>
 
         <Spinner
             android:id="@+id/addGroceryItemCategorySpinner"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:importantForAutofill="no"/>
     </LinearLayout>
 
     <LinearLayout
@@ -292,7 +308,8 @@
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/add_item" />
+            android:text="@string/add_item"
+            android:importantForAutofill="no"/>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
