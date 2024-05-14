@@ -16,10 +16,10 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
-import com.google.android.material.snackbar.Snackbar
 import com.jacobdamiangraham.groceryhelper.databinding.ActivityMainBinding
 import com.jacobdamiangraham.groceryhelper.factory.GroceryViewModelFactory
 import com.jacobdamiangraham.groceryhelper.factory.PromptBuilderFactory
+import com.jacobdamiangraham.groceryhelper.interfaces.IAddGroceryStoreCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IAuthStatusListener
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserLogoutCallback
 import com.jacobdamiangraham.groceryhelper.model.DialogInformation
@@ -132,6 +132,41 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun showStoreDeleteConfirmationDialog(storeName: String) {
+        val dialogInfo = DialogInformation(
+            title = "Confirm remove store",
+            message = "Are you sure you want to remove this store from your list?"
+        )
+
+        val alertDialogGenerator = PromptBuilderFactory.getAlertDialogGenerator(
+            "confirmation"
+        )
+
+        alertDialogGenerator.configure(
+            this,
+            AlertDialog.Builder(this),
+            dialogInfo,
+            positiveButtonAction = {
+                firebaseStorage.deleteGroceryStoreFromUser(storeName, object :
+                    IAddGroceryStoreCallback {
+                    override fun onAddStoreSuccess(successMessage: String) {
+                        runOnUiThread {
+                            Toast.makeText(this@MainActivity, successMessage, Toast.LENGTH_SHORT)
+                                .show()
+                            loadAndUpdateStoreNames()
+                        }
+                    }
+                    override fun onAddStoreFailure(failureMessage: String) {
+                        runOnUiThread {
+                            Toast.makeText(this@MainActivity, failureMessage, Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    }
+                })
+            }
+        ).show()
+    }
+
     private fun updateNavigationMenu(storeList: List<String>) {
         val navMenu = binding.navView.menu
 
@@ -147,11 +182,44 @@ class MainActivity : AppCompatActivity() {
             storeGroup?.add(R.id.store_group, Menu.NONE, Menu.NONE, storeName)
                 ?.setIcon(R.drawable.home_icon)
                 ?.setOnMenuItemClickListener {
-                    val bundle = bundleOf("storeName" to storeName)
-                    findNavController(R.id.nav_host_fragment_content_main).navigate(R.id.nav_home, bundle)
-                    binding.drawerLayout.closeDrawers()
+                    showStoreOptionsDialog(storeName)
                     true
                 }
+        }
+
+        binding.navView.invalidate()
+    }
+
+    private fun showStoreOptionsDialog(storeName: String) {
+        val options = arrayOf("Go to store list", "Delete store")
+        AlertDialog.Builder(this)
+            .setTitle(storeName)
+            .setItems(options) { dialog, whichOptionSelected ->
+                when(whichOptionSelected) {
+                    0 -> navigateToStore(storeName)
+                    1 -> showStoreDeleteConfirmationDialog(storeName)
+                }
+            }.show()
+    }
+
+    private fun navigateToStore(storeName: String) {
+        val bundle = bundleOf("storeName" to storeName)
+        findNavController(R.id.nav_host_fragment_content_main).navigate(R.id.nav_home, bundle)
+        binding.drawerLayout.closeDrawers()
+    }
+
+    private fun removeStoreFromMenu(storeName: String) {
+        val navMenu = binding.navView.menu
+        val storeGroup = navMenu.findItem(R.id.store_group)?.subMenu
+
+        storeGroup?.let {
+            for (i in 0 until it.size()) {
+                val menuItem = it.getItem(i)
+                if (menuItem.title == storeName) {
+                    it.removeItem(menuItem.itemId)
+                    break
+                }
+            }
         }
 
         binding.navView.invalidate()
@@ -203,11 +271,6 @@ class MainActivity : AppCompatActivity() {
         startActivity(signInActivityIntent)
         finish()
     }
-
-    private fun displayNotification(title: String, description: String) {
-        notificationBuilder.displayNotification(title, description)
-    }
-
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.

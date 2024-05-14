@@ -234,6 +234,21 @@ class FirebaseStorage() {
         }
     }
 
+    fun deleteGroceryStoreFromUser(storeName: String, callback: IAddGroceryStoreCallback) {
+        val currentUser = firebaseAuthentication.currentUser
+        if (currentUser != null) {
+            val userDocumentReference = firebaseUserCollectionInstance.document(currentUser.uid)
+
+            userDocumentReference.update("groceryStores", FieldValue.arrayRemove(storeName))
+                .addOnSuccessListener {
+                    callback.onAddStoreSuccess("Store successfully removed")
+                }
+                .addOnFailureListener { e ->
+                    callback.onAddStoreFailure("Failed to remove store")
+                }
+        }
+    }
+
     fun getGroceryStoreNames(callback: (List<String>) -> Unit) {
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser != null) {
