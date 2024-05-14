@@ -1,29 +1,22 @@
 package com.jacobdamiangraham.groceryhelper.ui.addgroceryitem
 
-import android.app.VoiceInteractor.Prompt
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.view.inputmethod.InputMethodManager.HIDE_IMPLICIT_ONLY
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.jacobdamiangraham.groceryhelper.MainActivity
 import com.jacobdamiangraham.groceryhelper.R
 import com.jacobdamiangraham.groceryhelper.databinding.FragmentAddGroceryItemBinding
 import com.jacobdamiangraham.groceryhelper.enums.AddGroceryItemInputType
@@ -112,6 +105,7 @@ class AddGroceryItemFragment: Fragment() {
         setupAddItemButton(groceryItemId)
         setupCategorySpinner()
         setupStoreNameSpinner()
+        setupStoreNameButton()
         loadStoreNamesIntoSpinner(groceryItemStore)
 
         if (groceryItemArgs.groceryItemName != "undefined") {
@@ -156,56 +150,60 @@ class AddGroceryItemFragment: Fragment() {
             }
         })
 
+        binding.addItemQuantity.addTextChangedListener(object: TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                validate(AddGroceryItemInputType.STORE, s.toString())
+            }
+        })
+
+
         binding.addNewStore.setOnEditorActionListener { v, actionId, event ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                val newStoreName = v.text.toString()
-
-                if (ValidationUtil.isValidGroceryItemString(newStoreName)) {
-                    addStoreNameToSpinner(newStoreName)
-                    firebaseStorage.getGroceryStoreNames {
-                        stores ->
-                            val groceryStoreExists = stores.contains(newStoreName)
-                            if (groceryStoreExists) {
-                                Toast.makeText(
-                                    requireContext(),
-                                    "This store already exists",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                return@getGroceryStoreNames
-                            }
-                    }
-                    firebaseStorage.addGroceryStoreToUser(
-                        newStoreName,
-                        object : IAddGroceryStoreCallback {
-                            override fun onAddStoreSuccess(successMessage: String) {
-                                Toast.makeText(
-                                    requireContext(),
-                                    successMessage,
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-
-                            override fun onAddStoreFailure(failureMessage: String) {
-                                Toast.makeText(
-                                    requireContext(),
-                                    failureMessage,
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        })
-                }
                 closeKeyboard(v)
-            } else {
-                Toast.
-                    makeText(context,
-                    "Invalid store name",
-                    Toast.LENGTH_SHORT)
-                        .show()
             }
             true
         }
-
         return root
+    }
+
+    private fun setupStoreNameButton() {
+        binding.addNewStoreConfirmButton.setOnClickListener {
+            val newStoreName: String = binding.addNewStore.text.toString()
+            addStoreNameToSpinner(newStoreName)
+
+            firebaseStorage.getGroceryStoreNames {
+                stores ->
+                val groceryStoreExists = stores.contains(newStoreName)
+                if (groceryStoreExists) {
+                    Toast.makeText(
+                        requireContext(),
+                        "This store already exists",
+                        Toast.LENGTH_SHORT).show()
+                    return@getGroceryStoreNames
+                }
+            }
+            firebaseStorage.addGroceryStoreToUser(
+                newStoreName,
+                object : IAddGroceryStoreCallback {
+                    override fun onAddStoreSuccess(successMessage: String) {
+                        Toast.makeText(
+                            requireContext(),
+                            successMessage,
+                            Toast.LENGTH_SHORT).show()
+                    }
+
+                    override fun onAddStoreFailure(failureMessage: String) {
+                        Toast.makeText(
+                            requireContext(),
+                            failureMessage,
+                            Toast.LENGTH_SHORT).show()
+                    }
+                })
+        }
     }
 
     private fun closeKeyboard(view: View) {
@@ -252,6 +250,20 @@ class AddGroceryItemFragment: Fragment() {
                     binding.addItemCostLabel.text = getString(R.string.invalid_cost)
                     binding.addItemCostLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
                     binding.addItemCost.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+                }
+            }
+
+            AddGroceryItemInputType.STORE -> {
+                if (ValidationUtil.isValidGroceryItemString(value)) {
+                    binding.addNewStore.setBackgroundResource(R.drawable.edit_text_valid)
+                    binding.addNewStoreLabel.text = getString(R.string.valid_store)
+                    binding.addNewStoreLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.green))
+                    binding.addNewStore.setTextColor(ContextCompat.getColor(requireContext(), R.color.green))
+                } else {
+                    binding.addNewStore.setBackgroundResource(R.drawable.edit_text_invalid)
+                    binding.addNewStoreLabel.text = getString(R.string.invalid_store)
+                    binding.addNewStoreLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+                    binding.addNewStore.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
                 }
             }
         }

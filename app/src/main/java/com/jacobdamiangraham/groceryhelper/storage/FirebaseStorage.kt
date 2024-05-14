@@ -234,6 +234,44 @@ class FirebaseStorage() {
         }
     }
 
+    fun deleteAllGroceryItemsByStore(storeName: String, callback: IDeleteGroceryItemCallback) {
+        val currentUser = firebaseAuthentication.currentUser
+        if (currentUser != null) {
+            val userDocumentReference = firebaseUserCollectionInstance.document(currentUser.uid)
+
+            userDocumentReference.get().addOnSuccessListener { documentSnapshot ->
+                val groceryItems = documentSnapshot.get("groceryItems") as? List<Map<String, Any>> ?: listOf()
+
+                val itemsToKeep = groceryItems.filterNot { it["store"] == storeName }
+
+                userDocumentReference.update("groceryItems", itemsToKeep)
+                    .addOnSuccessListener {
+                        callback.onDeleteSuccess("All items from store '${storeName}' have been deleted.")
+                    }
+                    .addOnFailureListener { e ->
+                        callback.onDeleteFailure("Failed to delete items from '${storeName}")
+                    }
+            }.addOnFailureListener { e ->
+                callback.onDeleteFailure("Failed to retrieve grocery items to delete from '${storeName}")
+            }
+        }
+    }
+
+    fun deleteGroceryStoreFromUser(storeName: String, callback: IAddGroceryStoreCallback) {
+        val currentUser = firebaseAuthentication.currentUser
+        if (currentUser != null) {
+            val userDocumentReference = firebaseUserCollectionInstance.document(currentUser.uid)
+
+            userDocumentReference.update("groceryStores", FieldValue.arrayRemove(storeName))
+                .addOnSuccessListener {
+                    callback.onAddStoreSuccess("Store successfully removed")
+                }
+                .addOnFailureListener { e ->
+                    callback.onAddStoreFailure("Failed to remove store")
+                }
+        }
+    }
+
     fun getGroceryStoreNames(callback: (List<String>) -> Unit) {
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser != null) {

@@ -7,17 +7,14 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.jacobdamiangraham.groceryhelper.R
 import com.jacobdamiangraham.groceryhelper.factory.PromptBuilderFactory
-import com.jacobdamiangraham.groceryhelper.interfaces.IDeleteGroceryItemCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IOnGroceryItemInteractionListener
 import com.jacobdamiangraham.groceryhelper.model.DialogInformation
 import com.jacobdamiangraham.groceryhelper.model.GroceryItem
-import com.jacobdamiangraham.groceryhelper.storage.FirebaseStorage
 
 class GroceryItemAdapter(
     private val context: Context,

@@ -10,12 +10,16 @@ class PromptBuilder(private val type: String) {
         context: Context,
         alertDialogBuilder: Builder,
         dialogInformation: DialogInformation,
-        positiveButtonAction: (() -> Unit)? = null
+        positiveButtonAction: (() -> Unit)? = null,
+        negativeButtonAction: (() -> Unit)? = null,
+        firstNavigationOption: String? = null,
+        secondNavigationOption: String? = null
     ): Builder {
         return when (type) {
             "error" -> configureErrorDialog(context, alertDialogBuilder, dialogInformation, positiveButtonAction)
             "confirmation" -> configureConfirmationDialog(context, alertDialogBuilder, dialogInformation, positiveButtonAction)
             "info" -> configureInfoDialog(context, alertDialogBuilder, dialogInformation)
+            "navigation" -> configureNavigationDialog(context, alertDialogBuilder, dialogInformation, firstNavigationOption, secondNavigationOption, positiveButtonAction, negativeButtonAction)
             else -> throw IllegalArgumentException("No valid dialog box type could be found")
         }
     }
@@ -46,6 +50,30 @@ class PromptBuilder(private val type: String) {
             }
             setNegativeButton("No") { dialog, id ->
                 dialog.cancel()
+            }
+        }
+    }
+
+    private fun configureNavigationDialog(
+        context: Context,
+        alertDialogBuilder: Builder,
+        dialogInformation: DialogInformation,
+        firstNavigationOptionTitle: String?,
+        secondNavigationOptionTitle: String?,
+        positiveButtonAction: (() -> Unit)?,
+        negativeActionButton: (() -> Unit)?
+    ): Builder {
+        return alertDialogBuilder.apply {
+            setCancelable(true)
+            setTitle(dialogInformation.title)
+            setMessage(dialogInformation.message)
+            setPositiveButton(firstNavigationOptionTitle) { dialog, id ->
+                positiveButtonAction?.invoke()
+                dialog.dismiss()
+            }
+            setNegativeButton(secondNavigationOptionTitle) { dialog, id ->
+                negativeActionButton?.invoke()
+                dialog.dismiss()
             }
         }
     }
