@@ -1,5 +1,5 @@
 package com.jacobdamiangraham.groceryhelper.enums
 
 enum class AddGroceryItemInputType {
-    NAME, QUANTITY, COST
+    NAME, QUANTITY, COST, STORE
 }

@@ -79,6 +79,7 @@
     <string name="add_new_store">Add new store</string>
     <string name="item_cost_dollar_sign">$ </string>
     <string name="your_grocery_list">Your grocery list</string>
+    <string name="add_store">Add store</string>
     <string-array name="categories">
         <item>Baking</item>
         <item>Canned goods</item>
