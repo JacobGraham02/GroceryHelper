@@ -16,15 +16,18 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
+import com.google.android.play.core.integrity.StandardIntegrityManager.StandardIntegrityTokenRequest
 import com.jacobdamiangraham.groceryhelper.databinding.ActivityMainBinding
 import com.jacobdamiangraham.groceryhelper.factory.GroceryViewModelFactory
 import com.jacobdamiangraham.groceryhelper.factory.PromptBuilderFactory
 import com.jacobdamiangraham.groceryhelper.interfaces.IAddGroceryStoreCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IAuthStatusListener
+import com.jacobdamiangraham.groceryhelper.interfaces.IDeleteGroceryItemCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserLogoutCallback
 import com.jacobdamiangraham.groceryhelper.model.DialogInformation
 import com.jacobdamiangraham.groceryhelper.notification.NotificationBuilder
 import com.jacobdamiangraham.groceryhelper.storage.FirebaseStorage
+import com.jacobdamiangraham.groceryhelper.ui.home.HomeFragment
 import com.jacobdamiangraham.groceryhelper.ui.signin.SignInView
 import com.jacobdamiangraham.groceryhelper.viewmodel.GroceryViewModel
 
@@ -62,7 +65,7 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
         setSupportActionBar(binding.appBarMain.toolbar)
 
-        loadAndUpdateStoreNames()
+        refreshNavigationMenu()
 
         navView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
@@ -124,12 +127,18 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    private fun loadAndUpdateStoreNames() {
+    private fun refreshNavigationMenu() {
         firebaseStorage.getGroceryStoreNames { storeNames ->
-            if (storeNames.isNotEmpty()) {
-                updateNavigationMenu(storeNames)
-            }
+            clearStoreMenu()
+            updateNavigationMenu(storeNames)
         }
+    }
+
+    private fun clearStoreMenu() {
+        val navMenu = binding.navView.menu
+        val storeGroup = navMenu.findItem(R.id.store_group)?.subMenu
+        storeGroup?.clear()
+        binding.navView.invalidate()
     }
 
     private fun showStoreDeleteConfirmationDialog(storeName: String) {
@@ -147,24 +156,44 @@ class MainActivity : AppCompatActivity() {
             AlertDialog.Builder(this),
             dialogInfo,
             positiveButtonAction = {
-                firebaseStorage.deleteGroceryStoreFromUser(storeName, object :
-                    IAddGroceryStoreCallback {
-                    override fun onAddStoreSuccess(successMessage: String) {
-                        runOnUiThread {
-                            Toast.makeText(this@MainActivity, successMessage, Toast.LENGTH_SHORT)
-                                .show()
-                            loadAndUpdateStoreNames()
+                firebaseStorage.deleteAllGroceryItemsByStore(
+                    storeName,
+                    object : IDeleteGroceryItemCallback {
+                        override fun onDeleteSuccess(successMessage: String) {
+                            firebaseStorage.deleteGroceryStoreFromUser(storeName, object :
+                                IAddGroceryStoreCallback {
+                                override fun onAddStoreSuccess(successMessage: String) {
+                                    runOnUiThread {
+                                        Toast.makeText(
+                                            this@MainActivity,
+                                            successMessage,
+                                            Toast.LENGTH_SHORT
+                                        )
+                                            .show()
+                                        refreshNavigationMenu()
+                                    }
+                                }
+
+                                override fun onAddStoreFailure(failureMessage: String) {
+                                    runOnUiThread {
+                                        Toast.makeText(
+                                            this@MainActivity,
+                                            failureMessage,
+                                            Toast.LENGTH_SHORT
+                                        )
+                                            .show()
+                                    }
+                                }
+                            })
                         }
-                    }
-                    override fun onAddStoreFailure(failureMessage: String) {
-                        runOnUiThread {
-                            Toast.makeText(this@MainActivity, failureMessage, Toast.LENGTH_SHORT)
-                                .show()
+
+                        override fun onDeleteFailure(failureMessage: String) {
+                            runOnUiThread {
+                                Toast.makeText(this@MainActivity, failureMessage, Toast.LENGTH_SHORT).show()
+                            }
                         }
-                    }
-                })
-            }
-        ).show()
+                    })
+            }).show()
     }
 
     private fun updateNavigationMenu(storeList: List<String>) {
