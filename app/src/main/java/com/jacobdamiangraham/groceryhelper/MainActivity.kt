@@ -109,6 +109,9 @@ class MainActivity : AppCompatActivity() {
                         }
                     ).show()
                 }
+                R.id.nav_merge_list -> {
+                    navController.navigate(R.id.nav_merge_list)
+                }
             }
             menuItem.isChecked = true
             drawerLayout.closeDrawers()

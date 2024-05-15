@@ -22,6 +22,11 @@
             android:id="@+id/nav_delete_account"
             android:icon="@drawable/account_delete_icon"
             android:title="@string/delete_account" />
+
+        <item
+            android:id="@+id/nav_merge_list"
+            android:icon="@drawable/home_icon"
+            android:title="@string/merge_with_another_user" />
     </group>
 
     <group android:id="@+id/store_group">

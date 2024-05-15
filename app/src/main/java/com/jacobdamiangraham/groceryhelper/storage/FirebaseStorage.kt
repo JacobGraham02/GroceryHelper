@@ -21,6 +21,7 @@ import com.jacobdamiangraham.groceryhelper.interfaces.IUserLoginCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserLogoutCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserRegistrationCallback
 import com.jacobdamiangraham.groceryhelper.model.GroceryItem
+import com.jacobdamiangraham.groceryhelper.model.User
 import com.jacobdamiangraham.groceryhelper.ui.signin.SignInView
 
 class FirebaseStorage() {
@@ -68,6 +69,24 @@ class FirebaseStorage() {
             Log.e("FirebaseError", "Failed to delete item: ${e.message}")
             callback.onDeleteFailure("Failed to delete item: ${e.message}")
         }
+    }
+
+    private fun getAllUsers(): MutableList<User> {
+        val currentFirebaseUser = Firebase.auth.currentUser
+        if (currentFirebaseUser != null) {
+            val userList = mutableListOf<User>()
+            firebaseUserCollectionInstance
+                .get()
+                .addOnSuccessListener { firebaseUsersQuerySnapshot ->
+                    for (userDocument in firebaseUsersQuerySnapshot.documents) {
+                        userDocument.toObject(User::class.java)?.let {
+                            userList.add(it)
+                        }
+                    }
+                }
+            return userList
+        }
+        return mutableListOf()
     }
 
     private fun getGroceryItemsFromCollection(storeName: String?) {

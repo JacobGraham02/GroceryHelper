@@ -80,6 +80,13 @@
     <string name="item_cost_dollar_sign">$ </string>
     <string name="your_grocery_list">Your grocery list</string>
     <string name="add_store">Add store</string>
+    <string name="combine_list_with_another_user">Combine list with another user</string>
+    <string name="if_you_request_to_combine_lists_the_other_user_will_get_a_notification_asking_if_they_want_to_merge_lists_with_you_if_they_confirm_the_lists_will_be_merged">If you request to combine lists, the other user will get a notification asking if they want to merge lists with you. If they confirm, the lists will be merged.</string>
+    <string name="currently_you_can_only_merge_a_grocery_list_with_another_user_if_you_both_have_a_grocery_list_for_the_same_grocery_store_for_example_you_can_merge_lists_if_user_a_has_bananas_at_food_basics_and_user_b_has_jello_at_food_basics">Currently, you can only merge a grocery list with another user if you both have a grocery list for the same grocery store. For example, you can merge lists if user A has Bananas at \'Food Basics\', and user B has Jello at \'Food Basics\'</string>
+    <string name="combine_with">Combine with...</string>
+    <string name="grocery_store">Grocery store</string>
+    <string name="combine_lists">Combine lists</string>
+    <string name="merge_with_another_user">Merge with another user</string>
     <string-array name="categories">
         <item>Baking</item>
         <item>Canned goods</item>
