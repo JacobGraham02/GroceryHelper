@@ -12,6 +12,9 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
+import com.jacobdamiangraham.groceryhelper.event.Observable
+import com.jacobdamiangraham.groceryhelper.event.UserDeleteAccountEvent
+import com.jacobdamiangraham.groceryhelper.event.UserLogoutAccountEvent
 import com.jacobdamiangraham.groceryhelper.interfaces.IAddGroceryItemCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IAddGroceryStoreCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IAuthStatusListener
@@ -21,6 +24,7 @@ import com.jacobdamiangraham.groceryhelper.interfaces.IUserLoginCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserLogoutCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserRegistrationCallback
 import com.jacobdamiangraham.groceryhelper.model.GroceryItem
+import com.jacobdamiangraham.groceryhelper.model.User
 import com.jacobdamiangraham.groceryhelper.ui.signin.SignInView
 
 class FirebaseStorage() {
@@ -30,6 +34,9 @@ class FirebaseStorage() {
     private lateinit var firebaseUserCollectionInstance: CollectionReference
     private var mutableGroceryItemList: MutableLiveData<MutableList<GroceryItem>> = MutableLiveData<MutableList<GroceryItem>>()
     private lateinit var userId: String
+
+    val deleteAccountObserver = Observable<UserDeleteAccountEvent>()
+    val logoutAccountObserver = Observable<UserLogoutAccountEvent>()
 
     init {
         getCollectionOfGroceryItems()
@@ -70,6 +77,24 @@ class FirebaseStorage() {
         }
     }
 
+    private fun getAllUsers(): MutableList<User> {
+        val currentFirebaseUser = Firebase.auth.currentUser
+        if (currentFirebaseUser != null) {
+            val userList = mutableListOf<User>()
+            firebaseUserCollectionInstance
+                .get()
+                .addOnSuccessListener { firebaseUsersQuerySnapshot ->
+                    for (userDocument in firebaseUsersQuerySnapshot.documents) {
+                        userDocument.toObject(User::class.java)?.let {
+                            userList.add(it)
+                        }
+                    }
+                }
+            return userList
+        }
+        return mutableListOf()
+    }
+
     private fun getGroceryItemsFromCollection(storeName: String?) {
         val currentFirebaseUser = Firebase.auth.currentUser
         if (currentFirebaseUser != null) {
@@ -94,7 +119,7 @@ class FirebaseStorage() {
         }
     }
 
-    fun deleteUserAccount(callback: IUserLogoutCallback) {
+    fun deleteUserAccount() {
         val currentUser = firebaseAuthentication.currentUser
         if (currentUser != null) {
             val userDocument = firebaseUserCollectionInstance.document(currentUser.uid)
@@ -105,17 +130,15 @@ class FirebaseStorage() {
                         currentUser.delete().addOnCompleteListener {
                             deleteFirebaseUserTask ->
                                 if (deleteFirebaseUserTask.isSuccessful) {
-                                    callback.onLogoutSuccess("Your account has been successfully deleted")
+                                    deleteAccountObserver.notifyObservers(UserDeleteAccountEvent(true,"Your account has been successfully deleted"))
                                 } else {
-                                    callback.onLogoutFailure("Failed to delete your account")
+                                    deleteAccountObserver.notifyObservers(UserDeleteAccountEvent(true, "Failed to delete your account"))
                                 }
                         }
                     } else {
-                        callback.onLogoutFailure("Failed to delete your user data")
+                        deleteAccountObserver.notifyObservers(UserDeleteAccountEvent(false,"Failed to delete your user data"))
                     }
             }
-        } else {
-            callback.onLogoutFailure("You are not currently logged in")
         }
     }
 

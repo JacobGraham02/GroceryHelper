@@ -9,6 +9,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -16,9 +17,9 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
-import com.google.android.play.core.integrity.StandardIntegrityManager.StandardIntegrityTokenRequest
 import com.jacobdamiangraham.groceryhelper.databinding.ActivityMainBinding
-import com.jacobdamiangraham.groceryhelper.factory.GroceryViewModelFactory
+import com.jacobdamiangraham.groceryhelper.event.UserDeleteAccountEvent
+import com.jacobdamiangraham.groceryhelper.event.UserLogoutAccountEvent
 import com.jacobdamiangraham.groceryhelper.factory.PromptBuilderFactory
 import com.jacobdamiangraham.groceryhelper.interfaces.IAddGroceryStoreCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IAuthStatusListener
@@ -27,29 +28,29 @@ import com.jacobdamiangraham.groceryhelper.interfaces.IUserLogoutCallback
 import com.jacobdamiangraham.groceryhelper.model.DialogInformation
 import com.jacobdamiangraham.groceryhelper.notification.NotificationBuilder
 import com.jacobdamiangraham.groceryhelper.storage.FirebaseStorage
-import com.jacobdamiangraham.groceryhelper.ui.home.HomeFragment
 import com.jacobdamiangraham.groceryhelper.ui.signin.SignInView
 import com.jacobdamiangraham.groceryhelper.viewmodel.GroceryViewModel
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), Observer<UserDeleteAccountEvent> {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private lateinit var notificationBuilder: NotificationBuilder
-    private val firebaseStorage: FirebaseStorage = FirebaseStorage()
+    private lateinit var firebaseStorage: FirebaseStorage
 
     private lateinit var viewModel: GroceryViewModel
-    private lateinit var viewModelFactory: GroceryViewModelFactory
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        firebaseStorage = FirebaseStorage()
+        firebaseStorage.deleteAccountObserver.addObserver(this)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setSupportActionBar(binding.appBarMain.toolbar)
 
-        viewModelFactory = GroceryViewModelFactory("food basics")
         viewModel = ViewModelProvider(this).get(GroceryViewModel::class.java)
 
         notificationBuilder = NotificationBuilder(this)
@@ -255,23 +256,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun deleteFirebaseUserAccount() {
-        firebaseStorage.deleteUserAccount(object : IUserLogoutCallback {
-            override fun onLogoutSuccess(successMessage: String) {
-                Toast.makeText(
-                    this@MainActivity,
-                    successMessage,
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-
-            override fun onLogoutFailure(failureMessage: String) {
-                Toast.makeText(
-                    this@MainActivity,
-                    failureMessage,
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        })
+        firebaseStorage.deleteUserAccount()
     }
 
     private fun logOutOfAccount() {
@@ -320,5 +305,9 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+    }
+
+    override fun onChanged(value: UserDeleteAccountEvent) {
+        Toast.makeText(this, value.message, Toast.LENGTH_SHORT).show()
     }
 }

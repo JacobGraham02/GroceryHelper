@@ -45,9 +45,16 @@
     </fragment>
 
     <fragment
+        android:id="@+id/nav_merge_list"
+        android:name="com.jacobdamiangraham.groceryhelper.ui.mergelist.MergeListFragment"
+        android:label="@string/merge_with_another_user"
+        tools:layout="@layout/fragment_merge_list">
+    </fragment>
+
+    <fragment
         android:id="@+id/nav_add_grocery_item"
         android:name="com.jacobdamiangraham.groceryhelper.ui.addgroceryitem.AddGroceryItemFragment"
-        android:label="Add grocery item to list"
+        android:label="@string/add_item_to_list"
         tools:layout="@layout/fragment_add_grocery_item">
         <argument
             android:name="groceryItemId"

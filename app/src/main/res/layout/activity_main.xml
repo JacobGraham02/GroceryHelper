@@ -15,6 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="visible"
+        android:textColor="@color/text_primary"
         tools:visibility="visible" />
 
     <com.google.android.material.navigation.NavigationView
@@ -25,6 +26,9 @@
         android:fitsSystemWindows="true"
         android:visibility="visible"
         app:headerLayout="@layout/nav_header_main"
+        app:itemBackground="@color/sidebar_background_primary"
+        app:itemIconTint="@color/text_primary"
+        app:itemTextColor="@color/text_primary"
         app:menu="@menu/activity_main_drawer"
         tools:visibility="visible" />
 </androidx.drawerlayout.widget.DrawerLayout>

@@ -24,7 +24,7 @@
                     android:layout_marginBottom="5dp"
                     android:text="@string/your_grocery_list"
                     android:textAlignment="center"
-                    android:textColor="#000000"
+                    android:textColor="@color/text_primary"
                     android:textSize="24sp"
                     android:textStyle="bold" />
 
@@ -36,7 +36,8 @@
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recyclerViewGroceryItemsList"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+                        android:layout_height="match_parent"
+                        android:textColor="@color/text_primary"/>
                 </LinearLayout>
             </LinearLayout>
     </ScrollView>

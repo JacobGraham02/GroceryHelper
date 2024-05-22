@@ -4,22 +4,30 @@
     <item
         android:id="@+id/sort_a_to_z"
         android:orderInCategory="100"
+        android:textColor="@color/text_primary"
+        android:background="@color/sidebar_background_primary"
         android:title="@string/sort_names_a_to_z"
         app:showAsAction="never" />
     <item
         android:id="@+id/sort_by_alphabetical_category"
         android:orderInCategory="100"
+        android:textColor="@color/text_primary"
+        android:background="@color/sidebar_background_primary"
         android:title="@string/sort_category_a_to_z"
         app:showAsAction="never" />
     <item
         android:id="@+id/sort_cost_high_to_low"
         android:orderInCategory="100"
+        android:textColor="@color/text_primary"
+        android:background="@color/sidebar_background_primary"
         android:title="@string/sort_cost_high_to_low"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/sort_cost_low_to_high"
         android:orderInCategory="100"
+        android:textColor="@color/text_primary"
+        android:background="@color/sidebar_background_primary"
         android:title="@string/sort_cost_low_to_high"
         app:showAsAction="never" />
 </menu>
