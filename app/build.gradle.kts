@@ -38,6 +38,8 @@ android {
 }
 
 dependencies {
+    implementation("androidx.security:security-crypto:1.0.0")
+    implementation("androidx.security:security-crypto-ktx:1.1.0-alpha06")
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(platform("com.google.firebase:firebase-bom:32.8.1"))

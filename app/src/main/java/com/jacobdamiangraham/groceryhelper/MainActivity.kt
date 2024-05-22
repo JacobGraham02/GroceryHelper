@@ -1,5 +1,6 @@
 package com.jacobdamiangraham.groceryhelper
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
@@ -19,7 +20,6 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
 import com.jacobdamiangraham.groceryhelper.databinding.ActivityMainBinding
 import com.jacobdamiangraham.groceryhelper.event.UserDeleteAccountEvent
-import com.jacobdamiangraham.groceryhelper.event.UserLogoutAccountEvent
 import com.jacobdamiangraham.groceryhelper.factory.PromptBuilderFactory
 import com.jacobdamiangraham.groceryhelper.interfaces.IAddGroceryStoreCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IAuthStatusListener
@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity(), Observer<UserDeleteAccountEvent> {
 
         setSupportActionBar(binding.appBarMain.toolbar)
 
-        viewModel = ViewModelProvider(this).get(GroceryViewModel::class.java)
+        viewModel = ViewModelProvider(this)[GroceryViewModel::class.java]
 
         notificationBuilder = NotificationBuilder(this)
 
@@ -85,11 +85,10 @@ class MainActivity : AppCompatActivity(), Observer<UserDeleteAccountEvent> {
                         "confirmation"
                     )
                     alertDialogGenerator.configure(
-                        this,
                         AlertDialog.Builder(this),
                         dialogInfo,
                         positiveButtonAction = {
-                            logOutOfAccount()
+                            logOutOfAccount(this)
                         }
                     ).show()
                 }
@@ -102,11 +101,10 @@ class MainActivity : AppCompatActivity(), Observer<UserDeleteAccountEvent> {
                         "confirmation"
                     )
                     alertDialogGenerator.configure(
-                        this,
                         AlertDialog.Builder(this),
                         dialogInfo,
                         positiveButtonAction = {
-                            deleteFirebaseUserAccount()
+                            deleteFirebaseUserAccount(this)
                         }
                     ).show()
                 }
@@ -153,7 +151,6 @@ class MainActivity : AppCompatActivity(), Observer<UserDeleteAccountEvent> {
         )
 
         alertDialogGenerator.configure(
-            this,
             AlertDialog.Builder(this),
             dialogInfo,
             positiveButtonAction = {
@@ -224,7 +221,7 @@ class MainActivity : AppCompatActivity(), Observer<UserDeleteAccountEvent> {
         val options = arrayOf("Go to store list", "Delete store")
         AlertDialog.Builder(this)
             .setTitle(storeName)
-            .setItems(options) { dialog, whichOptionSelected ->
+            .setItems(options) { _, whichOptionSelected ->
                 when(whichOptionSelected) {
                     0 -> navigateToStore(storeName)
                     1 -> showStoreDeleteConfirmationDialog(storeName)
@@ -238,29 +235,12 @@ class MainActivity : AppCompatActivity(), Observer<UserDeleteAccountEvent> {
         binding.drawerLayout.closeDrawers()
     }
 
-    private fun removeStoreFromMenu(storeName: String) {
-        val navMenu = binding.navView.menu
-        val storeGroup = navMenu.findItem(R.id.store_group)?.subMenu
-
-        storeGroup?.let {
-            for (i in 0 until it.size()) {
-                val menuItem = it.getItem(i)
-                if (menuItem.title == storeName) {
-                    it.removeItem(menuItem.itemId)
-                    break
-                }
-            }
-        }
-
-        binding.navView.invalidate()
+    private fun deleteFirebaseUserAccount(context: Context) {
+        firebaseStorage.deleteUserAccount(context)
     }
 
-    private fun deleteFirebaseUserAccount() {
-        firebaseStorage.deleteUserAccount()
-    }
-
-    private fun logOutOfAccount() {
-        firebaseStorage.logoutWithFirebase(object: IUserLogoutCallback {
+    private fun logOutOfAccount(context: Context) {
+        firebaseStorage.logoutWithFirebase(context, object: IUserLogoutCallback {
             override fun onLogoutSuccess(successMessage: String) {
                 Toast.makeText(
                     this@MainActivity,
@@ -292,15 +272,15 @@ class MainActivity : AppCompatActivity(), Observer<UserDeleteAccountEvent> {
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.sort_a_to_z -> viewModel.sortByNameAToZ()
-            R.id.sort_by_alphabetical_category -> viewModel.sortByCategoryAToZ()
-            R.id.sort_cost_high_to_low -> viewModel.sortByCostHighToLow()
-            R.id.sort_cost_low_to_high -> viewModel.sortByCostLowToHigh()
-        }
-        return super.onOptionsItemSelected(item)
-    }
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//        when (item.itemId) {
+//            R.id.sort_a_to_z -> viewModel.sortByNameAToZ()
+//            R.id.sort_by_alphabetical_category -> viewModel.sortByCategoryAToZ()
+//            R.id.sort_cost_high_to_low -> viewModel.sortByCostHighToLow()
+//            R.id.sort_cost_low_to_high -> viewModel.sortByCostLowToHigh()
+//        }
+//        return super.onOptionsItemSelected(item)
+//    }
 
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)

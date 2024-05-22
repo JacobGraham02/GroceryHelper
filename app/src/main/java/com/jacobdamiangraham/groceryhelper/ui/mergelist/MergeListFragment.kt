@@ -10,8 +10,6 @@ import com.jacobdamiangraham.groceryhelper.storage.FirebaseStorage
 
 class MergeListFragment : Fragment() {
 
-    private val firebaseStorage: FirebaseStorage = FirebaseStorage()
-
     private var _binding: FragmentMergeListBinding? = null
 
     private val binding get() = _binding!!

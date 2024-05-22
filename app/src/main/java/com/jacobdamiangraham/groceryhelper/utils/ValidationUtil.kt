@@ -4,33 +4,31 @@ object ValidationUtil {
 
     /**
      * ^                 start-of-string
-     * (?=.*[0-9])       a digit must occur at least once
-     * (?=.*[a-z])       a lower case letter must occur at least once
-     * (?=.*[A-Z])       an upper case letter must occur at least once
-     * (?=.*[@#$%^&+=])  a special character must occur at least once you can replace with your special characters
-     * (?=\\S+$)         no whitespace allowed in the entire string
-     * .{4,}             anything, at least six places though
+     * (?=.*\d)         # Positive lookahead: ensure the string contains at least one digit (\d)
+     * (?=.*[a-z])      # Positive lookahead: ensure the string contains at least one lowercase letter
+     * (?=.*[A-Z])      # Positive lookahead: ensure the string contains at least one uppercase letter
+     * .{8,}            # Match any character (except newline) at least 8 times
      * $                 end-of-string
      */
-    private const val passwordRegex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{6,}$"
+    private const val PASSWORD_REGEX = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$"
 
     fun isValidEmailAddress(email: String): Boolean {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 
     fun isValidPassword(password: String): Boolean {
-        return password.matches(passwordRegex.toRegex())
+        return password.matches(PASSWORD_REGEX.toRegex())
     }
 
     fun isValidGroceryItemString(value: String): Boolean {
         return value.isNotBlank()
     }
 
-    fun isValidQuantity(quantity: Int): Boolean {
+    private fun isValidQuantity(quantity: Int): Boolean {
         return quantity >= 1
     }
 
-    fun isValidCost(cost: Float): Boolean {
+    private fun isValidCost(cost: Float): Boolean {
         return cost >= 0.00
     }
 

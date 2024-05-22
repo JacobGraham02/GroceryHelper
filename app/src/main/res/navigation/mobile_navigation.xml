@@ -13,7 +13,7 @@
         <argument
             android:name="storeName"
             app:argType="string"
-            android:defaultValue="Select an option from the menu to get started"/>
+            android:defaultValue="Select an option from the left-hand side menu to get started. If you previously signed in, this application will remember your log in information, making your subsequent sign-ins easier!"/>
         <action
             android:id="@+id/actionHomeFragmentToAddGroceryItemFragment"
             app:destination="@id/nav_add_grocery_item">

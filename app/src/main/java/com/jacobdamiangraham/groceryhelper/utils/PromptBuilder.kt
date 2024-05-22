@@ -1,13 +1,11 @@
 package com.jacobdamiangraham.groceryhelper.utils
 
-import android.content.Context
 import androidx.appcompat.app.AlertDialog.Builder
 import com.jacobdamiangraham.groceryhelper.model.DialogInformation
 
 class PromptBuilder(private val type: String) {
 
     fun configure(
-        context: Context,
         alertDialogBuilder: Builder,
         dialogInformation: DialogInformation,
         positiveButtonAction: (() -> Unit)? = null,
@@ -16,46 +14,68 @@ class PromptBuilder(private val type: String) {
         secondNavigationOption: String? = null
     ): Builder {
         return when (type) {
-            "error" -> configureErrorDialog(context, alertDialogBuilder, dialogInformation, positiveButtonAction)
-            "confirmation" -> configureConfirmationDialog(context, alertDialogBuilder, dialogInformation, positiveButtonAction)
-            "info" -> configureInfoDialog(context, alertDialogBuilder, dialogInformation)
-            "navigation" -> configureNavigationDialog(context, alertDialogBuilder, dialogInformation, firstNavigationOption, secondNavigationOption, positiveButtonAction, negativeButtonAction)
+            "error" -> configureErrorDialog(
+                alertDialogBuilder,
+                dialogInformation,
+                positiveButtonAction
+            )
+            "confirmation" -> configureConfirmationDialog(
+                alertDialogBuilder,
+                dialogInformation,
+                positiveButtonAction
+            )
+            "info" -> configureInfoDialog(alertDialogBuilder, dialogInformation)
+            "navigation" -> configureNavigationDialog(
+                alertDialogBuilder,
+                dialogInformation,
+                firstNavigationOption,
+                secondNavigationOption,
+                positiveButtonAction,
+                negativeButtonAction
+            )
             else -> throw IllegalArgumentException("No valid dialog box type could be found")
         }
     }
 
-    private fun configureErrorDialog(context: Context, alertDialogBuilder: Builder, dialogInformation: DialogInformation, positiveButtonAction: (() -> Unit)?): Builder {
+    private fun configureErrorDialog(
+        alertDialogBuilder: Builder,
+        dialogInformation: DialogInformation,
+        positiveButtonAction: (() -> Unit)?
+    ): Builder {
         return alertDialogBuilder.apply {
             setCancelable(true)
             setTitle(dialogInformation.title)
             setMessage(dialogInformation.message)
-            setPositiveButton("Delete") { dialog, id ->
+            setPositiveButton("Delete") { dialog, _ ->
                 positiveButtonAction?.invoke()
                 dialog.dismiss()
             }
-            setNegativeButton("Cancel") { dialog, id ->
+            setNegativeButton("Cancel") { dialog, _ ->
                 dialog.cancel()
             }
         }
     }
 
-    private fun configureConfirmationDialog(context: Context, alertDialogBuilder: Builder, dialogInformation: DialogInformation, positiveButtonAction: (() -> Unit)?): Builder {
+    private fun configureConfirmationDialog(
+        alertDialogBuilder: Builder,
+        dialogInformation: DialogInformation,
+        positiveButtonAction: (() -> Unit)?
+    ): Builder {
         return alertDialogBuilder.apply {
             setCancelable(true)
             setTitle(dialogInformation.title)
             setMessage(dialogInformation.message)
-            setPositiveButton("Yes") { dialog, id ->
+            setPositiveButton("Yes") { dialog, _ ->
                 positiveButtonAction?.invoke()
                 dialog.dismiss()
             }
-            setNegativeButton("No") { dialog, id ->
+            setNegativeButton("No") { dialog, _ ->
                 dialog.cancel()
             }
         }
     }
 
     private fun configureNavigationDialog(
-        context: Context,
         alertDialogBuilder: Builder,
         dialogInformation: DialogInformation,
         firstNavigationOptionTitle: String?,
@@ -67,23 +87,26 @@ class PromptBuilder(private val type: String) {
             setCancelable(true)
             setTitle(dialogInformation.title)
             setMessage(dialogInformation.message)
-            setPositiveButton(firstNavigationOptionTitle) { dialog, id ->
+            setPositiveButton(firstNavigationOptionTitle) { dialog, _ ->
                 positiveButtonAction?.invoke()
                 dialog.dismiss()
             }
-            setNegativeButton(secondNavigationOptionTitle) { dialog, id ->
+            setNegativeButton(secondNavigationOptionTitle) { dialog, _ ->
                 negativeActionButton?.invoke()
                 dialog.dismiss()
             }
         }
     }
 
-    private fun configureInfoDialog(context: Context, alertDialogBuilder: Builder, dialogInformation: DialogInformation): Builder {
+    private fun configureInfoDialog(
+        alertDialogBuilder: Builder,
+        dialogInformation: DialogInformation
+    ): Builder {
         return alertDialogBuilder.apply {
             setCancelable(true)
             setTitle(dialogInformation.title)
             setMessage(dialogInformation.message)
-            setNegativeButton("Ok") { dialog, id ->
+            setNegativeButton("Ok") { dialog, _ ->
                 dialog.cancel()
             }
         }
