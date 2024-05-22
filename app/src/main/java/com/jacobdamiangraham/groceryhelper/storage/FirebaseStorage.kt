@@ -4,6 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
+import androidx.security.crypto.MasterKeys
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.ktx.auth
@@ -36,7 +39,6 @@ class FirebaseStorage() {
     private lateinit var userId: String
 
     val deleteAccountObserver = Observable<UserDeleteAccountEvent>()
-    val logoutAccountObserver = Observable<UserLogoutAccountEvent>()
 
     init {
         getCollectionOfGroceryItems()
@@ -316,16 +318,48 @@ class FirebaseStorage() {
         }
     }
 
-    fun logInUserWithFirebase(email: String, password: String, callback: IUserLoginCallback) {
+    fun logInUserWithFirebase(email: String, password: String, context: Context, callback: IUserLoginCallback) {
         firebaseAuthentication.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { completedLogInUserTask ->
                 if (completedLogInUserTask.isSuccessful) {
                     val firebaseUser = firebaseAuthentication.currentUser
-                    callback.onLoginSuccess("You logged in successfully")
+                    firebaseUser?.getIdToken(true)?.addOnCompleteListener {
+                        task ->
+                            if (task.isSuccessful) {
+                                val idToken = task.result?.token
+                                if (idToken != null) {
+                                    saveToken(idToken, context)
+                                }
+                                callback.onLoginSuccess("You logged in successfully")
+                            } else {
+                                callback.onLoginFailure("Unable to log you in")
+                            }
+                    }
                 } else {
                     callback.onLoginFailure("Unable to log you in")
                 }
             }
+    }
+
+    private fun saveToken(token: String, context: Context) {
+        try {
+            val masterKeyAlias = MasterKey.Builder(context)
+                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                .build()
+            val sharedPreferences = EncryptedSharedPreferences.create(
+                context,
+                "grocery_helper_shared_preferences",
+                masterKeyAlias,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            )
+            with(sharedPreferences.edit()) {
+                putString("grocery_helper_user_token", token)
+                apply()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     fun addGroceryItemToFirebase(groceryItem: GroceryItem, callback: IAddGroceryItemCallback) {
@@ -396,12 +430,34 @@ class FirebaseStorage() {
         }
     }
 
-    fun logoutWithFirebase(callback: IUserLogoutCallback) {
+    fun logoutWithFirebase(context: Context, callback: IUserLogoutCallback) {
         try {
+            clearToken(context)
             firebaseAuthentication.signOut()
             callback.onLogoutSuccess("You have successfully logged out")
         } catch (e: Exception) {
             callback.onLogoutFailure("Failed to log out. Try again")
+        }
+    }
+
+    private fun clearToken(context: Context) {
+        try {
+            val masterKeyAlias = MasterKey.Builder(context)
+                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                .build()
+            val sharedPreferences = EncryptedSharedPreferences.create(
+                context,
+                "grocery_helper_shared_preferences",
+                masterKeyAlias,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            )
+            with(sharedPreferences.edit()) {
+                remove("grocery_helper_user_token")
+                apply()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 

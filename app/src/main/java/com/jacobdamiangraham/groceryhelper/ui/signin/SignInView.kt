@@ -1,5 +1,6 @@
 package com.jacobdamiangraham.groceryhelper.ui.signin
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
@@ -7,6 +8,8 @@ import android.text.TextWatcher
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import com.jacobdamiangraham.groceryhelper.MainActivity
 import com.jacobdamiangraham.groceryhelper.R
 import com.jacobdamiangraham.groceryhelper.databinding.ActivitySigninBinding
@@ -25,6 +28,10 @@ class SignInView : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         activitySignInBinding = ActivitySigninBinding.inflate(layoutInflater)
         setContentView(activitySignInBinding.root)
+
+        if (isUserLoggedIn(applicationContext)) {
+            redirectToMainActivity()
+        }
 
         activitySignInBinding.signInButton.setOnClickListener {
             attemptLogin()
@@ -118,7 +125,7 @@ class SignInView : AppCompatActivity() {
                 .show()
         }
 
-        firebaseStorage.logInUserWithFirebase(email, password, object : IUserLoginCallback {
+        firebaseStorage.logInUserWithFirebase(email, password, applicationContext, object : IUserLoginCallback {
             override fun onLoginSuccess(successMessage: String) {
                 Toast.makeText(
                     this@SignInView,
@@ -138,6 +145,26 @@ class SignInView : AppCompatActivity() {
                     .show()
             }
         })
+    }
+
+    private fun isUserLoggedIn(context: Context): Boolean {
+        return try {
+            val masterKeyAlias = MasterKey.Builder(context)
+                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                .build()
+            val sharedPreferences = EncryptedSharedPreferences.create(
+                context,
+                "grocery_helper_shared_preferences",
+                masterKeyAlias,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            )
+            val signInToken = sharedPreferences.getString("grocery_helper_user_token", null)
+            signInToken != null
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
     }
 
     private fun redirectToMainActivity() {

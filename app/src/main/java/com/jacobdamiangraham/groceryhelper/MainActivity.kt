@@ -1,5 +1,6 @@
 package com.jacobdamiangraham.groceryhelper
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
@@ -89,7 +90,7 @@ class MainActivity : AppCompatActivity(), Observer<UserDeleteAccountEvent> {
                         AlertDialog.Builder(this),
                         dialogInfo,
                         positiveButtonAction = {
-                            logOutOfAccount()
+                            logOutOfAccount(this)
                         }
                     ).show()
                 }
@@ -259,8 +260,8 @@ class MainActivity : AppCompatActivity(), Observer<UserDeleteAccountEvent> {
         firebaseStorage.deleteUserAccount()
     }
 
-    private fun logOutOfAccount() {
-        firebaseStorage.logoutWithFirebase(object: IUserLogoutCallback {
+    private fun logOutOfAccount(context: Context) {
+        firebaseStorage.logoutWithFirebase(context, object: IUserLogoutCallback {
             override fun onLogoutSuccess(successMessage: String) {
                 Toast.makeText(
                     this@MainActivity,
