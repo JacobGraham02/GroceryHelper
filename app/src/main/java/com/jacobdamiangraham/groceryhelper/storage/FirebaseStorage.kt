@@ -12,6 +12,9 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
+import com.jacobdamiangraham.groceryhelper.event.Observable
+import com.jacobdamiangraham.groceryhelper.event.UserDeleteAccountEvent
+import com.jacobdamiangraham.groceryhelper.event.UserLogoutAccountEvent
 import com.jacobdamiangraham.groceryhelper.interfaces.IAddGroceryItemCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IAddGroceryStoreCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IAuthStatusListener
@@ -31,6 +34,9 @@ class FirebaseStorage() {
     private lateinit var firebaseUserCollectionInstance: CollectionReference
     private var mutableGroceryItemList: MutableLiveData<MutableList<GroceryItem>> = MutableLiveData<MutableList<GroceryItem>>()
     private lateinit var userId: String
+
+    val deleteAccountObserver = Observable<UserDeleteAccountEvent>()
+    val logoutAccountObserver = Observable<UserLogoutAccountEvent>()
 
     init {
         getCollectionOfGroceryItems()
@@ -113,7 +119,7 @@ class FirebaseStorage() {
         }
     }
 
-    fun deleteUserAccount(callback: IUserLogoutCallback) {
+    fun deleteUserAccount() {
         val currentUser = firebaseAuthentication.currentUser
         if (currentUser != null) {
             val userDocument = firebaseUserCollectionInstance.document(currentUser.uid)
@@ -124,17 +130,15 @@ class FirebaseStorage() {
                         currentUser.delete().addOnCompleteListener {
                             deleteFirebaseUserTask ->
                                 if (deleteFirebaseUserTask.isSuccessful) {
-                                    callback.onLogoutSuccess("Your account has been successfully deleted")
+                                    deleteAccountObserver.notifyObservers(UserDeleteAccountEvent(true,"Your account has been successfully deleted"))
                                 } else {
-                                    callback.onLogoutFailure("Failed to delete your account")
+                                    deleteAccountObserver.notifyObservers(UserDeleteAccountEvent(true, "Failed to delete your account"))
                                 }
                         }
                     } else {
-                        callback.onLogoutFailure("Failed to delete your user data")
+                        deleteAccountObserver.notifyObservers(UserDeleteAccountEvent(false,"Failed to delete your user data"))
                     }
             }
-        } else {
-            callback.onLogoutFailure("You are not currently logged in")
         }
     }
 
