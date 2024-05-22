@@ -121,7 +121,7 @@ class FirebaseStorage() {
         }
     }
 
-    fun deleteUserAccount() {
+    fun deleteUserAccount(context: Context) {
         val currentUser = firebaseAuthentication.currentUser
         if (currentUser != null) {
             val userDocument = firebaseUserCollectionInstance.document(currentUser.uid)
@@ -132,6 +132,7 @@ class FirebaseStorage() {
                         currentUser.delete().addOnCompleteListener {
                             deleteFirebaseUserTask ->
                                 if (deleteFirebaseUserTask.isSuccessful) {
+                                    clearToken(context)
                                     deleteAccountObserver.notifyObservers(UserDeleteAccountEvent(true,"Your account has been successfully deleted"))
                                 } else {
                                     deleteAccountObserver.notifyObservers(UserDeleteAccountEvent(true, "Failed to delete your account"))

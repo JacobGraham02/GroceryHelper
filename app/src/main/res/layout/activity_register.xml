@@ -58,6 +58,15 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold"
+                android:text="@string/must_be_a_valid_email_address" />
+
             <EditText
                 android:id="@+id/emailInputField"
                 android:layout_width="match_parent"

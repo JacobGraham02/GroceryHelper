@@ -107,7 +107,7 @@ class MainActivity : AppCompatActivity(), Observer<UserDeleteAccountEvent> {
                         AlertDialog.Builder(this),
                         dialogInfo,
                         positiveButtonAction = {
-                            deleteFirebaseUserAccount()
+                            deleteFirebaseUserAccount(this)
                         }
                     ).show()
                 }
@@ -256,8 +256,8 @@ class MainActivity : AppCompatActivity(), Observer<UserDeleteAccountEvent> {
         binding.navView.invalidate()
     }
 
-    private fun deleteFirebaseUserAccount() {
-        firebaseStorage.deleteUserAccount()
+    private fun deleteFirebaseUserAccount(context: Context) {
+        firebaseStorage.deleteUserAccount(context)
     }
 
     private fun logOutOfAccount(context: Context) {

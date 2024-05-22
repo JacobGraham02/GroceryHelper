@@ -50,7 +50,7 @@
     <string name="confirm_password">Confirm password</string>
     <string name="required_confirm_password">(required) confirm password</string>
     <string name="log_in">Log in</string>
-    <string name="at_least_1_digit_a_lower_case_and_upper_case_character_1_special_character_at_least_six_characters_in_length">at least 1 digit, a lower case and upper case character, 1 special character, at least six characters in length</string>
+    <string name="at_least_1_digit_a_lower_case_and_upper_case_character_1_special_character_at_least_six_characters_in_length">At least 1 number or special character, 1 lower case and 1 upper case character, at least 6 characters in length</string>
     <string name="must_be_the_same_as_your_password">Must be the same as your password</string>
     <string name="required_tap_to_type">(Required) tap to type</string>
     <string name="quantity">Quantity</string>
@@ -87,6 +87,7 @@
     <string name="grocery_store">Grocery store</string>
     <string name="combine_lists">Combine lists</string>
     <string name="merge_with_another_user">Merge your list with another user</string>
+    <string name="must_be_a_valid_email_address">Must be a valid email address</string>
     <string-array name="categories">
         <item>Baking</item>
         <item>Canned goods</item>
