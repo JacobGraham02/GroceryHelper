@@ -4,6 +4,10 @@ object ValidationUtil {
 
     /**
      * ^                 start-of-string
+     * (?=.*\d)         # Positive lookahead: ensure the string contains at least one digit (\d)
+     * (?=.*[a-z])      # Positive lookahead: ensure the string contains at least one lowercase letter
+     * (?=.*[A-Z])      # Positive lookahead: ensure the string contains at least one uppercase letter
+     * .{8,}            # Match any character (except newline) at least 8 times
      * $                 end-of-string
      */
     private const val passwordRegex = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$"
@@ -20,11 +24,11 @@ object ValidationUtil {
         return value.isNotBlank()
     }
 
-    fun isValidQuantity(quantity: Int): Boolean {
+    private fun isValidQuantity(quantity: Int): Boolean {
         return quantity >= 1
     }
 
-    fun isValidCost(cost: Float): Boolean {
+    private fun isValidCost(cost: Float): Boolean {
         return cost >= 0.00
     }
 

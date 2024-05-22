@@ -3,7 +3,6 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Grocery Helper</string>
-    <string name="nav_header_subtitle">jakegraham54@gmail.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="grocery_list_title">%1$s</string>
     <string name="grocery_list_modify_item">Save changes for %1$s</string>
@@ -35,12 +34,10 @@
 
     <string name="prompt_category">Choose a category</string>
     <string name="add_item_to_list">Add item to list</string>
-    <string name="food_basics">Food basics</string>
-    <string name="zehrs">Zehrs</string>
     <string name="email">Email</string>
-    <string name="required_email_tap_to_type">(required) email</string>
+    <string name="required_email_tap_to_type">(required) Email</string>
     <string name="password">Password</string>
-    <string name="required_password_tap_to_type">(required) password</string>
+    <string name="required_password_tap_to_type">(required) Password</string>
     <string name="welcome_back">Welcome back!</string>
     <string name="an_image_of_the_application_icon">An image of the application icon</string>
     <string name="sign_in">Sign in</string>
@@ -48,7 +45,7 @@
     <string name="clear_password">Clear password</string>
     <string name="register">Register</string>
     <string name="confirm_password">Confirm password</string>
-    <string name="required_confirm_password">(required) confirm password</string>
+    <string name="required_confirm_password">(required) Confirm password</string>
     <string name="log_in">Log in</string>
     <string name="at_least_1_digit_a_lower_case_and_upper_case_character_1_special_character_at_least_six_characters_in_length">At least 1 number or special character, 1 lower case and 1 upper case character, at least 6 characters in length</string>
     <string name="must_be_the_same_as_your_password">Must be the same as your password</string>
