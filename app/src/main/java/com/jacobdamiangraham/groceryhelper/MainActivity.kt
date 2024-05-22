@@ -272,15 +272,15 @@ class MainActivity : AppCompatActivity(), Observer<UserDeleteAccountEvent> {
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.sort_a_to_z -> viewModel.sortByNameAToZ()
-            R.id.sort_by_alphabetical_category -> viewModel.sortByCategoryAToZ()
-            R.id.sort_cost_high_to_low -> viewModel.sortByCostHighToLow()
-            R.id.sort_cost_low_to_high -> viewModel.sortByCostLowToHigh()
-        }
-        return super.onOptionsItemSelected(item)
-    }
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//        when (item.itemId) {
+//            R.id.sort_a_to_z -> viewModel.sortByNameAToZ()
+//            R.id.sort_by_alphabetical_category -> viewModel.sortByCategoryAToZ()
+//            R.id.sort_cost_high_to_low -> viewModel.sortByCostHighToLow()
+//            R.id.sort_cost_low_to_high -> viewModel.sortByCostLowToHigh()
+//        }
+//        return super.onOptionsItemSelected(item)
+//    }
 
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
