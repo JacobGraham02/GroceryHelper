@@ -1,6 +1,5 @@
 package com.jacobdamiangraham.groceryhelper.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.jacobdamiangraham.groceryhelper.interfaces.IDeleteGroceryItemCallback

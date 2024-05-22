@@ -314,7 +314,6 @@ class AddGroceryItemFragment: Fragment() {
                 "confirmation"
             )
             alertDialogGenerator.configure(
-                requireContext(),
                 AlertDialog.Builder(requireContext()),
                 dialogInfo,
                 positiveButtonAction = {

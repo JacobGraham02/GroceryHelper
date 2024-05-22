@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.jacobdamiangraham.groceryhelper.R
 import com.jacobdamiangraham.groceryhelper.factory.PromptBuilderFactory
 import com.jacobdamiangraham.groceryhelper.interfaces.IOnGroceryItemInteractionListener
-import com.jacobdamiangraham.groceryhelper.model.CategoryWithItems
 import com.jacobdamiangraham.groceryhelper.model.DialogInformation
 import com.jacobdamiangraham.groceryhelper.model.GroceryItem
 
@@ -23,12 +22,8 @@ class GroceryItemAdapter(
     private val onItemClick: (GroceryItem) -> Unit):
     RecyclerView.Adapter<GroceryItemAdapter.GroceryItemViewHolder>() {
 
-        private var arrayListGroceryItems: ArrayList<View>
+        private var arrayListGroceryItems: ArrayList<View> = ArrayList()
         private var groceryItemList: MutableList<GroceryItem> = ArrayList()
-
-        init {
-            arrayListGroceryItems = ArrayList()
-        }
 
     fun updateGroceryItems(newGroceryItems: MutableList<GroceryItem>) {
         groceryItemList = newGroceryItems
@@ -88,7 +83,6 @@ class GroceryItemAdapter(
                 val alertDialogGenerator = PromptBuilderFactory.getAlertDialogGenerator(
                     "confirmation")
                 alertDialogGenerator.configure(
-                    context,
                     AlertDialog.Builder(context),
                     dialogInfo,
                     positiveButtonAction = {

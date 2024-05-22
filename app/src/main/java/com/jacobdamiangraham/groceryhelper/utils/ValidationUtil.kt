@@ -10,14 +10,14 @@ object ValidationUtil {
      * .{8,}            # Match any character (except newline) at least 8 times
      * $                 end-of-string
      */
-    private const val passwordRegex = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$"
+    private const val PASSWORD_REGEX = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$"
 
     fun isValidEmailAddress(email: String): Boolean {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 
     fun isValidPassword(password: String): Boolean {
-        return password.matches(passwordRegex.toRegex())
+        return password.matches(PASSWORD_REGEX.toRegex())
     }
 
     fun isValidGroceryItemString(value: String): Boolean {

@@ -43,7 +43,7 @@ class HomeFragment : Fragment(), IOnGroceryItemInteractionListener {
 
     private fun setupViewModel(storeName: String) {
         val factory = GroceryViewModelFactory(storeName)
-        viewModel = ViewModelProvider(this, factory).get(GroceryViewModel::class.java)
+        viewModel = ViewModelProvider(this, factory)[GroceryViewModel::class.java]
 
         viewModel.groceryItems.observe(viewLifecycleOwner) { items ->
             val filteredItems = items.filter { it.store == storeName }

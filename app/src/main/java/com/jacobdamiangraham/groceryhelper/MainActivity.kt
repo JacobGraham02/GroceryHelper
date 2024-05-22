@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity(), Observer<UserDeleteAccountEvent> {
 
         setSupportActionBar(binding.appBarMain.toolbar)
 
-        viewModel = ViewModelProvider(this).get(GroceryViewModel::class.java)
+        viewModel = ViewModelProvider(this)[GroceryViewModel::class.java]
 
         notificationBuilder = NotificationBuilder(this)
 
@@ -85,7 +85,6 @@ class MainActivity : AppCompatActivity(), Observer<UserDeleteAccountEvent> {
                         "confirmation"
                     )
                     alertDialogGenerator.configure(
-                        this,
                         AlertDialog.Builder(this),
                         dialogInfo,
                         positiveButtonAction = {
@@ -102,7 +101,6 @@ class MainActivity : AppCompatActivity(), Observer<UserDeleteAccountEvent> {
                         "confirmation"
                     )
                     alertDialogGenerator.configure(
-                        this,
                         AlertDialog.Builder(this),
                         dialogInfo,
                         positiveButtonAction = {
@@ -153,7 +151,6 @@ class MainActivity : AppCompatActivity(), Observer<UserDeleteAccountEvent> {
         )
 
         alertDialogGenerator.configure(
-            this,
             AlertDialog.Builder(this),
             dialogInfo,
             positiveButtonAction = {
@@ -224,7 +221,7 @@ class MainActivity : AppCompatActivity(), Observer<UserDeleteAccountEvent> {
         val options = arrayOf("Go to store list", "Delete store")
         AlertDialog.Builder(this)
             .setTitle(storeName)
-            .setItems(options) { dialog, whichOptionSelected ->
+            .setItems(options) { _, whichOptionSelected ->
                 when(whichOptionSelected) {
                     0 -> navigateToStore(storeName)
                     1 -> showStoreDeleteConfirmationDialog(storeName)
@@ -236,23 +233,6 @@ class MainActivity : AppCompatActivity(), Observer<UserDeleteAccountEvent> {
         val bundle = bundleOf("storeName" to storeName)
         findNavController(R.id.nav_host_fragment_content_main).navigate(R.id.nav_home, bundle)
         binding.drawerLayout.closeDrawers()
-    }
-
-    private fun removeStoreFromMenu(storeName: String) {
-        val navMenu = binding.navView.menu
-        val storeGroup = navMenu.findItem(R.id.store_group)?.subMenu
-
-        storeGroup?.let {
-            for (i in 0 until it.size()) {
-                val menuItem = it.getItem(i)
-                if (menuItem.title == storeName) {
-                    it.removeItem(menuItem.itemId)
-                    break
-                }
-            }
-        }
-
-        binding.navView.invalidate()
     }
 
     private fun deleteFirebaseUserAccount(context: Context) {
