@@ -15,8 +15,10 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/Theme.GroceryHelper.PopupOverlay" />
+            android:background="@color/sidebar_background_primary"
+            android:textColor="@color/text_primary"
+            app:titleTextColor="@color/text_primary"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
     </com.google.android.material.appbar.AppBarLayout>
 

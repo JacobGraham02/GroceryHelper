@@ -25,7 +25,7 @@
             android:gravity="center_horizontal"
             android:padding="2dp"
             android:text="@string/name"
-            android:textColor="#000000"
+            android:textColor="@color/text_primary"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -35,7 +35,7 @@
             android:layout_height="match_parent"
             android:gravity="center_horizontal"
             android:text="@string/item_name"
-            android:textColor="#474343"
+            android:textColor="@color/text_primary"
             android:textSize="18sp" />
 
         <TextView
@@ -45,7 +45,7 @@
             android:gravity="center_horizontal"
             android:padding="2dp"
             android:text="@string/quantity"
-            android:textColor="#000000"
+            android:textColor="@color/text_primary"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -55,7 +55,7 @@
             android:layout_height="match_parent"
             android:gravity="center_horizontal"
             android:text="@string/item_amount"
-            android:textColor="#474343"
+            android:textColor="@color/text_primary"
             android:textSize="18sp" />
 
         <ImageView
@@ -88,7 +88,7 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:text="@string/cost"
-            android:textColor="#000000"
+            android:textColor="@color/text_primary"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -103,7 +103,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/item_cost_dollar_sign"
-                android:textColor="#000000"
+                android:textColor="@color/text_primary"
                 android:textStyle="bold" />
 
             <TextView
@@ -112,7 +112,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 android:text="@string/item_cost"
-                android:textColor="#474343"
+                android:textColor="@color/text_primary"
                 android:textSize="18sp" />
         </LinearLayout>
 
@@ -123,7 +123,7 @@
             android:gravity="center_horizontal"
             android:padding="2dp"
             android:text="@string/category"
-            android:textColor="#000000"
+            android:textColor="@color/text_primary"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -133,7 +133,7 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:text="@string/category_name"
-            android:textColor="#474343"
+            android:textColor="@color/text_primary"
             android:textSize="18sp" />
 
         <LinearLayout
@@ -148,6 +148,7 @@
                 style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/text_primary"
                 android:text="@string/delete_item" />
         </LinearLayout>
 
