@@ -86,7 +86,7 @@
     <string name="combine_with">Combine with…</string>
     <string name="grocery_store">Grocery store</string>
     <string name="combine_lists">Combine lists</string>
-    <string name="merge_with_another_user">Merge with another user</string>
+    <string name="merge_with_another_user">Merge your list with another user</string>
     <string-array name="categories">
         <item>Baking</item>
         <item>Canned goods</item>

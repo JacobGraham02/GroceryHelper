@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.jacobdamiangraham.groceryhelper.R
 import com.jacobdamiangraham.groceryhelper.factory.PromptBuilderFactory
 import com.jacobdamiangraham.groceryhelper.interfaces.IOnGroceryItemInteractionListener
+import com.jacobdamiangraham.groceryhelper.model.CategoryWithItems
 import com.jacobdamiangraham.groceryhelper.model.DialogInformation
 import com.jacobdamiangraham.groceryhelper.model.GroceryItem
 
@@ -35,6 +36,7 @@ class GroceryItemAdapter(
     }
 
     inner class GroceryItemViewHolder(groceryItemView: View): RecyclerView.ViewHolder(groceryItemView) {
+        val groceryItemCategoryHeading: TextView = groceryItemView.findViewById(R.id.itemCategoryHeading)
         val groceryItemName: TextView = groceryItemView.findViewById(R.id.groceryItemNameTextView)
         val groceryItemAmount: TextView = groceryItemView.findViewById(R.id.groceryItemAmountTextView)
         val groceryItemCost: TextView = groceryItemView.findViewById(R.id.itemCostTextView)
@@ -63,6 +65,7 @@ class GroceryItemAdapter(
         }
         with(holder) {
             var isExpanded = false
+            groceryItemCategoryHeading.text = groceryItem.category
             groceryItemName.text = groceryItem.name
             groceryItemAmount.text = groceryItem.quantity.toString()
             groceryItemCost.text = groceryItem.cost.toString()
