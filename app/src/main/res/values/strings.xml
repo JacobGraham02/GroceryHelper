@@ -85,6 +85,7 @@
     <string name="combine_lists">Combine lists</string>
     <string name="merge_with_another_user">Merge your list with another user</string>
     <string name="must_be_a_valid_email_address">Must be a valid email address</string>
+    <string name="voice_input">Voice input</string>
     <string-array name="categories">
         <item>Baking</item>
         <item>Canned goods</item>
