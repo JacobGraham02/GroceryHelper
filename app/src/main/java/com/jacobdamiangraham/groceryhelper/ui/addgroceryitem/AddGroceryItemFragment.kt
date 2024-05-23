@@ -1,7 +1,10 @@
 package com.jacobdamiangraham.groceryhelper.ui.addgroceryitem
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.speech.RecognizerIntent
+import android.speech.SpeechRecognizer
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -12,7 +15,10 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -32,6 +38,10 @@ import java.util.UUID
 
 class AddGroceryItemFragment: Fragment() {
 
+    companion object {
+        private const val REQUEST_CODE_SPEECH_INPUT = 1
+    }
+
     private var _binding: FragmentAddGroceryItemBinding? = null
     private val binding get() = _binding!!
 
@@ -42,6 +52,14 @@ class AddGroceryItemFragment: Fragment() {
     private var storeNames = mutableListOf<String>()
 
     private lateinit var storeNamesSpinnerAdapter: ArrayAdapter<String>
+
+    private val voiceInputFields: List<EditText> by lazy {
+        listOf(binding.addItemName, binding.addItemQuantity, binding.addItemCost)
+    }
+
+    private var currentVoiceInputFieldIndex: Int = 0
+
+    private lateinit var speechRecognizerLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -106,6 +124,7 @@ class AddGroceryItemFragment: Fragment() {
         setupCategorySpinner()
         setupStoreNameSpinner()
         setupStoreNameButton()
+        setupVoiceInputButton()
         loadStoreNamesIntoSpinner(groceryItemStore)
 
         if (groceryItemArgs.groceryItemName != "undefined") {
@@ -203,6 +222,59 @@ class AddGroceryItemFragment: Fragment() {
                             Toast.LENGTH_SHORT).show()
                     }
                 })
+        }
+    }
+
+    private fun setupVoiceInputButton() {
+        binding.voiceInputButton.setOnClickListener {
+            startVoiceInput()
+        }
+    }
+
+    private fun startVoiceInput() {
+        if (!SpeechRecognizer.isRecognitionAvailable(requireContext())) {
+            Toast.makeText(
+                requireContext(),
+                "Speech recognition is not available on this device",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+        val intent: Intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+            putExtra(RecognizerIntent.EXTRA_PROMPT, getPromptMessage())
+        }
+
+        speechRecognizerLauncher.launch(intent)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        speechRecognizerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                result ->
+            if (result.resultCode == AppCompatActivity.RESULT_OK && result.data != null) {
+                val voiceInputText =
+                    result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.get(0)
+
+                if (voiceInputText != null) {
+                    voiceInputFields[currentVoiceInputFieldIndex].setText(voiceInputText)
+                    currentVoiceInputFieldIndex++
+
+                    if (currentVoiceInputFieldIndex < voiceInputFields.size) {
+                        startVoiceInput()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun getPromptMessage(): String {
+        return when (currentVoiceInputFieldIndex) {
+            0 -> "What is the item name?"
+            1 -> "How many of this item do you want?"
+            2 -> "What is the item cost?"
+            else -> ""
         }
     }
 
@@ -424,6 +496,7 @@ class AddGroceryItemFragment: Fragment() {
     override fun onDestroyView() {
         viewModel.liveDataGroceryItem.removeObservers(viewLifecycleOwner)
         super.onDestroyView()
+        currentVoiceInputFieldIndex = 0
         _binding = null
     }
 }
