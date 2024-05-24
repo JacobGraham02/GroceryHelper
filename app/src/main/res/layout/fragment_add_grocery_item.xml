@@ -73,7 +73,7 @@
                     android:textColor="@color/text_primary"
                     android:textStyle="bold" />
 
-                <EditText
+                <com.jacobdamiangraham.groceryhelper.utils.CustomEditText
                     android:id="@+id/addItemName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -82,6 +82,7 @@
                     android:importantForAutofill="no"
                     android:textColor="@color/text_primary"
                     android:inputType="text|textAutoComplete|textAutoCorrect"
+                    app:TtsPrompt="What is the item name?"
                     android:textAlignment="viewStart" />
 
             </LinearLayout>
@@ -114,7 +115,7 @@
                     android:textColor="@color/text_primary"
                     android:textStyle="bold" />
 
-                <EditText
+                <com.jacobdamiangraham.groceryhelper.utils.CustomEditText
                     android:id="@+id/addItemQuantity"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -122,6 +123,7 @@
                     android:importantForAutofill="no"
                     android:inputType="numberDecimal"
                     android:textAlignment="viewStart"
+                    app:TtsPrompt="How much do you want?"
                     android:textColor="@color/text_primary" />
 
             </LinearLayout>
@@ -170,7 +172,7 @@
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
-                    <EditText
+                    <com.jacobdamiangraham.groceryhelper.utils.CustomEditText
                         android:id="@+id/addItemCost"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -178,6 +180,7 @@
                         android:importantForAutofill="no"
                         android:inputType="numberDecimal"
                         android:nextFocusDown="@id/addItemButton"
+                        app:TtsPrompt="What is the cost?"
                         android:textColor="@color/text_primary" />
                 </LinearLayout>
 

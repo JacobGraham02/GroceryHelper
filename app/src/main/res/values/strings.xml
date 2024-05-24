@@ -23,6 +23,14 @@
     <string name="invalid_cost">Cost - Invalid</string>
     <string name="valid_store">Store - Valid</string>
     <string name="invalid_store">Store - Invalid</string>
+    <string name="store_exists">This store already exists</string>
+    <string name="error_adding_item">There was an error when adding this item</string>
+
+    <string name="confirm_add_grocery_item">Confirm add grocery item</string>
+    <string name="confirmation_add_grocery_item">Are you sure you want to add this grocery item?</string>
+    <string name="invalid_data">Please enter valid data</string>
+
+    <string name="prompt_confirmation">confirmation</string>
 
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
@@ -31,6 +39,15 @@
     <string name="item_cost">Item cost</string>
     <string name="item_amount">Item amount</string>
     <string name="item_name">Item name</string>
+
+    <string name="tts_item_name">What is the item name?</string>
+    <string name="tts_item_quantity">How much do you want?</string>
+    <string name="tts_item_cost">What is the cost?</string>
+    <string name="tts_not_available">TTS is not available on this device</string>
+    <string name="tts_error">There was an error using TTS</string>
+
+    <string name="blank_string">""</string>
+    <string name="invalid">undefined</string>
 
     <string name="prompt_category">Choose a category</string>
     <string name="add_item_to_list">Add item to list</string>
@@ -101,11 +118,6 @@
         <item>Spice</item>
         <item>Sweet</item>
         <item>Vegetable</item>
-    </string-array>
-
-    <string-array name="stores">
-        <item>food basics</item>
-        <item>zehrs</item>
     </string-array>
 
     <item name="store_group" type="id"/>

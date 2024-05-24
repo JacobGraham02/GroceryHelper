@@ -5,8 +5,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
+import android.speech.tts.TextToSpeech
+import android.speech.tts.UtteranceProgressListener
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,6 +25,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.jacobdamiangraham.groceryhelper.R
 import com.jacobdamiangraham.groceryhelper.databinding.FragmentAddGroceryItemBinding
@@ -32,15 +36,17 @@ import com.jacobdamiangraham.groceryhelper.interfaces.IAddGroceryStoreCallback
 import com.jacobdamiangraham.groceryhelper.model.DialogInformation
 import com.jacobdamiangraham.groceryhelper.model.GroceryItem
 import com.jacobdamiangraham.groceryhelper.storage.FirebaseStorage
+import com.jacobdamiangraham.groceryhelper.utils.CustomEditText
 import com.jacobdamiangraham.groceryhelper.utils.ValidationUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.Locale
 import java.util.UUID
+import kotlin.coroutines.resume
 
 class AddGroceryItemFragment: Fragment() {
-
-    companion object {
-        private const val REQUEST_CODE_SPEECH_INPUT = 1
-    }
 
     private var _binding: FragmentAddGroceryItemBinding? = null
     private val binding get() = _binding!!
@@ -61,6 +67,8 @@ class AddGroceryItemFragment: Fragment() {
 
     private lateinit var speechRecognizerLauncher: ActivityResultLauncher<Intent>
 
+    private lateinit var textToSpeech: TextToSpeech
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -70,12 +78,19 @@ class AddGroceryItemFragment: Fragment() {
         _binding = FragmentAddGroceryItemBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+        textToSpeech = TextToSpeech(context) {
+            textToSpeechStatus ->
+                if (textToSpeechStatus != TextToSpeech.ERROR) {
+                    textToSpeech.language = Locale.getDefault()
+                }
+        }
+
         val groceryItemArgs: AddGroceryItemFragmentArgs by navArgs()
 
         val groceryItemValueConditions = mapOf(
-            0 to { item: Any? -> item != null && item.toString() != "undefined" }, // Name
-            1 to { item: Any? -> item != null && item != 1 },                      // Quantity
-            2 to { item: Any? -> item != null && item != 0.00 },                   // Cost
+            0 to { item: Any? -> item != null && item.toString() != getString(R.string.invalid) },  // Name
+            1 to { item: Any? -> item != null && item != 1 },                                       // Quantity
+            2 to { item: Any? -> item != null && item != 0.00 },                                    // Cost
         )
 
         val arrayListBindingElements = arrayListOf(
@@ -92,22 +107,7 @@ class AddGroceryItemFragment: Fragment() {
         val groceryItemStore = groceryItemArgs.groceryItemStore
         val groceryItemId = groceryItemArgs.groceryItemId
 
-        val arrayListGroceryItemCategory = arrayListOf(
-            "Baking",
-            "Canned goods",
-            "Cereal",
-            "Condiments",
-            "Dairy",
-            "Deli",
-            "Fruit",
-            "Meat",
-            "Pasta",
-            "Rice",
-            "Seafood",
-            "Spice",
-            "Sweet",
-            "Vegetable"
-        )
+        val arrayListGroceryItemCategory = ArrayList(resources.getStringArray(R.array.categories).toList())
 
         for (index in arrayListBindingElements.indices) {
             val editText: EditText = arrayListBindingElements[index]
@@ -127,7 +127,7 @@ class AddGroceryItemFragment: Fragment() {
         setupVoiceInputButton()
         loadStoreNamesIntoSpinner(groceryItemStore)
 
-        if (groceryItemArgs.groceryItemName != "undefined") {
+        if (groceryItemArgs.groceryItemName != getString(R.string.invalid)) {
             binding.addItemButton.text = getString(R.string.grocery_list_modify_item, groceryItemArgs.groceryItemName)
             binding.addItemPageLabel.text = getString(R.string.grocery_list_title_modify, groceryItemArgs.groceryItemName)
         }
@@ -189,6 +189,10 @@ class AddGroceryItemFragment: Fragment() {
         return root
     }
 
+    private fun speakPrompt(prompt: String) {
+        textToSpeech.speak(prompt, TextToSpeech.QUEUE_FLUSH, null, null)
+    }
+
     private fun setupStoreNameButton() {
         binding.addNewStoreConfirmButton.setOnClickListener {
             val newStoreName: String = binding.addNewStore.text.toString()
@@ -200,7 +204,7 @@ class AddGroceryItemFragment: Fragment() {
                 if (groceryStoreExists) {
                     Toast.makeText(
                         requireContext(),
-                        "This store already exists",
+                        getString(R.string.store_exists),
                         Toast.LENGTH_SHORT).show()
                     return@getGroceryStoreNames
                 }
@@ -232,14 +236,51 @@ class AddGroceryItemFragment: Fragment() {
     }
 
     private fun startVoiceInput() {
+        lifecycleScope.launch(Dispatchers.Main) {
+            val promptMessage = getPromptMessage()
+            val ttsCompleted = speakPromptAndWait(promptMessage)
+
+            if (ttsCompleted) {
+                launchSpeechRecognizer()
+            }
+        }
+    }
+
+    private suspend fun speakPromptAndWait(promptMessage: String): Boolean {
+        val utteranceId = "AddGroceryItemTts"
+
+        val params = Bundle().apply {
+            putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, utteranceId)
+        }
+
+        textToSpeech.speak(promptMessage, TextToSpeech.QUEUE_FLUSH, params, utteranceId)
+
+        return suspendCancellableCoroutine { continuation ->
+
+            textToSpeech.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+                override fun onStart(utteranceId: String?) {}
+
+                override fun onDone(utteranceId: String?) {
+                    continuation.resume(true)
+                }
+
+                override fun onError(utteranceId: String?) {
+                    continuation.resume(false)
+                }
+            })
+        }
+    }
+
+    private fun launchSpeechRecognizer() {
         if (!SpeechRecognizer.isRecognitionAvailable(requireContext())) {
             Toast.makeText(
                 requireContext(),
-                "Speech recognition is not available on this device",
+                getString(R.string.tts_not_available),
                 Toast.LENGTH_SHORT
             ).show()
             return
         }
+
         val intent: Intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
             putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
@@ -248,6 +289,7 @@ class AddGroceryItemFragment: Fragment() {
 
         speechRecognizerLauncher.launch(intent)
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -258,7 +300,10 @@ class AddGroceryItemFragment: Fragment() {
                     result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.get(0)
 
                 if (voiceInputText != null) {
-                    voiceInputFields[currentVoiceInputFieldIndex].setText(voiceInputText)
+                    val currentFocusedField = voiceInputFields[currentVoiceInputFieldIndex]
+
+                    currentFocusedField.setText(voiceInputText)
+
                     currentVoiceInputFieldIndex++
 
                     if (currentVoiceInputFieldIndex < voiceInputFields.size) {
@@ -271,10 +316,10 @@ class AddGroceryItemFragment: Fragment() {
 
     private fun getPromptMessage(): String {
         return when (currentVoiceInputFieldIndex) {
-            0 -> "What is the item name?"
-            1 -> "How many of this item do you want?"
-            2 -> "What is the item cost?"
-            else -> ""
+            0 -> getString(R.string.tts_item_name)
+            1 -> getString(R.string.tts_item_quantity)
+            2 -> getString(R.string.tts_item_cost)
+            else -> getString(R.string.blank_string)
         }
     }
 
@@ -343,7 +388,7 @@ class AddGroceryItemFragment: Fragment() {
 
     private fun setupAddItemButton(groceryItemId: String) {
         binding.addItemButton.setOnClickListener {
-            val groceryItemName = binding.addItemName.text?.toString() ?: ""
+            val groceryItemName = binding.addItemName.text?.toString() ?: getString(R.string.blank_string)
             val groceryItemQuantity = binding.addItemQuantity.text?.toString()?.toIntOrNull() ?: 0
             val groceryItemCost = binding.addItemCost.text?.toString()?.toFloatOrNull() ?: 0.0f
             val groceryItemStore = binding.addGroceryStoreNameSpinner.selectedItem?.toString() ?: ""
@@ -364,7 +409,7 @@ class AddGroceryItemFragment: Fragment() {
 
                 Toast.makeText(
                     context,
-                    "Please enter valid data",
+                    getString(R.string.invalid_data),
                     Toast.LENGTH_SHORT)
                     .show()
                 return@setOnClickListener
@@ -379,11 +424,11 @@ class AddGroceryItemFragment: Fragment() {
                 groceryItemCost)
 
             val dialogInfo = DialogInformation(
-                title = "Confirm add grocery item",
-                message = "Are you sure you want to add this grocery item?"
+                title = getString(R.string.confirm_add_grocery_item),
+                message = getString(R.string.confirmation_add_grocery_item)
             )
             val alertDialogGenerator = PromptBuilderFactory.getAlertDialogGenerator(
-                "confirmation"
+                getString(R.string.prompt_confirmation)
             )
             alertDialogGenerator.configure(
                 AlertDialog.Builder(requireContext()),
@@ -429,7 +474,7 @@ class AddGroceryItemFragment: Fragment() {
                     }
                 })
         } catch (e: Exception) {
-            throw Error("There was an error when attempting to insert grocery item into firebase: ${e}")
+            throw Error(getString(R.string.error_adding_item))
         }
     }
 
@@ -496,6 +541,8 @@ class AddGroceryItemFragment: Fragment() {
     override fun onDestroyView() {
         viewModel.liveDataGroceryItem.removeObservers(viewLifecycleOwner)
         super.onDestroyView()
+        textToSpeech.stop()
+        textToSpeech.shutdown()
         currentVoiceInputFieldIndex = 0
         _binding = null
     }
