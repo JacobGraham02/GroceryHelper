@@ -41,7 +41,7 @@
     <string name="item_name">Item name</string>
 
     <string name="tts_item_name">What is the item name?</string>
-    <string name="tts_item_quantity">How much do you want?</string>
+    <string name="tts_item_quantity">How many do you want?</string>
     <string name="tts_item_cost">What is the cost?</string>
     <string name="tts_not_available">TTS is not available on this device</string>
     <string name="tts_error">There was an error using TTS</string>

@@ -8,6 +8,7 @@ import android.speech.SpeechRecognizer
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import android.text.Editable
+import android.text.SpannableStringBuilder
 import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
@@ -302,7 +303,13 @@ class AddGroceryItemFragment: Fragment() {
                 if (voiceInputText != null) {
                     val currentFocusedField = voiceInputFields[currentVoiceInputFieldIndex]
 
-                    currentFocusedField.setText(voiceInputText)
+                    if ((currentFocusedField.id == R.id.addItemQuantity) || (currentFocusedField.id == R.id.addItemCost)) {
+                        val lowercaseVoiceInputText = voiceInputText.lowercase()
+                        val quantityWordToNum = convertWordToNumber(lowercaseVoiceInputText)
+                        currentFocusedField.text = SpannableStringBuilder("$quantityWordToNum")
+                    } else {
+                        currentFocusedField.setText(voiceInputText)
+                    }
 
                     currentVoiceInputFieldIndex++
 
@@ -312,6 +319,14 @@ class AddGroceryItemFragment: Fragment() {
                 }
             }
         }
+    }
+
+    private fun convertWordToNumber(text: String): Int? {
+        val numberWords = mapOf(
+            "zero" to 0, "one" to 1, "two" to 2, "three" to 3, "four" to 4,
+            "five" to 5, "six" to 6, "seven" to 7, "eight" to 8, "nine" to 9
+        )
+        return numberWords.get(text)
     }
 
     private fun getPromptMessage(): String {
@@ -344,7 +359,8 @@ class AddGroceryItemFragment: Fragment() {
                 }
             }
             AddGroceryItemInputType.QUANTITY -> {
-                if (ValidationUtil.isValidGroceryItemString(value)) {
+                val quantity = value.toInt()
+                if (ValidationUtil.isValidQuantity(quantity)) {
                     binding.addItemQuantity.setBackgroundResource(R.drawable.edit_text_valid)
                     binding.addItemQuantityLabel.text = getString(R.string.valid_quantity)
                     binding.addItemQuantityLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.green))
@@ -357,7 +373,8 @@ class AddGroceryItemFragment: Fragment() {
                 }
             }
             AddGroceryItemInputType.COST -> {
-                if (ValidationUtil.isValidGroceryItemString(value)) {
+                val cost = value.toFloat()
+                if (ValidationUtil.isValidCost(cost)) {
                     binding.addItemCost.setBackgroundResource(R.drawable.edit_text_valid)
                     binding.addItemCostLabel.text = getString(R.string.valid_cost)
                     binding.addItemCostLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.green))

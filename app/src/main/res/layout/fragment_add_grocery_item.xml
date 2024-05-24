@@ -121,9 +121,9 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/required_tap_to_type"
                     android:importantForAutofill="no"
-                    android:inputType="numberDecimal"
+                    android:inputType="number"
                     android:textAlignment="viewStart"
-                    app:TtsPrompt="How much do you want?"
+                    app:TtsPrompt="How many do you want?"
                     android:textColor="@color/text_primary" />
 
             </LinearLayout>
