@@ -268,6 +268,14 @@ class FirebaseStorage() {
                             .document(firebaseUserUid)
                             .set(user)
                             .addOnSuccessListener {
+                                sendEmailVerification {
+                                    success, message ->
+                                    if (success) {
+                                        callback.onRegistrationSuccess("Registration successful and verification email sent")
+                                    } else {
+                                        callback.onRegistrationFailure("Registration successful but failed to send verification email: $message")
+                                    }
+                                }
                                 callback.onRegistrationSuccess("Registration successful")
                             }
                             .addOnFailureListener { exception ->
@@ -284,6 +292,19 @@ class FirebaseStorage() {
                     }
                 }
             }
+    }
+
+    fun sendEmailVerification(callback: (Boolean, String) -> Unit) {
+        val user = firebaseAuthentication.currentUser
+
+        user?.sendEmailVerification()?.addOnCompleteListener {
+            task ->
+                if (task.isSuccessful) {
+                    callback(true, "New user register verification email has been sent")
+                } else {
+                    callback(false, "Error sending verification email: ${task.exception?.message}")
+                }
+        }
     }
 
     fun addGroceryStoreToUser(storeName: String, callback: IAddGroceryStoreCallback) {
@@ -365,8 +386,8 @@ class FirebaseStorage() {
             .addOnCompleteListener { completedLogInUserTask ->
                 if (completedLogInUserTask.isSuccessful) {
                     val firebaseUser = firebaseAuthentication.currentUser
-                    firebaseUser?.getIdToken(true)?.addOnCompleteListener {
-                        task ->
+                    if (firebaseUser != null && firebaseUser.isEmailVerified) {
+                        firebaseUser.getIdToken(true).addOnCompleteListener { task ->
                             if (task.isSuccessful) {
                                 val idToken = task.result?.token
                                 if (idToken != null) {
@@ -376,6 +397,9 @@ class FirebaseStorage() {
                             } else {
                                 callback.onLoginFailure("Unable to log you in")
                             }
+                        }
+                    } else {
+                        callback.onLoginFailure("Please verify your email address before logging in")
                     }
                 } else {
                     callback.onLoginFailure("Unable to log you in")
