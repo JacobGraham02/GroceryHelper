@@ -18,6 +18,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.EditText
+import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -70,6 +71,13 @@ class AddGroceryItemFragment: Fragment() {
 
     private lateinit var textToSpeech: TextToSpeech
 
+    private lateinit var addItemNameEditText: EditText
+    private lateinit var addItemQuantityText: EditText
+    private lateinit var addItemCostText: EditText
+    private lateinit var addGroceryItemCategorySpinner: Spinner
+    private lateinit var groceryStoreSpinner: Spinner
+    private lateinit var addStoreEditText: EditText
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -78,6 +86,13 @@ class AddGroceryItemFragment: Fragment() {
         viewModel = ViewModelProvider(this)[AddGroceryItemViewModel::class.java]
         _binding = FragmentAddGroceryItemBinding.inflate(inflater, container, false)
         val root: View = binding.root
+
+        addItemNameEditText = binding.addItemName
+        addItemQuantityText = binding.addItemQuantity
+        addItemCostText = binding.addItemCost
+        addGroceryItemCategorySpinner = binding.addGroceryItemCategorySpinner
+        groceryStoreSpinner = binding.addGroceryStoreNameSpinner
+        addStoreEditText = binding.addNewStore
 
         textToSpeech = TextToSpeech(context) {
             textToSpeechStatus ->
@@ -254,23 +269,29 @@ class AddGroceryItemFragment: Fragment() {
             putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, utteranceId)
         }
 
+        if (!isAdded) return false
+
         textToSpeech.speak(promptMessage, TextToSpeech.QUEUE_FLUSH, params, utteranceId)
 
         return suspendCancellableCoroutine { continuation ->
-
             textToSpeech.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                 override fun onStart(utteranceId: String?) {}
 
                 override fun onDone(utteranceId: String?) {
-                    continuation.resume(true)
+                    if (isAdded) {
+                        continuation.resume(true)
+                    }
                 }
 
                 override fun onError(utteranceId: String?) {
-                    continuation.resume(false)
+                    if (isAdded) {
+                        continuation.resume(false)
+                    }
                 }
             })
         }
     }
+
 
     private fun launchSpeechRecognizer() {
         if (!SpeechRecognizer.isRecognitionAvailable(requireContext())) {
@@ -478,7 +499,6 @@ class AddGroceryItemFragment: Fragment() {
                             Toast.LENGTH_SHORT
                         )
                             .show()
-                        clearInputFields()
                     }
 
                     override fun onAddFailure(failureMessage: String) {
@@ -493,15 +513,6 @@ class AddGroceryItemFragment: Fragment() {
         } catch (e: Exception) {
             throw Error(getString(R.string.error_adding_item))
         }
-    }
-
-    private fun clearInputFields() {
-        binding.addItemName.text = null
-        binding.addItemQuantity.text = null
-        binding.addItemCost.text = null
-        binding.addGroceryItemCategorySpinner.setSelection(0)
-        binding.addGroceryStoreNameSpinner.setSelection(0)
-        binding.addNewStore.text = null
     }
 
     private fun setupCategorySpinner() {
@@ -558,8 +569,10 @@ class AddGroceryItemFragment: Fragment() {
     override fun onDestroyView() {
         viewModel.liveDataGroceryItem.removeObservers(viewLifecycleOwner)
         super.onDestroyView()
-        textToSpeech.stop()
-        textToSpeech.shutdown()
+        if (::textToSpeech.isInitialized) {
+            textToSpeech.stop()
+            textToSpeech.shutdown()
+        }
         currentVoiceInputFieldIndex = 0
         _binding = null
     }

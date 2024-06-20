@@ -37,9 +37,13 @@
             android:exported="true"
             android:theme="@style/Theme.GroceryHelper.NoActionBar">
         </activity>
+
         <activity
             android:name=".ui.register.RegisterView"
             android:exported="true"/>
-    </application>
 
+        <activity
+            android:name=".ui.forgotpassword.ForgotPasswordView"
+            android:exported="true"/>
+    </application>
 </manifest>

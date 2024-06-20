@@ -16,6 +16,7 @@ import com.jacobdamiangraham.groceryhelper.databinding.ActivitySigninBinding
 import com.jacobdamiangraham.groceryhelper.enums.SignInInputType
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserLoginCallback
 import com.jacobdamiangraham.groceryhelper.storage.FirebaseStorage
+import com.jacobdamiangraham.groceryhelper.ui.forgotpassword.ForgotPasswordView
 import com.jacobdamiangraham.groceryhelper.ui.register.RegisterView
 import com.jacobdamiangraham.groceryhelper.utils.ValidationUtil
 
@@ -47,6 +48,10 @@ class SignInView : AppCompatActivity() {
 
         activitySignInBinding.registerAccountButton.setOnClickListener {
             redirectToRegisterActivity()
+        }
+
+        activitySignInBinding.forgotPasswordButton.setOnClickListener {
+            redirectToForgotPasswordActivity()
         }
 
         activitySignInBinding.emailInputField.addTextChangedListener(object : TextWatcher {
@@ -176,6 +181,10 @@ class SignInView : AppCompatActivity() {
     private fun redirectToRegisterActivity() {
         val registerActivityIntent = Intent(this, RegisterView::class.java)
         startActivity(registerActivityIntent)
-        finish()
+    }
+
+    private fun redirectToForgotPasswordActivity() {
+        val forgotPasswordActivityIntent = Intent(this, ForgotPasswordView::class.java)
+        startActivity(forgotPasswordActivityIntent)
     }
 }

@@ -103,6 +103,10 @@
     <string name="merge_with_another_user">Merge your list with another user</string>
     <string name="must_be_a_valid_email_address">Must be a valid email address</string>
     <string name="voice_input">Voice input</string>
+    <string name="forgot_password">Forgot password</string>
+    <string name="if_you_have_forgotten_your_password_enter_your_email_below_to_have_an_email_sent_to_you_giving_you_instructions_on_how_to_change_your_email">If you have forgotten your password, enter your email below to have an email sent to you giving you instructions on how to change your email</string>
+    <string name="required_email">(Required) email</string>
+    <string name="send_password_reset_email">Send password reset email</string>
     <string-array name="categories">
         <item>Baking</item>
         <item>Canned goods</item>

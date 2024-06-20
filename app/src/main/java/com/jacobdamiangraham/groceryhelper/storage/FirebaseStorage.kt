@@ -6,7 +6,6 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import androidx.security.crypto.MasterKeys
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.ktx.auth
@@ -17,7 +16,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.jacobdamiangraham.groceryhelper.event.Observable
 import com.jacobdamiangraham.groceryhelper.event.UserDeleteAccountEvent
-import com.jacobdamiangraham.groceryhelper.event.UserLogoutAccountEvent
 import com.jacobdamiangraham.groceryhelper.interfaces.IAddGroceryItemCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IAddGroceryStoreCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IAuthStatusListener
@@ -143,6 +141,49 @@ class FirebaseStorage() {
                     }
             }
         }
+    }
+
+    fun logoutWithFirebase(context: Context, callback: IUserLogoutCallback) {
+        try {
+            clearToken(context)
+            firebaseAuthentication.signOut()
+            callback.onLogoutSuccess("You have successfully logged out")
+        } catch (e: Exception) {
+            callback.onLogoutFailure("Failed to log out. Try again")
+        }
+    }
+
+    private fun clearToken(context: Context) {
+        try {
+            val masterKeyAlias = MasterKey.Builder(context)
+                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                .build()
+            val sharedPreferences = EncryptedSharedPreferences.create(
+                context,
+                "grocery_helper_shared_preferences",
+                masterKeyAlias,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            )
+            with(sharedPreferences.edit()) {
+                remove("grocery_helper_user_token")
+                apply()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    fun sendPasswordResetEmail(email: String, callback: (Boolean, String) -> Unit) {
+        firebaseAuthentication.sendPasswordResetEmail(email)
+            .addOnCompleteListener {
+                    resetPasswordTask ->
+                    if (resetPasswordTask.isSuccessful) {
+                        callback(true, "Password reset email sent")
+                    } else {
+                        callback(false, "Failed to send reset email")
+                    }
+            }
     }
 
     fun shareGroceryItemsWithUser(storeName: String, recipientUserId: String, callback: IMergeGroceryListOperation) {
@@ -428,37 +469,6 @@ class FirebaseStorage() {
                         }
                     }
                 }
-        }
-    }
-
-    fun logoutWithFirebase(context: Context, callback: IUserLogoutCallback) {
-        try {
-            clearToken(context)
-            firebaseAuthentication.signOut()
-            callback.onLogoutSuccess("You have successfully logged out")
-        } catch (e: Exception) {
-            callback.onLogoutFailure("Failed to log out. Try again")
-        }
-    }
-
-    private fun clearToken(context: Context) {
-        try {
-            val masterKeyAlias = MasterKey.Builder(context)
-                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                .build()
-            val sharedPreferences = EncryptedSharedPreferences.create(
-                context,
-                "grocery_helper_shared_preferences",
-                masterKeyAlias,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            )
-            with(sharedPreferences.edit()) {
-                remove("grocery_helper_user_token")
-                apply()
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
     }
 
