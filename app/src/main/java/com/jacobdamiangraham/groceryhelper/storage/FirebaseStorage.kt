@@ -8,6 +8,7 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
@@ -77,6 +78,11 @@ class FirebaseStorage() {
         }
     }
 
+    fun getCurrentLoggedInUser(): FirebaseUser? {
+        val currentFirebaseUser = firebaseAuthentication.currentUser
+        return currentFirebaseUser
+    }
+
     private fun getAllUsers(): MutableList<User> {
         val currentFirebaseUser = Firebase.auth.currentUser
         if (currentFirebaseUser != null) {
@@ -130,7 +136,6 @@ class FirebaseStorage() {
                         currentUser.delete().addOnCompleteListener {
                             deleteFirebaseUserTask ->
                                 if (deleteFirebaseUserTask.isSuccessful) {
-                                    clearToken(context)
                                     deleteAccountObserver.notifyObservers(UserDeleteAccountEvent(true,"Your account has been successfully deleted"))
                                 } else {
                                     deleteAccountObserver.notifyObservers(UserDeleteAccountEvent(true, "Failed to delete your account"))
@@ -145,32 +150,10 @@ class FirebaseStorage() {
 
     fun logoutWithFirebase(context: Context, callback: IUserLogoutCallback) {
         try {
-            clearToken(context)
             firebaseAuthentication.signOut()
             callback.onLogoutSuccess("You have successfully logged out")
         } catch (e: Exception) {
             callback.onLogoutFailure("Failed to log out. Try again")
-        }
-    }
-
-    private fun clearToken(context: Context) {
-        try {
-            val masterKeyAlias = MasterKey.Builder(context)
-                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                .build()
-            val sharedPreferences = EncryptedSharedPreferences.create(
-                context,
-                "grocery_helper_shared_preferences",
-                masterKeyAlias,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            )
-            with(sharedPreferences.edit()) {
-                remove("grocery_helper_user_token")
-                apply()
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
     }
 
@@ -389,10 +372,6 @@ class FirebaseStorage() {
                     if (firebaseUser != null && firebaseUser.isEmailVerified) {
                         firebaseUser.getIdToken(true).addOnCompleteListener { task ->
                             if (task.isSuccessful) {
-                                val idToken = task.result?.token
-                                if (idToken != null) {
-                                    saveToken(idToken, context)
-                                }
                                 callback.onLoginSuccess("You logged in successfully")
                             } else {
                                 callback.onLoginFailure("Unable to log you in")

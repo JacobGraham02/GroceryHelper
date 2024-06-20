@@ -3,6 +3,7 @@ package com.jacobdamiangraham.groceryhelper
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -105,6 +106,35 @@ class MainActivity : AppCompatActivity(), Observer<UserDeleteAccountEvent> {
                         dialogInfo,
                         positiveButtonAction = {
                             deleteFirebaseUserAccount(this)
+                        }
+                    ).show()
+                }
+                R.id.nav_reset_password -> {
+                    val dialogInfo = DialogInformation(
+                        title = "Confirm reset password",
+                        message = "Are you sure you want to reset your password? A password reset email will be sent to your email inbox. You will stay signed in until you log out"
+                    )
+                    val alertDialogGenerator = PromptBuilderFactory.getAlertDialogGenerator(
+                        "confirmation"
+                    )
+                    alertDialogGenerator.configure(
+                        AlertDialog.Builder(this),
+                        dialogInfo,
+                        positiveButtonAction = {
+                            val currentFirebaseUser = firebaseStorage.getCurrentLoggedInUser()
+                            Log.w("CurrentFirebaseUser", "${currentFirebaseUser}")
+                            if (currentFirebaseUser != null) {
+                                val currentFirebaseUserEmail = currentFirebaseUser.email
+                                if (currentFirebaseUserEmail != null) {
+                                    firebaseStorage.sendPasswordResetEmail(currentFirebaseUserEmail) {success, message ->
+                                        if (success) {
+                                            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+                                        } else {
+                                            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                                }
+                            }
                         }
                     ).show()
                 }

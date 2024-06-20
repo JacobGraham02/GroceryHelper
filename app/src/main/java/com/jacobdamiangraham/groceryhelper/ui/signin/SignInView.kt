@@ -9,8 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
+import com.google.firebase.auth.FirebaseAuth
 import com.jacobdamiangraham.groceryhelper.MainActivity
 import com.jacobdamiangraham.groceryhelper.R
 import com.jacobdamiangraham.groceryhelper.databinding.ActivitySigninBinding
@@ -33,7 +32,7 @@ class SignInView : AppCompatActivity() {
         activitySignInBinding = ActivitySigninBinding.inflate(layoutInflater)
         setContentView(activitySignInBinding.root)
 
-        if (isUserLoggedIn(applicationContext)) {
+        if (isUserSessionActive()) {
             redirectToMainActivity()
         }
 
@@ -178,24 +177,9 @@ class SignInView : AppCompatActivity() {
         })
     }
 
-    private fun isUserLoggedIn(context: Context): Boolean {
-        return try {
-            val masterKeyAlias = MasterKey.Builder(context)
-                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                .build()
-            val sharedPreferences = EncryptedSharedPreferences.create(
-                context,
-                "grocery_helper_shared_preferences",
-                masterKeyAlias,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            )
-            val signInToken = sharedPreferences.getString("grocery_helper_user_token", null)
-            signInToken != null
-        } catch (e: Exception) {
-            e.printStackTrace()
-            false
-        }
+    private fun isUserSessionActive(): Boolean {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        return currentUser != null
     }
 
     private fun redirectToMainActivity() {
