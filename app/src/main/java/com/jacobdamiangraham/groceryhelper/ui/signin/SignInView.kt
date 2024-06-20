@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.security.crypto.EncryptedSharedPreferences
@@ -14,7 +15,9 @@ import com.jacobdamiangraham.groceryhelper.MainActivity
 import com.jacobdamiangraham.groceryhelper.R
 import com.jacobdamiangraham.groceryhelper.databinding.ActivitySigninBinding
 import com.jacobdamiangraham.groceryhelper.enums.SignInInputType
+import com.jacobdamiangraham.groceryhelper.factory.PromptBuilderFactory
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserLoginCallback
+import com.jacobdamiangraham.groceryhelper.model.DialogInformation
 import com.jacobdamiangraham.groceryhelper.storage.FirebaseStorage
 import com.jacobdamiangraham.groceryhelper.ui.forgotpassword.ForgotPasswordView
 import com.jacobdamiangraham.groceryhelper.ui.register.RegisterView
@@ -148,6 +151,29 @@ class SignInView : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 )
                     .show()
+            }
+
+            override fun onVerifyEmailFail(failureMessage: String) {
+                val dialogInfo = DialogInformation(
+                    title = "Verify account",
+                    message = "Please verify your account before logging in. If you need the email re-sent, please click the 'resend' button below"
+                )
+                val alertDialogGenerator = PromptBuilderFactory.getAlertDialogGenerator(
+                    "resend_email"
+                )
+                alertDialogGenerator.configure(
+                    AlertDialog.Builder(this@SignInView),
+                    dialogInfo,
+                    positiveButtonAction = {
+                        firebaseStorage.resendVerificationEmail { success, message ->
+                            if (success) {
+                                Toast.makeText(this@SignInView, "Verification email sent to your inbox", Toast.LENGTH_SHORT).show()
+                            } else {
+                                Toast.makeText(this@SignInView, "Failed to resend verification email to your inbox", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                ).show()
             }
         })
     }

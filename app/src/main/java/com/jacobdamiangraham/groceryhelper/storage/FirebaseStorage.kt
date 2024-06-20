@@ -294,7 +294,7 @@ class FirebaseStorage() {
             }
     }
 
-    fun sendEmailVerification(callback: (Boolean, String) -> Unit) {
+    private fun sendEmailVerification(callback: (Boolean, String) -> Unit) {
         val user = firebaseAuthentication.currentUser
 
         user?.sendEmailVerification()?.addOnCompleteListener {
@@ -399,12 +399,29 @@ class FirebaseStorage() {
                             }
                         }
                     } else {
-                        callback.onLoginFailure("Please verify your email address before logging in")
+                        callback.onVerifyEmailFail("Please verify your email address before logging in")
                     }
                 } else {
                     callback.onLoginFailure("Unable to log you in")
                 }
             }
+    }
+
+    fun resendVerificationEmail(callback: (Boolean, String) -> Unit) {
+        val currentUser = firebaseAuthentication.currentUser
+
+        if (currentUser != null && (!(currentUser.isEmailVerified))) {
+            currentUser.sendEmailVerification().addOnCompleteListener {
+                sendVerificationEmailTask ->
+                    if (sendVerificationEmailTask.isSuccessful) {
+                        callback(true, "A verification email has been sent to your email inbox")
+                    } else {
+                        callback(false, "Unable to send verification email to your inbox")
+                    }
+            }
+        } else {
+            callback(false, "Your email is already verified. Log in to your account")
+        }
     }
 
     private fun saveToken(token: String, context: Context) {

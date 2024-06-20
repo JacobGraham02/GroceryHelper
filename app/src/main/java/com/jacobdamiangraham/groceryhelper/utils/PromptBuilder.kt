@@ -24,7 +24,10 @@ class PromptBuilder(private val type: String) {
                 dialogInformation,
                 positiveButtonAction
             )
-            "info" -> configureInfoDialog(alertDialogBuilder, dialogInformation)
+            "info" -> configureInfoDialog(
+                alertDialogBuilder,
+                dialogInformation
+            )
             "navigation" -> configureNavigationDialog(
                 alertDialogBuilder,
                 dialogInformation,
@@ -33,7 +36,31 @@ class PromptBuilder(private val type: String) {
                 positiveButtonAction,
                 negativeButtonAction
             )
+            "resend_email" -> configureResendEmailDialog(
+                alertDialogBuilder,
+                dialogInformation,
+                positiveButtonAction,
+            )
             else -> throw IllegalArgumentException("No valid dialog box type could be found")
+        }
+    }
+
+    private fun configureResendEmailDialog(
+        alertDialogBuilder: Builder,
+        dialogInformation: DialogInformation,
+        positiveButtonAction: (() -> Unit)?
+    ): Builder {
+        return alertDialogBuilder.apply {
+            setCancelable(true)
+            setTitle(dialogInformation.title)
+            setMessage(dialogInformation.message)
+            setPositiveButton("Resend") { resendAction, _ ->
+                positiveButtonAction?.invoke()
+                resendAction.dismiss()
+            }
+            setNegativeButton("Cancel") { cancelAction, _ ->
+                cancelAction.cancel()
+            }
         }
     }
 
