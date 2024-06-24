@@ -10,6 +10,11 @@
             android:title="@string/menu_home" />
 
         <item
+            android:id="@+id/nav_add_grocery_item_store"
+            android:icon="@drawable/add_grocery_item_icon"
+            android:title="@string/add_new_grocery_store" />
+
+        <item
             android:id="@+id/nav_add_grocery_item"
             android:icon="@drawable/add_grocery_item_icon"
             android:title="@string/add_item_to_list" />

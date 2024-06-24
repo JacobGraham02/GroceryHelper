@@ -68,7 +68,6 @@
                 android:hint="@string/required_email_tap_to_type"
                 android:inputType="textEmailAddress"
                 android:textColor="@color/text_primary"
-                android:isCredential="true"
                 android:textStyle="bold" />
 
             <TextView
@@ -102,7 +101,6 @@
                 android:hint="@string/required_password_tap_to_type"
                 android:inputType="textPassword"
                 android:textColor="@color/text_primary"
-                android:isCredential="true"
                 android:textStyle="bold" />
 
             <Button
@@ -178,5 +176,6 @@
             </LinearLayout>
 
         </LinearLayout>
+
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

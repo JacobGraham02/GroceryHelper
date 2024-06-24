@@ -6,6 +6,12 @@
     app:startDestination="@+id/nav_home">
 
     <fragment
+        android:id="@+id/nav_add_grocery_item_store"
+        android:name="com.jacobdamiangraham.groceryhelper.ui.addgroceryitemstore.AddGroceryItemStoreFragment"
+        android:label="@string/add_new_grocery_store"
+        tools:layout="@layout/fragment_add_grocery_store"/>
+
+    <fragment
         android:id="@+id/nav_home"
         android:name="com.jacobdamiangraham.groceryhelper.ui.home.HomeFragment"
         android:label="@string/menu_home"

@@ -20,4 +20,8 @@ class CustomEditText(context: Context, attributes: AttributeSet) : AppCompatEdit
             }
         }
     }
+
+    fun getTtsPrompt(): String? {
+        return customTtsPrompt
+    }
 }
