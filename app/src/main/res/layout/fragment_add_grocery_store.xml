@@ -75,7 +75,7 @@
 
                 <com.jacobdamiangraham.groceryhelper.utils.CustomEditText
                     android:id="@+id/addStoreName"
-                    app:TtsPrompt="What is the item name?"
+                    app:TtsPrompt="What is the store name?"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
@@ -86,7 +86,7 @@
                     android:textColor="@color/text_primary" />
 
                 <Button
-                    android:id="@+id/button2"
+                    android:id="@+id/addNewGroceryStoreButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/add_store"

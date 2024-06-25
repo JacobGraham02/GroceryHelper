@@ -229,51 +229,6 @@
                         android:importantForAutofill="no" />
                 </LinearLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/addNewStoreLabel"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:importantForAutofill="no"
-                        android:text="@string/add_new_store"
-                        android:textAlignment="center"
-                        android:textColor="@color/text_primary"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/addNewStoreText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:importantForAutofill="no"
-                        android:text="@string/optional"
-                        android:textAlignment="center"
-                        android:textColor="@color/text_primary"
-                        android:textStyle="bold" />
-
-                    <EditText
-                        android:id="@+id/addNewStore"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/optional_tap_to_type"
-                        android:imeOptions="actionDone"
-                        android:importantForAutofill="no"
-                        android:textColor="@color/text_primary"
-                        android:inputType="text" />
-
-                    <Button
-                        android:id="@+id/addNewStoreConfirmButton"
-                        style="?android:attr/buttonBarButtonStyle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/text_primary"
-                        android:text="@string/add_store" />
-                </LinearLayout>
-
             </LinearLayout>
 
             <LinearLayout

@@ -3,6 +3,7 @@ package com.jacobdamiangraham.groceryhelper
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.MessageQueue.IdleHandler
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -191,41 +192,30 @@ class MainActivity : AppCompatActivity(), Observer<UserDeleteAccountEvent> {
                     storeName,
                     object : IDeleteGroceryItemCallback {
                         override fun onDeleteSuccess(successMessage: String) {
-                            firebaseStorage.deleteGroceryStoreFromUser(storeName, object :
-                                IAddGroceryStoreCallback {
-                                override fun onAddStoreSuccess(successMessage: String) {
-                                    runOnUiThread {
-                                        Toast.makeText(
-                                            this@MainActivity,
-                                            successMessage,
-                                            Toast.LENGTH_SHORT
-                                        )
-                                            .show()
-                                        refreshNavigationMenu()
-                                    }
-                                }
+                            runOnUiThread {
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    successMessage,
+                                    Toast.LENGTH_SHORT
+                                ).show()
 
-                                override fun onAddStoreFailure(failureMessage: String) {
-                                    runOnUiThread {
-                                        Toast.makeText(
-                                            this@MainActivity,
-                                            failureMessage,
-                                            Toast.LENGTH_SHORT
-                                        )
-                                            .show()
-                                    }
-                                }
-                            })
+                            }
                         }
 
                         override fun onDeleteFailure(failureMessage: String) {
                             runOnUiThread {
-                                Toast.makeText(this@MainActivity, failureMessage, Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    failureMessage,
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         }
+
                     })
             }).show()
     }
+
 
     private fun updateNavigationMenu(storeList: List<String>) {
         val navMenu = binding.navView.menu

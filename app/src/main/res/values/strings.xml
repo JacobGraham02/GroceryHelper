@@ -32,6 +32,9 @@
     <string name="confirmation_add_grocery_item">Are you sure you want to add this grocery item?</string>
     <string name="invalid_data">Please enter valid data</string>
 
+    <string name="confirm_add_grocery_store">Confirm add grocery store</string>
+    <string name="confirmation_add_grocery_store">Are you sure you want to add this grocery store? This will create a new empty grocery list</string>
+
     <string name="prompt_confirmation">confirmation</string>
 
     <string name="menu_home">Home</string>

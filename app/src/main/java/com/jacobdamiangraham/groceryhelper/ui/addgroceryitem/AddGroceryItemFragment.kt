@@ -76,7 +76,6 @@ class AddGroceryItemFragment: Fragment() {
     private lateinit var addItemCostText: EditText
     private lateinit var addGroceryItemCategorySpinner: Spinner
     private lateinit var groceryStoreSpinner: Spinner
-    private lateinit var addStoreEditText: EditText
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -92,13 +91,11 @@ class AddGroceryItemFragment: Fragment() {
         addItemCostText = binding.addItemCost
         addGroceryItemCategorySpinner = binding.addGroceryItemCategorySpinner
         groceryStoreSpinner = binding.addGroceryStoreNameSpinner
-        addStoreEditText = binding.addNewStore
 
-        textToSpeech = TextToSpeech(context) {
-            textToSpeechStatus ->
-                if (textToSpeechStatus != TextToSpeech.ERROR) {
-                    textToSpeech.language = Locale.getDefault()
-                }
+        textToSpeech = TextToSpeech(context) { textToSpeechStatus ->
+            if (textToSpeechStatus != TextToSpeech.ERROR) {
+                textToSpeech.language = Locale.getDefault()
+            }
         }
 
         val groceryItemArgs: AddGroceryItemFragmentArgs by navArgs()
@@ -112,18 +109,21 @@ class AddGroceryItemFragment: Fragment() {
         val arrayListBindingElements = arrayListOf(
             binding.addItemName,
             binding.addItemQuantity,
-            binding.addItemCost)
+            binding.addItemCost
+        )
 
         val arrayListGroceryItemArgs = arrayListOf(
             groceryItemArgs.groceryItemName,
             groceryItemArgs.groceryItemQuantity,
-            groceryItemArgs.groceryItemCost)
+            groceryItemArgs.groceryItemCost
+        )
 
         val groceryItemCategory = groceryItemArgs.groceryItemCategory
         val groceryItemStore = groceryItemArgs.groceryItemStore
         val groceryItemId = groceryItemArgs.groceryItemId
 
-        val arrayListGroceryItemCategory = ArrayList(resources.getStringArray(R.array.categories).toList())
+        val arrayListGroceryItemCategory =
+            ArrayList(resources.getStringArray(R.array.categories).toList())
 
         for (index in arrayListBindingElements.indices) {
             val editText: EditText = arrayListBindingElements[index]
@@ -139,13 +139,14 @@ class AddGroceryItemFragment: Fragment() {
         setupAddItemButton(groceryItemId)
         setupCategorySpinner()
         setupStoreNameSpinner()
-        setupStoreNameButton()
         setupVoiceInputButton()
         loadStoreNamesIntoSpinner(groceryItemStore)
 
         if (groceryItemArgs.groceryItemName != getString(R.string.invalid)) {
-            binding.addItemButton.text = getString(R.string.grocery_list_modify_item, groceryItemArgs.groceryItemName)
-            binding.addItemPageLabel.text = getString(R.string.grocery_list_title_modify, groceryItemArgs.groceryItemName)
+            binding.addItemButton.text =
+                getString(R.string.grocery_list_modify_item, groceryItemArgs.groceryItemName)
+            binding.addItemPageLabel.text =
+                getString(R.string.grocery_list_title_modify, groceryItemArgs.groceryItemName)
         }
 
         if (arrayListGroceryItemCategory.contains(groceryItemCategory)) {
@@ -155,7 +156,7 @@ class AddGroceryItemFragment: Fragment() {
             binding.addGroceryItemCategorySpinner.setSelection(categoryPosition)
         }
 
-        binding.addItemName.addTextChangedListener(object: TextWatcher {
+        binding.addItemName.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -165,7 +166,7 @@ class AddGroceryItemFragment: Fragment() {
             }
         })
 
-        binding.addItemCost.addTextChangedListener(object: TextWatcher {
+        binding.addItemCost.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -175,7 +176,7 @@ class AddGroceryItemFragment: Fragment() {
             }
         })
 
-        binding.addItemQuantity.addTextChangedListener(object: TextWatcher {
+        binding.addItemQuantity.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -185,64 +186,21 @@ class AddGroceryItemFragment: Fragment() {
             }
         })
 
-        binding.addItemQuantity.addTextChangedListener(object: TextWatcher {
+        binding.addItemQuantity.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
             override fun afterTextChanged(s: Editable?) {
-                validate(AddGroceryItemInputType.STORE, s.toString())
+                validate(AddGroceryItemInputType.QUANTITY, s.toString())
             }
         })
 
-
-        binding.addNewStore.setOnEditorActionListener { v, actionId, event ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                closeKeyboard(v)
-            }
-            true
-        }
         return root
     }
 
     private fun speakPrompt(prompt: String) {
         textToSpeech.speak(prompt, TextToSpeech.QUEUE_FLUSH, null, null)
-    }
-
-    private fun setupStoreNameButton() {
-        binding.addNewStoreConfirmButton.setOnClickListener {
-            val newStoreName: String = binding.addNewStore.text.toString()
-            addStoreNameToSpinner(newStoreName)
-
-            firebaseStorage.getGroceryStoreNames {
-                stores ->
-                val groceryStoreExists = stores.contains(newStoreName)
-                if (groceryStoreExists) {
-                    Toast.makeText(
-                        requireContext(),
-                        getString(R.string.store_exists),
-                        Toast.LENGTH_SHORT).show()
-                    return@getGroceryStoreNames
-                }
-            }
-            firebaseStorage.addGroceryStoreToUser(
-                newStoreName,
-                object : IAddGroceryStoreCallback {
-                    override fun onAddStoreSuccess(successMessage: String) {
-                        Toast.makeText(
-                            requireContext(),
-                            successMessage,
-                            Toast.LENGTH_SHORT).show()
-                    }
-
-                    override fun onAddStoreFailure(failureMessage: String) {
-                        Toast.makeText(
-                            requireContext(),
-                            failureMessage,
-                            Toast.LENGTH_SHORT).show()
-                    }
-                })
-        }
     }
 
     private fun setupVoiceInputButton() {
@@ -405,20 +363,6 @@ class AddGroceryItemFragment: Fragment() {
                     binding.addItemCostLabel.text = getString(R.string.invalid_cost)
                     binding.addItemCostLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
                     binding.addItemCost.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
-                }
-            }
-
-            AddGroceryItemInputType.STORE -> {
-                if (ValidationUtil.isValidGroceryItemString(value)) {
-                    binding.addNewStore.setBackgroundResource(R.drawable.edit_text_valid)
-                    binding.addNewStoreLabel.text = getString(R.string.valid_store)
-                    binding.addNewStoreLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.green))
-                    binding.addNewStore.setTextColor(ContextCompat.getColor(requireContext(), R.color.green))
-                } else {
-                    binding.addNewStore.setBackgroundResource(R.drawable.edit_text_invalid)
-                    binding.addNewStoreLabel.text = getString(R.string.invalid_store)
-                    binding.addNewStoreLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
-                    binding.addNewStore.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
                 }
             }
         }
