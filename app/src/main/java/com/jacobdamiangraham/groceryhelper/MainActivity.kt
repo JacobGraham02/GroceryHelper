@@ -138,6 +138,9 @@ class MainActivity : AppCompatActivity(), Observer<UserDeleteAccountEvent> {
                         }
                     ).show()
                 }
+                R.id.nav_add_grocery_store -> {
+                    navController.navigate(R.id.nav_add_grocery_store)
+                }
             }
             menuItem.isChecked = true
             drawerLayout.closeDrawers()

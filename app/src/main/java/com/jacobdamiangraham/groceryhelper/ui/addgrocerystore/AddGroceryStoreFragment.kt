@@ -1,4 +1,4 @@
-package com.jacobdamiangraham.groceryhelper.ui.addgroceryitemstore
+package com.jacobdamiangraham.groceryhelper.ui.addgrocerystore
 
 import android.content.Intent
 import android.os.Bundle
@@ -21,13 +21,12 @@ import com.jacobdamiangraham.groceryhelper.databinding.FragmentAddGroceryStoreBi
 import com.jacobdamiangraham.groceryhelper.storage.FirebaseStorage
 import com.jacobdamiangraham.groceryhelper.utils.CustomEditText
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.Locale
 import kotlin.coroutines.resume
 
-class AddGroceryItemStoreFragment: Fragment() {
+class AddGroceryStoreFragment: Fragment() {
 
     private var _binding: FragmentAddGroceryStoreBinding? = null
 
@@ -49,7 +48,7 @@ class AddGroceryItemStoreFragment: Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentAddGroceryStoreBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
