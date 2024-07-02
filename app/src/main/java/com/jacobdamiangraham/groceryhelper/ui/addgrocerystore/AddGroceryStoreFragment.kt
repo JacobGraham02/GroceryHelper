@@ -16,6 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.jacobdamiangraham.groceryhelper.R
 import com.jacobdamiangraham.groceryhelper.databinding.FragmentAddGroceryStoreBinding
@@ -23,6 +24,7 @@ import com.jacobdamiangraham.groceryhelper.factory.PromptBuilderFactory
 import com.jacobdamiangraham.groceryhelper.interfaces.IAddGroceryStoreCallback
 import com.jacobdamiangraham.groceryhelper.model.DialogInformation
 import com.jacobdamiangraham.groceryhelper.storage.FirebaseStorage
+import com.jacobdamiangraham.groceryhelper.ui.addgroceryitem.AddGroceryItemViewModel
 import com.jacobdamiangraham.groceryhelper.utils.CustomEditText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -221,5 +223,15 @@ class AddGroceryStoreFragment: Fragment() {
                     }
                 })
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView();
+        if (::textToSpeech.isInitialized) {
+            textToSpeech.shutdown()
+            textToSpeech.stop()
+        }
+        currentVoiceInputFieldIndex = 0
+        _binding = null
     }
 }

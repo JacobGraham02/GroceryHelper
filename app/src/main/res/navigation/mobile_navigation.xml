@@ -6,12 +6,6 @@
     app:startDestination="@+id/nav_home">
 
     <fragment
-        android:id="@+id/nav_add_grocery_store"
-        android:name="com.jacobdamiangraham.groceryhelper.ui.addgrocerystore.AddGroceryStoreFragment"
-        android:label="@string/add_new_grocery_store"
-        tools:layout="@layout/fragment_add_grocery_store"/>
-
-    <fragment
         android:id="@+id/nav_home"
         android:name="com.jacobdamiangraham.groceryhelper.ui.home.HomeFragment"
         android:label="@string/menu_home"
@@ -86,5 +80,12 @@
             android:name="groceryItemCost"
             app:argType="float"
             android:defaultValue="0.00"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_add_grocery_store"
+        android:name="com.jacobdamiangraham.groceryhelper.ui.addgrocerystore.AddGroceryStoreFragment"
+        android:label="@string/add_new_grocery_store"
+        tools:layout="@layout/fragment_add_grocery_store">
     </fragment>
 </navigation>

@@ -51,8 +51,6 @@ class MainActivity : AppCompatActivity(), Observer<UserDeleteAccountEvent> {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setSupportActionBar(binding.appBarMain.toolbar)
-
         viewModel = ViewModelProvider(this)[GroceryViewModel::class.java]
 
         notificationBuilder = NotificationBuilder(this)
@@ -60,13 +58,14 @@ class MainActivity : AppCompatActivity(), Observer<UserDeleteAccountEvent> {
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_content_main)
+
+        setSupportActionBar(binding.appBarMain.toolbar)
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(setOf(
-                R.id.nav_home, R.id.nav_add_grocery_item), drawerLayout)
+                R.id.nav_home, R.id.nav_add_grocery_item, R.id.nav_add_grocery_store), drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-        setSupportActionBar(binding.appBarMain.toolbar)
 
         refreshNavigationMenu()
 
