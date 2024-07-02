@@ -5,17 +5,21 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
+import com.google.firebase.auth.FirebaseAuth
 import com.jacobdamiangraham.groceryhelper.MainActivity
 import com.jacobdamiangraham.groceryhelper.R
 import com.jacobdamiangraham.groceryhelper.databinding.ActivitySigninBinding
 import com.jacobdamiangraham.groceryhelper.enums.SignInInputType
+import com.jacobdamiangraham.groceryhelper.factory.PromptBuilderFactory
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserLoginCallback
+import com.jacobdamiangraham.groceryhelper.model.DialogInformation
 import com.jacobdamiangraham.groceryhelper.storage.FirebaseStorage
+import com.jacobdamiangraham.groceryhelper.ui.forgotpassword.ForgotPasswordView
 import com.jacobdamiangraham.groceryhelper.ui.register.RegisterView
 import com.jacobdamiangraham.groceryhelper.utils.ValidationUtil
 
@@ -29,7 +33,7 @@ class SignInView : AppCompatActivity() {
         activitySignInBinding = ActivitySigninBinding.inflate(layoutInflater)
         setContentView(activitySignInBinding.root)
 
-        if (isUserLoggedIn(applicationContext)) {
+        if (isUserSessionActive()) {
             redirectToMainActivity()
         }
 
@@ -47,6 +51,10 @@ class SignInView : AppCompatActivity() {
 
         activitySignInBinding.registerAccountButton.setOnClickListener {
             redirectToRegisterActivity()
+        }
+
+        activitySignInBinding.forgotPasswordButton.setOnClickListener {
+            redirectToForgotPasswordActivity()
         }
 
         activitySignInBinding.emailInputField.addTextChangedListener(object : TextWatcher {
@@ -144,27 +152,35 @@ class SignInView : AppCompatActivity() {
                 )
                     .show()
             }
+
+            override fun onVerifyEmailFail(failureMessage: String) {
+                val dialogInfo = DialogInformation(
+                    title = "Verify account",
+                    message = "Please verify your account before logging in. If you need the email re-sent, please click the 'resend' button below"
+                )
+                val alertDialogGenerator = PromptBuilderFactory.getAlertDialogGenerator(
+                    "resend_email"
+                )
+                alertDialogGenerator.configure(
+                    AlertDialog.Builder(this@SignInView),
+                    dialogInfo,
+                    positiveButtonAction = {
+                        firebaseStorage.resendVerificationEmail { success, message ->
+                            if (success) {
+                                Toast.makeText(this@SignInView, "Verification email sent to your inbox", Toast.LENGTH_SHORT).show()
+                            } else {
+                                Toast.makeText(this@SignInView, "Failed to resend verification email to your inbox", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                ).show()
+            }
         })
     }
 
-    private fun isUserLoggedIn(context: Context): Boolean {
-        return try {
-            val masterKeyAlias = MasterKey.Builder(context)
-                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                .build()
-            val sharedPreferences = EncryptedSharedPreferences.create(
-                context,
-                "grocery_helper_shared_preferences",
-                masterKeyAlias,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            )
-            val signInToken = sharedPreferences.getString("grocery_helper_user_token", null)
-            signInToken != null
-        } catch (e: Exception) {
-            e.printStackTrace()
-            false
-        }
+    private fun isUserSessionActive(): Boolean {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        return currentUser != null
     }
 
     private fun redirectToMainActivity() {
@@ -176,6 +192,10 @@ class SignInView : AppCompatActivity() {
     private fun redirectToRegisterActivity() {
         val registerActivityIntent = Intent(this, RegisterView::class.java)
         startActivity(registerActivityIntent)
-        finish()
+    }
+
+    private fun redirectToForgotPasswordActivity() {
+        val forgotPasswordActivityIntent = Intent(this, ForgotPasswordView::class.java)
+        startActivity(forgotPasswordActivityIntent)
     }
 }

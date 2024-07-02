@@ -8,6 +8,8 @@
     <string name="grocery_list_modify_item">Save changes for %1$s</string>
     <string name="grocery_list_title_modify">Modify %1$s</string>
 
+    <string name="default_google_oauth_web_client_id">1092689401366-v5ks3bhfbgto2vuajvevkhv2em16niqn.apps.googleusercontent.com</string>
+
     <string name="valid_email">Email - Valid</string>
     <string name="invalid_email">Email - Invalid</string>
     <string name="valid_password">Password - Valid</string>
@@ -23,6 +25,17 @@
     <string name="invalid_cost">Cost - Invalid</string>
     <string name="valid_store">Store - Valid</string>
     <string name="invalid_store">Store - Invalid</string>
+    <string name="store_exists">This store already exists</string>
+    <string name="error_adding_item">There was an error when adding this item</string>
+
+    <string name="confirm_add_grocery_item">Confirm add grocery item</string>
+    <string name="confirmation_add_grocery_item">Are you sure you want to add this grocery item?</string>
+    <string name="invalid_data">Please enter valid data</string>
+
+    <string name="confirm_add_grocery_store">Confirm add grocery store</string>
+    <string name="confirmation_add_grocery_store">Are you sure you want to add this grocery store? This will create a new empty grocery list</string>
+
+    <string name="prompt_confirmation">confirmation</string>
 
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
@@ -32,8 +45,17 @@
     <string name="item_amount">Item amount</string>
     <string name="item_name">Item name</string>
 
+    <string name="tts_item_name">What is the item name?</string>
+    <string name="tts_item_quantity">How many do you want?</string>
+    <string name="tts_item_cost">What is the cost?</string>
+    <string name="tts_not_available">TTS is not available on this device</string>
+    <string name="tts_error">There was an error using TTS</string>
+
+    <string name="blank_string">""</string>
+    <string name="invalid">undefined</string>
+
     <string name="prompt_category">Choose a category</string>
-    <string name="add_item_to_list">Add item to list</string>
+    <string name="add_item_to_list">Add new grocery item</string>
     <string name="email">Email</string>
     <string name="required_email_tap_to_type">(required) Email</string>
     <string name="password">Password</string>
@@ -54,7 +76,9 @@
     <string name="cost">Cost</string>
     <string name="optional_tap_to_type">(Optional) tap to type</string>
     <string name="category">Category</string>
-    <string name="add_item">Add item</string>
+    <string name="add_item">Add new grocery item</string>
+    <string name="add_store">Add new grocery store</string>
+    <string name="please_provide_a_store_name">Please provide a store name</string>
     <string name="name">Name</string>
     <string name="store_name">Store</string>
     <string name="log_out">Log out</string>
@@ -72,11 +96,10 @@
     <string name="cannot_be_blank">Cannot be blank</string>
     <string name="must_cost_at_least_0_00">Must cost at least $0.00</string>
     <string name="must_be_at_least_1">Must be at least 1</string>
-    <string name="must_have_at_least_1_letter">Must have at least 1 letter</string>
+    <string name="must_contain_at_least_1_letter">Must have at least 1 letter</string>
     <string name="add_new_store">Add new store</string>
     <string name="item_cost_dollar_sign">$ </string>
     <string name="your_grocery_list">Your grocery list</string>
-    <string name="add_store">Add store</string>
     <string name="combine_list_with_another_user">Combine list with another user</string>
     <string name="if_you_request_to_combine_lists_the_other_user_will_get_a_notification_asking_if_they_want_to_merge_lists_with_you_if_they_confirm_the_lists_will_be_merged">If you request to combine lists, the other user will get a notification asking if they want to merge lists with you. If they confirm, the lists will be merged.</string>
     <string name="currently_you_can_only_merge_a_grocery_list_with_another_user_if_you_both_have_a_grocery_list_for_the_same_grocery_store_for_example_you_can_merge_lists_if_user_a_has_bananas_at_food_basics_and_user_b_has_jello_at_food_basics">Currently, you can only merge a grocery list with another user if you both have a grocery list for the same grocery store. For example, you can merge lists if user A has Bananas at \'Food Basics\', and user B has Jello at \'Food Basics\'</string>
@@ -86,6 +109,12 @@
     <string name="merge_with_another_user">Merge your list with another user</string>
     <string name="must_be_a_valid_email_address">Must be a valid email address</string>
     <string name="voice_input">Voice input</string>
+    <string name="forgot_password">Forgot password</string>
+    <string name="if_you_have_forgotten_your_password_enter_your_email_below_to_have_an_email_sent_to_you_giving_you_instructions_on_how_to_change_your_email">If you have forgotten your password, enter your email below to have an email sent to you giving you instructions on how to change your email</string>
+    <string name="required_email">(Required) email</string>
+    <string name="send_password_reset_email">Send password reset email</string>
+    <string name="reset_password">Reset password</string>
+    <string name="add_new_grocery_store">Add new grocery store</string>
     <string-array name="categories">
         <item>Baking</item>
         <item>Canned goods</item>
@@ -101,11 +130,7 @@
         <item>Spice</item>
         <item>Sweet</item>
         <item>Vegetable</item>
-    </string-array>
-
-    <string-array name="stores">
-        <item>food basics</item>
-        <item>zehrs</item>
+        <item>Other</item>
     </string-array>
 
     <item name="store_group" type="id"/>

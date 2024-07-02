@@ -5,4 +5,6 @@ interface IUserLoginCallback {
     fun onLoginSuccess(successMessage: String)
 
     fun onLoginFailure(failureMessage: String)
+
+    fun onVerifyEmailFail(failureMessage: String)
 }

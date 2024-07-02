@@ -3,6 +3,8 @@ package com.jacobdamiangraham.groceryhelper
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.MessageQueue.IdleHandler
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -49,8 +51,6 @@ class MainActivity : AppCompatActivity(), Observer<UserDeleteAccountEvent> {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setSupportActionBar(binding.appBarMain.toolbar)
-
         viewModel = ViewModelProvider(this)[GroceryViewModel::class.java]
 
         notificationBuilder = NotificationBuilder(this)
@@ -58,13 +58,14 @@ class MainActivity : AppCompatActivity(), Observer<UserDeleteAccountEvent> {
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_content_main)
+
+        setSupportActionBar(binding.appBarMain.toolbar)
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(setOf(
-                R.id.nav_home, R.id.nav_add_grocery_item), drawerLayout)
+                R.id.nav_home, R.id.nav_add_grocery_item, R.id.nav_add_grocery_store), drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-        setSupportActionBar(binding.appBarMain.toolbar)
 
         refreshNavigationMenu()
 
@@ -107,6 +108,38 @@ class MainActivity : AppCompatActivity(), Observer<UserDeleteAccountEvent> {
                             deleteFirebaseUserAccount(this)
                         }
                     ).show()
+                }
+                R.id.nav_reset_password -> {
+                    val dialogInfo = DialogInformation(
+                        title = "Confirm reset password",
+                        message = "Are you sure you want to reset your password? A password reset email will be sent to your email inbox. You will stay signed in until you log out"
+                    )
+                    val alertDialogGenerator = PromptBuilderFactory.getAlertDialogGenerator(
+                        "confirmation"
+                    )
+                    alertDialogGenerator.configure(
+                        AlertDialog.Builder(this),
+                        dialogInfo,
+                        positiveButtonAction = {
+                            val currentFirebaseUser = firebaseStorage.getCurrentLoggedInUser()
+                            Log.w("CurrentFirebaseUser", "${currentFirebaseUser}")
+                            if (currentFirebaseUser != null) {
+                                val currentFirebaseUserEmail = currentFirebaseUser.email
+                                if (currentFirebaseUserEmail != null) {
+                                    firebaseStorage.sendPasswordResetEmail(currentFirebaseUserEmail) {success, message ->
+                                        if (success) {
+                                            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+                                        } else {
+                                            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ).show()
+                }
+                R.id.nav_add_grocery_store -> {
+                    navController.navigate(R.id.nav_add_grocery_store)
                 }
             }
             menuItem.isChecked = true
@@ -158,41 +191,30 @@ class MainActivity : AppCompatActivity(), Observer<UserDeleteAccountEvent> {
                     storeName,
                     object : IDeleteGroceryItemCallback {
                         override fun onDeleteSuccess(successMessage: String) {
-                            firebaseStorage.deleteGroceryStoreFromUser(storeName, object :
-                                IAddGroceryStoreCallback {
-                                override fun onAddStoreSuccess(successMessage: String) {
-                                    runOnUiThread {
-                                        Toast.makeText(
-                                            this@MainActivity,
-                                            successMessage,
-                                            Toast.LENGTH_SHORT
-                                        )
-                                            .show()
-                                        refreshNavigationMenu()
-                                    }
-                                }
+                            runOnUiThread {
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    successMessage,
+                                    Toast.LENGTH_SHORT
+                                ).show()
 
-                                override fun onAddStoreFailure(failureMessage: String) {
-                                    runOnUiThread {
-                                        Toast.makeText(
-                                            this@MainActivity,
-                                            failureMessage,
-                                            Toast.LENGTH_SHORT
-                                        )
-                                            .show()
-                                    }
-                                }
-                            })
+                            }
                         }
 
                         override fun onDeleteFailure(failureMessage: String) {
                             runOnUiThread {
-                                Toast.makeText(this@MainActivity, failureMessage, Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    failureMessage,
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         }
+
                     })
             }).show()
     }
+
 
     private fun updateNavigationMenu(storeList: List<String>) {
         val navMenu = binding.navView.menu

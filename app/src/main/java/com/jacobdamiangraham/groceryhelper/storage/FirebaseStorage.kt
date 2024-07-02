@@ -6,9 +6,9 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import androidx.security.crypto.MasterKeys
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
@@ -17,7 +17,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.jacobdamiangraham.groceryhelper.event.Observable
 import com.jacobdamiangraham.groceryhelper.event.UserDeleteAccountEvent
-import com.jacobdamiangraham.groceryhelper.event.UserLogoutAccountEvent
 import com.jacobdamiangraham.groceryhelper.interfaces.IAddGroceryItemCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IAddGroceryStoreCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IAuthStatusListener
@@ -79,6 +78,11 @@ class FirebaseStorage() {
         }
     }
 
+    fun getCurrentLoggedInUser(): FirebaseUser? {
+        val currentFirebaseUser = firebaseAuthentication.currentUser
+        return currentFirebaseUser
+    }
+
     private fun getAllUsers(): MutableList<User> {
         val currentFirebaseUser = Firebase.auth.currentUser
         if (currentFirebaseUser != null) {
@@ -132,7 +136,6 @@ class FirebaseStorage() {
                         currentUser.delete().addOnCompleteListener {
                             deleteFirebaseUserTask ->
                                 if (deleteFirebaseUserTask.isSuccessful) {
-                                    clearToken(context)
                                     deleteAccountObserver.notifyObservers(UserDeleteAccountEvent(true,"Your account has been successfully deleted"))
                                 } else {
                                     deleteAccountObserver.notifyObservers(UserDeleteAccountEvent(true, "Failed to delete your account"))
@@ -143,6 +146,27 @@ class FirebaseStorage() {
                     }
             }
         }
+    }
+
+    fun logoutWithFirebase(context: Context, callback: IUserLogoutCallback) {
+        try {
+            firebaseAuthentication.signOut()
+            callback.onLogoutSuccess("You have successfully logged out")
+        } catch (e: Exception) {
+            callback.onLogoutFailure("Failed to log out. Try again")
+        }
+    }
+
+    fun sendPasswordResetEmail(email: String, callback: (Boolean, String) -> Unit) {
+        firebaseAuthentication.sendPasswordResetEmail(email)
+            .addOnCompleteListener {
+                    resetPasswordTask ->
+                    if (resetPasswordTask.isSuccessful) {
+                        callback(true, "Password reset email sent")
+                    } else {
+                        callback(false, "Failed to send reset email")
+                    }
+            }
     }
 
     fun shareGroceryItemsWithUser(storeName: String, recipientUserId: String, callback: IMergeGroceryListOperation) {
@@ -227,6 +251,14 @@ class FirebaseStorage() {
                             .document(firebaseUserUid)
                             .set(user)
                             .addOnSuccessListener {
+                                sendEmailVerification {
+                                    success, message ->
+                                    if (success) {
+                                        callback.onRegistrationSuccess("Registration successful and verification email sent")
+                                    } else {
+                                        callback.onRegistrationFailure("Registration successful but failed to send verification email: $message")
+                                    }
+                                }
                                 callback.onRegistrationSuccess("Registration successful")
                             }
                             .addOnFailureListener { exception ->
@@ -243,6 +275,19 @@ class FirebaseStorage() {
                     }
                 }
             }
+    }
+
+    private fun sendEmailVerification(callback: (Boolean, String) -> Unit) {
+        val user = firebaseAuthentication.currentUser
+
+        user?.sendEmailVerification()?.addOnCompleteListener {
+            task ->
+                if (task.isSuccessful) {
+                    callback(true, "New user register verification email has been sent")
+                } else {
+                    callback(false, "Error sending verification email: ${task.exception?.message}")
+                }
+        }
     }
 
     fun addGroceryStoreToUser(storeName: String, callback: IAddGroceryStoreCallback) {
@@ -324,22 +369,38 @@ class FirebaseStorage() {
             .addOnCompleteListener { completedLogInUserTask ->
                 if (completedLogInUserTask.isSuccessful) {
                     val firebaseUser = firebaseAuthentication.currentUser
-                    firebaseUser?.getIdToken(true)?.addOnCompleteListener {
-                        task ->
+                    if (firebaseUser != null && firebaseUser.isEmailVerified) {
+                        firebaseUser.getIdToken(true).addOnCompleteListener { task ->
                             if (task.isSuccessful) {
-                                val idToken = task.result?.token
-                                if (idToken != null) {
-                                    saveToken(idToken, context)
-                                }
                                 callback.onLoginSuccess("You logged in successfully")
                             } else {
                                 callback.onLoginFailure("Unable to log you in")
                             }
+                        }
+                    } else {
+                        callback.onVerifyEmailFail("Please verify your email address before logging in")
                     }
                 } else {
                     callback.onLoginFailure("Unable to log you in")
                 }
             }
+    }
+
+    fun resendVerificationEmail(callback: (Boolean, String) -> Unit) {
+        val currentUser = firebaseAuthentication.currentUser
+
+        if (currentUser != null && (!(currentUser.isEmailVerified))) {
+            currentUser.sendEmailVerification().addOnCompleteListener {
+                sendVerificationEmailTask ->
+                    if (sendVerificationEmailTask.isSuccessful) {
+                        callback(true, "A verification email has been sent to your email inbox")
+                    } else {
+                        callback(false, "Unable to send verification email to your inbox")
+                    }
+            }
+        } else {
+            callback(false, "Your email is already verified. Log in to your account")
+        }
     }
 
     private fun saveToken(token: String, context: Context) {
@@ -428,37 +489,6 @@ class FirebaseStorage() {
                         }
                     }
                 }
-        }
-    }
-
-    fun logoutWithFirebase(context: Context, callback: IUserLogoutCallback) {
-        try {
-            clearToken(context)
-            firebaseAuthentication.signOut()
-            callback.onLogoutSuccess("You have successfully logged out")
-        } catch (e: Exception) {
-            callback.onLogoutFailure("Failed to log out. Try again")
-        }
-    }
-
-    private fun clearToken(context: Context) {
-        try {
-            val masterKeyAlias = MasterKey.Builder(context)
-                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                .build()
-            val sharedPreferences = EncryptedSharedPreferences.create(
-                context,
-                "grocery_helper_shared_preferences",
-                masterKeyAlias,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            )
-            with(sharedPreferences.edit()) {
-                remove("grocery_helper_user_token")
-                apply()
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
     }
 

@@ -24,11 +24,11 @@ object ValidationUtil {
         return value.isNotBlank()
     }
 
-    private fun isValidQuantity(quantity: Int): Boolean {
+    fun isValidQuantity(quantity: Int): Boolean {
         return quantity >= 1
     }
 
-    private fun isValidCost(cost: Float): Boolean {
+    fun isValidCost(cost: Float): Boolean {
         return cost >= 0.00
     }
 
