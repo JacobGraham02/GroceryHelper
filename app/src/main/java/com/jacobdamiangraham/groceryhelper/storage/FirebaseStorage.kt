@@ -25,13 +25,16 @@ import com.jacobdamiangraham.groceryhelper.interfaces.IMergeGroceryListOperation
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserLoginCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserLogoutCallback
 import com.jacobdamiangraham.groceryhelper.interfaces.IUserRegistrationCallback
+import com.jacobdamiangraham.groceryhelper.interfaces.IUserRepository
 import com.jacobdamiangraham.groceryhelper.model.GroceryItem
 import com.jacobdamiangraham.groceryhelper.model.User
 import com.jacobdamiangraham.groceryhelper.ui.signin.SignInView
+import java.util.UUID
 
-class FirebaseStorage() {
+class FirebaseStorage(): IUserRepository {
 
     private var firebaseAuthentication: FirebaseAuth = Firebase.auth
+    private lateinit var firebaseInstance: FirebaseFirestore
     private lateinit var firebaseGroceryItemCollectionInstance: DocumentReference
     private lateinit var firebaseUserCollectionInstance: CollectionReference
     private var mutableGroceryItemList: MutableLiveData<MutableList<GroceryItem>> = MutableLiveData<MutableList<GroceryItem>>()
@@ -42,6 +45,7 @@ class FirebaseStorage() {
     init {
         getCollectionOfGroceryItems()
         getCollectionOfUsers()
+        getFirebaseFirestore()
     }
 
     private fun getCollectionOfGroceryItems() {
@@ -57,6 +61,10 @@ class FirebaseStorage() {
 
     private fun getCollectionOfUsers() {
         firebaseUserCollectionInstance = FirebaseFirestore.getInstance().collection("users")
+    }
+
+    private fun getFirebaseFirestore() {
+        firebaseInstance = FirebaseFirestore.getInstance()
     }
 
     fun deleteGroceryItem(groceryItem: GroceryItem, callback: IDeleteGroceryItemCallback) {
@@ -506,4 +514,160 @@ class FirebaseStorage() {
         getGroceryItemsFromCollection(storeName)
         return mutableGroceryItemList
     }
+
+    override fun getUser(userId: String, callback: (User?, String) -> Unit) {
+        firebaseUserCollectionInstance.document(userId).get()
+            .addOnSuccessListener { documentSnapshot ->
+                val user = documentSnapshot.toObject(User::class.java)
+                callback(user, "User successfully retrieved")
+            }
+            .addOnFailureListener { error ->
+                callback(null, "User could not be retrieved")
+            }
+    }
+
+    override fun addUser(currentUserId: String, friendUserId: String, user: User, callback: (Boolean, String) -> Unit) {
+        val currentUserDocument = firebaseUserCollectionInstance.document(currentUserId)
+        val friendUserDocument = firebaseUserCollectionInstance.document(friendUserId)
+
+        val addFriendBatch = firebaseInstance.batch()
+
+        val currentUserData = mapOf(
+            "uid" to currentUserId
+        )
+
+        val currentUserFriendData = mapOf(
+            "uid" to friendUserId
+        )
+
+        addFriendBatch.update(
+            currentUserDocument,
+            "friends", FieldValue.arrayUnion(currentUserFriendData)
+        )
+
+        addFriendBatch.update(
+            friendUserDocument,
+            "friends", FieldValue.arrayUnion(currentUserData)
+        )
+
+        addFriendBatch.commit()
+            .addOnSuccessListener {
+                callback(true, "Successfully added friend")
+            }
+            .addOnFailureListener { error ->
+                callback(false, "Failed to add friend: ${error.message}")
+            }
+    }
+
+    override fun deleteUser(currentUserId: String, friendUserId: String, callback: (Boolean, String) -> Unit) {
+        val currentUserDocument = firebaseUserCollectionInstance.document(currentUserId)
+        val friendUserDocument = firebaseUserCollectionInstance.document(friendUserId)
+
+        val addFriendBatch = firebaseInstance.batch()
+
+        val currentUserData = mapOf(
+            "uid" to currentUserId
+        )
+
+        val currentUserFriendData = mapOf(
+            "uid" to friendUserId
+        )
+
+        addFriendBatch.update(
+            currentUserDocument,
+            "friends", FieldValue.arrayRemove(currentUserFriendData)
+        )
+
+        addFriendBatch.update(
+            friendUserDocument,
+            "friends", FieldValue.arrayRemove(currentUserData)
+        )
+
+        addFriendBatch.commit()
+            .addOnSuccessListener {
+                callback(true, "Successfully removed friend")
+            }
+            .addOnFailureListener { error ->
+                callback(false, "Failed to remove friend: ${error.message}")
+            }
+    }
+
+    override fun sendFriendRequest(
+        toUserId: String,
+        fromUserId: String,
+        callback: (Boolean, String) -> Unit
+    ) {
+        val currentUserDocument = firebaseUserCollectionInstance.document(fromUserId)
+        val friendUserDocument = firebaseUserCollectionInstance.document(toUserId)
+
+        val sendFriendRequestBatch = firebaseInstance.batch()
+
+        val currentUserOutgoingRequests = mapOf(
+            "from" to fromUserId,
+            "to" to toUserId
+        )
+
+        val currentUserFriendIncomingRequests = mapOf(
+            "from" to fromUserId,
+            "to" to toUserId
+        )
+
+        sendFriendRequestBatch.update(
+            currentUserDocument,
+            "outgoingFriendRequests", FieldValue.arrayUnion(currentUserOutgoingRequests)
+        )
+
+        sendFriendRequestBatch.update(
+            friendUserDocument,
+            "incomingFriendRequests", FieldValue.arrayUnion(currentUserFriendIncomingRequests)
+        )
+
+        sendFriendRequestBatch.commit()
+            .addOnSuccessListener {
+                callback(true, "Successfully sent friend request")
+            }
+            .addOnFailureListener { error ->
+                callback(false, "Failed to send friend request")
+            }
+    }
+
+    override fun removeFriendRequest(
+        toUserId: String,
+        fromUserId: String,
+        callback: (Boolean, String) -> Unit
+    ) {
+        val currentUserDocument = firebaseUserCollectionInstance.document(fromUserId)
+        val friendUserDocument = firebaseUserCollectionInstance.document(toUserId)
+
+        val sendFriendRequestBatch = firebaseInstance.batch()
+
+        val currentUserOutgoingRequests = mapOf(
+            "from" to fromUserId,
+            "to" to toUserId
+        )
+
+        val currentUserFriendIncomingRequests = mapOf(
+            "from" to fromUserId,
+            "to" to toUserId
+        )
+
+        sendFriendRequestBatch.update(
+            currentUserDocument,
+            "outgoingFriendRequests", FieldValue.arrayRemove(currentUserOutgoingRequests)
+        )
+
+        sendFriendRequestBatch.update(
+            friendUserDocument,
+            "incomingFriendRequests", FieldValue.arrayRemove(currentUserFriendIncomingRequests)
+        )
+
+        sendFriendRequestBatch.commit()
+            .addOnSuccessListener {
+                callback(true, "Successfully removed friend request")
+            }
+            .addOnFailureListener { error ->
+                callback(false, "Failed to remove friend request")
+            }
+    }
 }
+
