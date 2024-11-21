@@ -23,6 +23,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
+                android:fontFamily="sans-serif-black"
                 android:importantForAutofill="no"
                 android:text="@string/add_item"
                 android:textColor="@color/text_primary"
@@ -36,11 +37,11 @@
 
                 <Button
                     android:id="@+id/voiceInputButton"
+                    style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:text="@string/voice_input"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:textColor="@color/text_primary"/>
+                    android:textColor="@color/text_primary" />
             </LinearLayout>
 
             <LinearLayout
@@ -80,10 +81,10 @@
                     android:layout_marginTop="5dp"
                     android:hint="@string/required_tap_to_type"
                     android:importantForAutofill="no"
-                    android:textColor="@color/text_primary"
                     android:inputType="text|textAutoComplete|textAutoCorrect"
-                    app:TtsPrompt="What is the item name?"
-                    android:textAlignment="viewStart" />
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/text_primary"
+                    app:TtsPrompt="What is the item name?" />
 
             </LinearLayout>
 
@@ -123,8 +124,8 @@
                     android:importantForAutofill="no"
                     android:inputType="number"
                     android:textAlignment="viewStart"
-                    app:TtsPrompt="How many do you want?"
-                    android:textColor="@color/text_primary" />
+                    android:textColor="@color/text_primary"
+                    app:TtsPrompt="How many do you want?" />
 
             </LinearLayout>
 
@@ -180,8 +181,8 @@
                         android:importantForAutofill="no"
                         android:inputType="numberDecimal"
                         android:nextFocusDown="@id/addItemButton"
-                        app:TtsPrompt="What is the cost?"
-                        android:textColor="@color/text_primary" />
+                        android:textColor="@color/text_primary"
+                        app:TtsPrompt="What is the cost?" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -225,8 +226,8 @@
                         android:id="@+id/addGroceryStoreNameSpinner"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:textColor="@color/text_primary"
-                        android:importantForAutofill="no" />
+                        android:importantForAutofill="no"
+                        android:textColor="@color/text_primary" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -263,8 +264,8 @@
                     android:id="@+id/addGroceryItemCategorySpinner"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:textColor="@color/text_primary"
-                    android:importantForAutofill="no" />
+                    android:importantForAutofill="no"
+                    android:textColor="@color/text_primary" />
             </LinearLayout>
 
             <LinearLayout
@@ -281,8 +282,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:importantForAutofill="no"
-                    android:textColor="@color/text_primary"
-                    android:text="@string/add_item" />
+                    android:text="@string/add_item"
+                    android:textColor="@color/text_primary" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

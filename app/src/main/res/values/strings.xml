@@ -8,6 +8,14 @@
     <string name="grocery_list_modify_item">Save changes for %1$s</string>
     <string name="grocery_list_title_modify">Modify %1$s</string>
 
+    <!-- Strings for the 'fragment_add_friend' fragment   -->
+
+    <string name="add_new_friend">Add new friend</string>
+    <string name="how_to_add_friends">On this page, you can add friends to your app so that you can share grocery lists with each other. You have to enter the email address of the friend that you want to add in the text box below, and click on the \'Add friend' button: this will send a notification to the user in which they can accept or deny the friend request</string>
+    <string name="send_friend_request">Send friend request</string>
+
+    <!-- End of strings for the 'fragment_add_friend' fragment   -->
+
     <string name="default_google_oauth_web_client_id">1092689401366-v5ks3bhfbgto2vuajvevkhv2em16niqn.apps.googleusercontent.com</string>
 
     <string name="valid_email">Email - Valid</string>
