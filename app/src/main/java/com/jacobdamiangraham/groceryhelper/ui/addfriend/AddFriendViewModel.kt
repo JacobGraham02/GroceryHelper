@@ -1,4 +1,4 @@
-package com.jacobdamiangraham.groceryhelper.viewmodel
+package com.jacobdamiangraham.groceryhelper.ui.addfriend
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
